@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Greg Wegman's Blog - Technical insights and personal reflections">
+    <title>Blog - Greg Wegman</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1 class="page-title">Blog</h1>
+                <p class="page-description">Technical insights, lessons learned, and personal reflections</p>
+            </div>
+        </section>
+
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <div class="blog-main" id="blog-posts-list">
+                        <!-- Posts injected by JS -->
+                    </div>
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        function formatDate(dateStr) {
+            const [year, month, day] = dateStr.split('-').map(Number);
+            return new Date(year, month - 1, day).toLocaleDateString('en-US', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+        }
+
+        const postsList = document.getElementById('blog-posts-list');
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const href = post.slug + '.html';
+
+            // Main post card
+            const card = document.createElement('article');
+            card.className = 'blog-card';
+            card.innerHTML = `
+                <div class="blog-card-meta">
+                    <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> ${formatDate(post.date)}</span>
+                    <div class="blog-card-tags">
+                        ${post.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+                    </div>
+                </div>
+                <h2 class="blog-card-title"><a href="${href}">${post.title}</a></h2>
+                <p class="blog-card-description">${post.description}</p>
+                <a href="${href}" class="project-link">Read more <i class="fas fa-arrow-right"></i></a>
+            `;
+            postsList.appendChild(card);
+
+            // Sidebar link
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="${href}" class="sidebar-post-link">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+</body>
+</html>

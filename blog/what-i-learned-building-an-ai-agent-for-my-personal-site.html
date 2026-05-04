@@ -1,36 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Greg Wegman's Technical Insights: AI Agent Development for Personal Website</title>
-  <meta name="description" content="In this technical blog post, Greg Wegman discusses his experience building an autonomous system for his personal site. He reflects on challenges and lessons learned, highlighting the importance of scalability and cross-functional collaboration." />
-  <link rel="stylesheet" href="/assets/css/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Reflections on building an autonomous AI agent for my personal website — architecture decisions, challenges, and lessons learned.">
+    <title>What I Learned Building an AI Agent for My Personal Site - Greg Wegman</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <nav>
-    <a href="/">Home</a>
-    <a href="/projects.html">Projects</a>
-    <a href="/blog/">Blog</a>
-  </nav>
-  <main>
-    <article>
-      <h1>What I Learned Building an AI Agent for My Personal Site</h1>
-      <p class="meta">Tags: AI, autonomous systems, software engineering</p>
-      <h2>Introduction</h2>
-<p>The process of building an AI agent for my personal website has been both enlightening and challenging. The goal was to create a system capable of handling complex tasks automatically, such as site monitoring and content generation.</p>
-<h2>System Architecture</h2>
-<p>The architecture of the AI agent is multi-layered, incorporating several components:</p>
-<ul><li>Multitenant environment support for scalability and modularity.</li><li>Microservices setup for better control over services and dependencies.</li></ul>
-<p>This approach offered the flexibility to implement advanced feature sets like model routing and RAG (Retrieval-Augmented Generation) research tools.</p>
-<h2>Challenges Encountered</h2>
-<ul><li>Managing latency and throughput during high traffic.<br><code>&lt;br&gt;</code></li><li>Troubleshooting issues with the Nats API in non-standard setups, such as debugging unexpected behavior.</li><li>Maintaining a balance between performance optimization and ease of use for end-users, ensuring efficient resource allocation without compromising user experience.</li></ul>
-<h2>Lessons Learned</h2>
-<p>The journey has taught me the importance of:</p>
-<ul><li>Designing systems with scalability in mind.</li><li>Carefully selecting and integrating services to ensure optimal functionality.</li><li>Involving cross-functional teams early on for a holistic development approach.</li></ul>
-<h2>Future Work</h2>
-<p>The next phase of this project will focus on enhancing security features and exploring the incorporation of machine learning models into existing microservices, enabling more intelligent automation capabilities.</p>
-    </article>
-  </main>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> May 3, 2026</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">AI</span>
+                                    <span class="tag">Autonomous Systems</span>
+                                    <span class="tag">Software Engineering</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">What I Learned Building an AI Agent for My Personal Site</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <h2>Introduction</h2>
+                            <p>The process of building an AI agent for my personal website has been both enlightening and challenging. The goal was to create a system capable of handling complex tasks automatically, such as site monitoring and content generation.</p>
+
+                            <h2>System Architecture</h2>
+                            <p>The architecture of the AI agent is multi-layered, incorporating several components:</p>
+                            <ul>
+                                <li>Multitenant environment support for scalability and modularity.</li>
+                                <li>Microservices setup for better control over services and dependencies.</li>
+                            </ul>
+                            <p>This approach offered the flexibility to implement advanced feature sets like model routing and RAG (Retrieval-Augmented Generation) research tools.</p>
+
+                            <h2>Challenges Encountered</h2>
+                            <ul>
+                                <li>Managing latency and throughput during high traffic.</li>
+                                <li>Troubleshooting issues with the Nats API in non-standard setups, such as debugging unexpected behavior.</li>
+                                <li>Maintaining a balance between performance optimization and ease of use for end-users, ensuring efficient resource allocation without compromising user experience.</li>
+                            </ul>
+
+                            <h2>Lessons Learned</h2>
+                            <p>The journey has taught me the importance of:</p>
+                            <ul>
+                                <li>Designing systems with scalability in mind.</li>
+                                <li>Carefully selecting and integrating services to ensure optimal functionality.</li>
+                                <li>Involving cross-functional teams early on for a holistic development approach.</li>
+                            </ul>
+
+                            <h2>Future Work</h2>
+                            <p>The next phase of this project will focus on enhancing security features and exploring the incorporation of machine learning models into existing microservices, enabling more intelligent automation capabilities.</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'what-i-learned-building-an-ai-agent-for-my-personal-site';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
 </body>
 </html>
