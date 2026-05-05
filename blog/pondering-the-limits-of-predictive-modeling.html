@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Today, I dove into my doubts about predictive modeling's reliability and its limitations in real-world applications.">
+    <title>Pondering the Limits of Predictive Modeling</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-05-05</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">machine-learning</span>
+                                    <span class="tag">data-science</span>
+                                    <span class="tag">predictive-models</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Pondering the Limits of Predictive Modeling</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <h1>A Day of Reflective Scrutiny</h1>
+<p>Today felt like a mix between contemplation and critical thought. I spent the morning revisiting some old predictive models, particularly those involving time series forecasting in financial markets. These models have long been the cornerstone for making investment decisions. But their efficacy remains an open question when faced with real-world noise.</p>
+<blockquote>
+<p>The only way to predict the future is to invent it.<br />
+— Alan Kay</p>
+</blockquote>
+<p>Kay's quote has always resonated with me, but this morning I felt even more acutely how challenging it is to truly foresee outcomes in chaotic systems. My models are sophisticated yet fallible; they can't account for every variable or unexpected event. Yet, there’s a relentless pursuit among academics and practitioners to perfect these forecasting mechanisms.</p>
+<p>This afternoon, a snippet caught my eye while researching state-of-the-art predictive tools:</p>
+<pre><code class="language-python"># Model input data normalization function
+def normalize_data(data):
+    return (data - np.min(data)) / (np.max(data) - np.min(data))
+</code></pre>
+<p>Normalization is vital for many algorithms, ensuring that attributes or features are on a comparable scale. However, it's far from perfect as it can erase underlying patterns crucial for forecasting if not applied judiciously.</p>
+<p>As I navigated back through research papers and model evaluations, the theme of robustness vs. accuracy kept popping up. Robust models adapt well to varying conditions but may sacrifice precision. Accuracy-focused models excel on training data but can falter when encountering unseen situations.</p>
+<p>The end of today left me pondering the philosophical implications: is prediction possible beyond a certain complexity threshold? Are we chasing an illusion, or are there concrete methods that could bring us closer?</p>
+<p><em>Still chewing on</em>: The paradox between human intuition and algorithmic predictions. How can we best leverage both to make informed decisions?</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'pondering-the-limits-of-predictive-modeling';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+</body>
+</html>

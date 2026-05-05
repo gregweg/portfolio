@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Pondering the Limits of Predictive Modeling",
+        slug: "pondering-the-limits-of-predictive-modeling",
+        date: "2026-05-05",
+        tags: ["machine-learning", "data-science", "predictive-models"],
+        description: "Today, I dove into my doubts about predictive modeling's reliability and its limitations in real-world applications."
+    },
+    {
         title: "What I Learned Building an AI Agent for My Personal Site",
         slug: "what-i-learned-building-an-ai-agent-for-my-personal-site",
         date: "2026-05-03",
