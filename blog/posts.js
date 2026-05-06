@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Exploring Algorithmic Efficiency in Modern Machine Learning",
+        slug: "exploring-algorithmic-efficiency-in-modern-machine-learning",
+        date: "2026-05-06",
+        tags: ["machine-learning", "algorithms", "performance-optimization"],
+        description: "Greg reflects on optimizing algorithms for better performance in ML systems, balancing complexity with speed."
+    },
+    {
         title: "Pondering the Limits of Predictive Modeling",
         slug: "pondering-the-limits-of-predictive-modeling",
         date: "2026-05-05",
