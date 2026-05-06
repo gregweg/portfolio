@@ -1,11 +1,11 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
-        title: "Data Structures and Algorithms: Implementations and Insights",
-        slug: "data-structures-and-algorithms-implementations-insights",
+        title: "Daily Musings: Dive Into QuadTrees & Algorithmic Queries",
+        slug: "daily-musings-diving-into-quadtrees-and-algorithmic-queries",
         date: "2026-05-06",
-        tags: ["coding", "python", "algorithms", "data_structures", "optimization"],
-        description: "Exploring quad trees, sliding window techniques, social network analysis, uniqueness, binary search optimizations."
+        tags: ["Data Structures", "Algorithms", "Python"],
+        description: "Today's notes explore quad tree construction, longest subarray with bounded element differences, and social network dynamics through friend grouping."
     },
     {
         title: "Data Structures and Algorithms: Implementations and Insights",
