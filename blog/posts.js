@@ -8,20 +8,6 @@ const BLOG_POSTS = [
         description: "Today's notes explore quad tree construction, longest subarray with bounded element differences, and social network dynamics through friend grouping."
     },
     {
-        title: "Data Structures and Algorithms: Implementations and Insights",
-        slug: "exploring-algorithmic-efficiency-in-modern-machine-learning",
-        date: "2026-05-06",
-        tags: ["coding", "python", "algorithms", "data_structures", "optimization"],
-        description: "Exploring quad trees, sliding window techniques, social network analysis, uniqueness, binary search optimizations."
-    },
-    {
-        title: "Exploring Algorithmic Efficiency in Modern Machine Learning",
-        slug: "exploring-algorithmic-efficiency-in-modern-machine-learning",
-        date: "2026-05-06",
-        tags: ["machine-learning", "algorithms", "performance-optimization"],
-        description: "Greg reflects on optimizing algorithms for better performance in ML systems, balancing complexity with speed."
-    },
-    {
         title: "Pondering the Limits of Predictive Modeling",
         slug: "pondering-the-limits-of-predictive-modeling",
         date: "2026-05-05",
