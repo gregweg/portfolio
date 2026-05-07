@@ -1,11 +1,11 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
-        title: "Exploring Data Structures & Algorithms in Depth",
-        slug: "exploring-data-structures-and-algorithms-in-depth",
+        title: "Data Structures and Algorithms Essentials",
+        slug: "data-structures-and-algorithms-essentials",
         date: "2026-05-07",
-        tags: ["Data structures", "Algorithms", "Python"],
-        description: "A dive into fundamental algorithms like two pointers, sliding window, binary search, and DFS, alongside more complex problem-solving techniques."
+        tags: ["data-structures", "algorithms", "python"],
+        description: "Review of essential algorithms and data structures with a focus on two pointers, sliding window, binary search, BFS/DFS traversal techniques."
     },
     {
         title: "Data Structures and Algorithms: Implementations and Insights",
