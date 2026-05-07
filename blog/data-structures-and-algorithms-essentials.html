@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Review of essential algorithms and data structures with a focus on two pointers, sliding window, binary search, BFS/DFS traversal techniques.">
+    <title>Data Structures and Algorithms Essentials</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-05-07</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">data-structures</span>
+                                    <span class="tag">algorithms</span>
+                                    <span class="tag">python</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Data Structures and Algorithms Essentials</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Today's notes delve into fundamental coding concepts that are crucial for efficient algorithm design. From the two-pointer technique to depth-first search and priority queues, these topics form the backbone of effective problem-solving in software engineering.</p>
+<p><em>Overview of two-pointers applications in common problems</em></p>
+<div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
+<p>Two Pointers<br />
+- Palindromes<br />
+- Reversals<br />
+- Merging sorted data<br />
+- "K" sized comparisons</p>
+<pre><code class="language-python">#Same Direction
+class Node:
+  def __init__(self, val, next=None):
+    self.val = val
+    self.next = next
+
+def middle_of_linked_list(head: Node) -&gt; int:
+  slow = fast = head
+  while fast and fast.next:
+    fast = fast.next.next
+    slow = slow.next
+  return slow.val
+
+#Opposite Directions
+
+def is_palindrome(s: str) -&gt; bool:
+  l, r = 0, len(s) - 1
+  while l &lt; r:
+    while l &lt; r and not s[l].isalnum(): # Note 1, 2
+      l += 1
+    while l &lt; r and not s[r].isalnum(): # skip non alpha-numeric
+      r += 1
+    if s[l].lower() != s[r].lower():
+      return False
+    l += 1
+    r -= 1
+  return True
+
+def leftMostColumnWithOne(self, binaryMatrix: 'BinaryMatrix') -&gt; int:
+    rows, cols = binaryMatrix.dimensions()
+
+    row = 0
+    col = cols-1
+    leftmost = -1
+
+    while row &lt; rows and col &gt;= 0:
+        if binaryMatrix.get(row, col) == 1:
+            leftmost = col
+            col -= 1
+        else:
+            row += 1
+    return leftmost
+</code></pre>
+</div>
+<p><em>Example of using two pointers on a singly linked list</em></p>
+<div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
+<p>Sliding Window</p>
+<p>Fixed Window<br />
+- Find max avg of any subarray of size k<br />
+- Return the sum of every k-length block<br />
+- Find the subarray of length k with the largest/smallest X</p>
+<pre><code class="language-python">def sliding_window_fixed(input, window_size):
+  ans = window = input[0:window_size]
+  for right in range(window_size, len(input)):
+    left = right - window_size
+    remove input[left] from window
+    append input[right] to window
+    ans = optimal(ans, window)
+  return ans
+
+# Complexity O (n)
+def subarray_sum_fixed(nums: list[int], k: int) -&gt; int:
+  window_sum = 0
+  for i in range(k):
+    window_sum += nums[i]
+  largest = window_sum
+  for left, right in range(k, len(nums)):
+    left = right - k
+    window_sum -= nums[left]
+    window_sum += nums[right]
+    largest = max(largest, window_sum)
+  return largest
+</code></pre>
+<p>Dynamic Window<br />
+- Find the length of th elongest substring with at most K unique characters.<br />
+- What's the smallest subarray with a sum greater than a target?<br />
+- Return the longest window where a certain rule is valid.</p>
+<p>Dynamic Window Template</p>
+<pre><code class="language-python">def sliding_window_flexible_longest(input):
+  initialize window, ans
+  left = 0
+  for right in range(len(input)):
+    append input[right] to window
+    while invalid(window):
+      remove input[left] from window
+      left += 1
+    ans = max(ans, window)
+  return ans
+
+def longest_substring_without_repeating_characters(s: int) -&gt; int:
+  longest = 0
+  l = 0
+  counter: dict[str, int] = defaultdict(int)
+  for r in range(len(s)):
+    counter[s[r]] += 1
+    while counts[s[r]] &gt; 1:
+      counter[s[l]] -= 1
+      l += 1
+    longest = max(longest, r - l + 1)
+  return longest
+</code></pre>
+</div>
+<p><em>Handling palindromes with two-pointers in string contexts</em></p>
+<div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
+<p>Binary Search<br />
+Monotonic - Consistently incrementing/decrementing in a single direction (Therefore can be binary searched) only transitions in one direction</p>
+<pre><code class="language-python"># O log(n)
+def binary_search(arr: list[int], target: int) -&gt; int:
+  left, right = 0, len(arr) - 1
+  while left &lt;= right:
+    mid = (left + right) // 2
+    if arr[mid] == target:
+      return mid
+    elif arr[mid] &lt; target:
+      left = mid + 1
+    else:
+      right = mid - 1
+  return -1
+
+def find_min_rotated(arr: list[int]) -&gt; int:
+  left, right = 0, len(arr) - 1
+  boundary_index = -1
+
+  while left &lt;= right:
+    mid = (left + right) // 2
+    # if &lt;= last element, then belongs to lower half
+    if arr[mid] &lt;= arr[-1]:
+      boundary_index = mid
+      right = mid - 1
+    else:
+      left = mid + 1
+
+  return boundary_index
+</code></pre>
+</div>
+<p><em>Binary search and depth-first traversal techniques</em></p>
+<div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
+<p>Breadth-First Search<br />
+1. A queue for the current layer of exploration<br />
+2. A loop to process each node<br />
+3. A branching step where nodes are added to queue</p>
+<p>Breadth-First Search<br />
+- Shortest number of steps<br />
+- Clean level-order traversal<br />
+- Way to explore everything</p>
+<p>Tree Breadth-First Search<br />
+- Traversing a tree from top to bottom<br />
+- Care about depth, distance, or levels<br />
+- Looking for the first match/closest node to root</p>
+<pre><code class="language-python">def bfs(root):
+  queue = deque([root])
+  while len(queue) &gt; 0:
+    node = queue.popleft()
+    for child in node.children:
+      if is_goal(child):
+        return FOUND(child)
+      queue.append(child)
+  return NOT_FOUND
+
+from collections import deque
+
+class Node:
+  def __init__(self, val, left=None, right=None):
+    self.val = val
+    self.left = left
+    self.right = right
+
+def level_order_traversal(root: Node) -&gt; list[list[int]]:
+  res = []
+  queue = deque([root])
+  while len(queue) &gt; 0:
+    n = len(queue)
+    new_level = []
+    for _ in range(n):
+      node = queue.popleft()
+      new_level.append(node.val)
+      for child in [node.left, node.right]:
+        if child is not None:
+          queue.append(child)
+    res.append(new_level)
+  return res
+</code></pre>
+<p>Breadth-First Search Graphs</p>
+<p>Graph BFS Uses<br />
+- Working with grids, adjacency lists, or networks<br />
+- Structure canc ontain cycles or duplicate paths<br />
+- Need to find the shortest number of steps<br />
+- Exploring possible states</p>
+<pre><code class="language-python">def bfs(root):
+  queue = deque([root])
+  visited = set([root])
+  while len(queue) &gt; 0:
+    node = queue.popleft()
+    for neighbor in get_neighbors(node):
+      if neighbor in visited:
+        continue
+      queue.append(neighbor)
+      visited.append(neighbor)
+
+def flood_fill(r: int, c: int, replacement: int, image: list[list[int]]) -&gt; list[list[int]]:
+  num_rows, num_cols = len(image), len(image[0])
+  def get_neighbors(coord, color):
+    row, col = coord
+    delta_row = [-1, 0, 1, 0]
+    delta_col = [0, 1, 0, -1]
+    for i in range(len(delta_row)):
+      neighbor_row = row + delta_row[i]
+      neighbor_col = col + delta_col[i]
+      if 0 &lt;= neighbor_row &lt; num_rows and 0 &lt;= neighbor_col &lt; num_cols:
+        if image[neighbor_row][neighbor_col] == color:
+          yield neighbor_row, neighbor_col
+
+  def bfs(root):
+    queue = deque([root])
+    visited = [[False for c in range(num_cols)] for r in range(num_rows)]
+    r, c = root
+    color = image[r][c]
+    image[r][c] = replacement # replace root color
+    visited[r][c] = True
+    while len(queue) &gt; 0:
+      node = queue.popleft()
+      for neighbor in get_neighbors(node, color):
+        r, c = neighbor
+        if visited[r][c]:
+          continue
+        image[r][c] = replacement # replace color
+        queue.append(neighbor)
+        visited[r][c] = True
+</code></pre>
+</div>
+<p><em>Fixed window approach for handling subarrays</em></p>
+<div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
+<p>Depth-First Search<br />
+- Explore every possibility<br />
+- Want to visit all nodes<br />
+- Care about structure, not distance</p>
+<p>DFS Trees<br />
+- Flattening trees<br />
+- Building or checking structures<br />
+- Searching for nodes based on custom logic.</p>
+<pre><code class="language-python">def dfs(root, target):
+  if root is None:
+    return None
+  if root.val == target:
+    return root
+  left = dfs(root.left, target)
+  if left is not None:
+    return left
+  return dfs(root.right, target)
+
+def tree_max_depth(root: Node) -&gt; int:
+  def dfs(root):
+    if not root:
+      return 0
+    return max(dfs(root.left), dfs(root.right)) + 1
+
+  return dfs(root) - 1 if root else 0
+</code></pre>
+<p>DFS Graphs<br />
+- Puzzles and state exploration<br />
+- Graph coloring<br />
+- Recursive traversal<br />
+- Backtracking</p>
+<pre><code class="language-python">def dfs(root, visited):
+  for neighbor in get_neighbors(root):
+    if neighbor in visited:
+      continue
+    visited.add(neighbor)
+    dfs(neighbor, visited)
+
+def count_number_of_islands(grid: list[list[int]]) -&gt; int:
+  num_rows = len(grid)
+  num_cols = len(grid[0])
+
+  def get_neighbors(coord):
+    res = []
+    row, col = coord
+    delta_row = [-1, 0, 1, 0]
+    delta_col = [0, 1, 0, -1]
+    for i in range(len(delta_row)):
+      r = row + delta_row[i]
+      c = col + delta_col[i]
+      if 0 &lt;= r &lt; num_rows and 0 &lt;= c &lt; num_cols:
+        res.append((r, c))
+    return res
+
+  def dfs(coord):
+    r, c = coord
+    if grid[r][c] == 0:
+      return
+    grid[r][c] = 0
+    for neighbor in get_neighbors(coord):
+      nr, nc = neighbor
+      if grid[nr][nc] == 1:
+        dfs(neighbor)
+
+  count = 0
+  for r in range(num_rows):
+    for c in range(num_cols):
+      if grid[r][c] == 1:
+        dfs((r, c))
+        count += 1
+  return count
+</code></pre>
+</div>
+<p><em>Subarray sum optimization with sliding window technique</em></p>
+<div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
+<p>Backtracking<br />
+- Combinations, permutations, etc.<br />
+- Building up a partial solution<br />
+- Want all possible solutions<br />
+- Need to discard bad paths early<br />
+- Sudoku Solver, Word Search</p>
+<p>Spot a Backtracking Problem<br />
+- Generate all combinations or arrangements<br />
+- Building up a partial solution<br />
+- Want all possible solutions<br />
+- Need to discard bad paths early</p>
+<pre><code class="language-python">ans = []
+def dfs(start_index, path, [...additional states]):
+  if is_leaf(start_index):
+    ans.append(path[:]) # add a copy of the path to the result
+    return
+  for edge in get_edges(start_index, [...additional states]):
+    # prune if needed
+    if not is_valid(edge):
+      continue
+    path.add(edge)
+    if additional states:
+      update(...additional states)
+    dfs(start_index + len(edge), path, [...additional states])
+    # revert(...additional states) if necessary e.g. permutations
+    path.pop()
+
+def exist(board: list[list[str]], word: str) -&gt; bool:
+  def dfs(i, j, word_i):
+    if board[i][j] != word[word_i]:
+      return False
+    if word_i == len(word) - 1:
+      return True
+    char = board[i][j]
+    board[i][j] = '#'
+    coors = [(i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1)]
+    for r, c in coors:
+      if 0 &lt;= r &lt; len(board) and 0 &lt;= c &lt; len(board[0]):
+        if dfs(r, c, word_i + 1);
+          return True
+    board[i][j] = char
+    return Flase
+
+  for r in range(len(board)):
+    for c in range(len(board[0])):
+      if dfs(r, c, 0):
+        return True
+</code></pre>
+</div>
+<p><em>Conceptual introduction to dynamic sliding window problems</em></p>
+<div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
+<p>Priority Queue<br />
+Insertion: O(log n)<br />
+Removal: O(log n)<br />
+Min Heap Min at the top <br />
+Max Heap Max at the top (python -negative minheap)</p>
+<h1>heaps use first item in a tuple for priority</h1>
+<p>Uses for Priority Queue<br />
+- Repeatedly extract the smallest/largest item<br />
+- Maintaining a top-k or bottom-k set of values<br />
+- Real-time ranking, greedy selection, etc.<br />
+- Need to sort on the fly, faster than O(n log n)</p>
+<pre><code class="language-python">from heapq import heappop, heappush
+
+def k_closest_points(points: list[list[int]], k: int) -&gt; list[list[int]]:
+  heap: list[tuple[int, list[int]]] = []
+
+  for pt in points:
+    heappush(heap, (pt[0] ** 2 + pt[1] ** 2, pt))
+
+  res = []
+  for _ in range(l):
+    skip, pt = heappop(heap)
+    res.append(pt)
+  return res
+
+def find_kth_smallest(nums: list[int], k: int) -&gt; int:
+  nums = [-x for x in nums]
+  heapify(nums)
+  for _ in range(k - 1):
+    heappop(nums)
+  return -nums[0]
+</code></pre>
+</div>
+<p><em>Optimizing search over arrays using binary search logic</em></p>
+<div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
+<ol>
+<li>Restate the problem, preferably in your own words.</li>
+<li>Ask clarifying questions, explicitly state any assumptions you have. Questions to ask which will lead to data structure to use. Be ready for them to turn it around.<ol>
+<li>Can I use existing functions and libraries?</li>
+<li>Will input always be valid? Do I need to handle edge cases?</li>
+<li>What is the type of input Int 32, Int 64?</li>
+<li>Does the input fit in memory?<ol>
+<li>Does it fit into disk</li>
+<li>Does it need to be distributed amongst many machines</li>
+</ol>
+</li>
+<li>Is the input already sorted?<ol>
+<li>If sorted, save steps on my end</li>
+<li>If sorted opens up potential for Binary Search to find optimal (Sorted ~ Think Binary Search)</li>
+</ol>
+</li>
+<li>How do we define optimal in this situation?<ol>
+<li>Big O time complexity</li>
+<li>Big O space complexity</li>
+<li>Other fields to prioritize?</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>Work through inputs and the corresponding outputs<ol>
+<li>Come up with several test cases and edge cases</li>
+<li>Communicate things you have affirmed, allows misunderstandings to be corrected.</li>
+</ol>
+</li>
+<li>Brainstorm 2 or 3 ways you could solve the problem<ol>
+<li>Interview can help push us the other way</li>
+<li>Ask yourself what’s the best that I can do in this problem?</li>
+<li>Be prepared to provide the Big O</li>
+<li>How do you work towards it.</li>
+</ol>
+</li>
+<li>Implement your solution.</li>
+<li>Test your code<ol>
+<li>Scan code line by line, ensure no off by one, logic errors,</li>
+<li>Use examples to step through code</li>
+<li>Debugging watch variables.</li>
+<li>Bad inputs: Null, 0,</li>
+</ol>
+</li>
+</ol>
+</div>
+<p><em>Basic BFS and its use in tree-level order traversals</em></p>
+<div style="border-left: 4px solid #6b9fd4; background: #1e2630; border-radius: 0 6px 6px 0; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #d0d8e4;">
+<ol>
+<li>Context compiler: Nexus takes raw source data and a task specification and builds specialized knowledge artifacts — structured, task-optimized representations that agents consume directly without interpretation overhead. The same underlying data estate produces different artifacts for different agents: a sales agent gets deal context synthesized from CRM and call records, a finance agent gets revenue context linking contracts to billing schedules. Artifacts are persistent and reused across agent sessions, not regenerated at inference time.</li>
+<li>Composable retriever: Compiled artifacts are served at query time with typed fields, per-field citations with confidence levels, and deterministic conflict resolution. Output is shaped to match the agent's specified format rather than returned as raw text for the agent to re-parse.</li>
+<li>KnowQL: Pinecone describes this as the first declarative query language designed for agents rather than humans. Six primitives — intent, filter, provenance, output shape, confidence, and budget — allow agents to specify structured responses and source grounding and latency envelopes in a single interface. Ashutosh compared the structural gap that KnowQL fills to what SQL did for relational databases: Before a standard interface existed, every application built its own data access layer from scratch.</li>
+</ol>
+<footer style="margin-top: 0.75rem; font-size: 0.875rem; color: #8a9ab0;">referenced from: <a href="https://venturebeat.com/data/the-rag-era-is-ending-for-agentic-ai-a-new-compilation-stage-knowledge-layer-is-what-comes-next" style="color: #6b9fd4;">https://venturebeat.com/data/the-rag-era-is-ending-for-agentic-ai-a-new-compilation-stage-knowledge-layer-is-what-comes-next</a></footer>
+</div>
+<hr />
+<p><em>Still chewing on:</em> As I explore these foundational concepts, it's clear how interconnected they are and how each can be extended to solve a myriad of complex issues. However, I'm still pondering the best ways to apply priority queues and backtracking problems effectively.</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'data-structures-and-algorithms-essentials';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+</body>
+</html>
