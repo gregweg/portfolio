@@ -1,11 +1,11 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
-        title: "Thoughts on Domain Driven Design Principles",
-        slug: "thoughts-on-domain-driven-design-principles",
+        title: "Understanding UBIQUITOUS LANGUAGE and Key Concepts in Domain Driven Design",
+        slug: "understanding-ubiquitous-language-and-key-concepts-in-domain-driven-design",
         date: "2026-05-11",
-        tags: ["ddd", "software-architecture", "coding-best-practices"],
-        description: "Greg delves into various DDD principles like Ubiquitous Language, Entities, Services, and Repositories to better understand software system design."
+        tags: ["domain driven design", "ubiquitous language", "entities", "value objects"],
+        description: "Notes on UBIQUITOUS LANGUAGE, ENTITIES, VALUE OBJECTS, SERVICES, MODULES, AGGREGATES, FACTORIES, REPOSITORIES from Eric Evans' Domain Driven Design."
     },
     {
         title: "Data Structures and Algorithms: Implementations and Insights",
