@@ -8,18 +8,25 @@ const BLOG_POSTS = [
         description: "Notes on UBIQUITOUS LANGUAGE, ENTITIES, VALUE OBJECTS, SERVICES, MODULES, AGGREGATES, FACTORIES, REPOSITORIES from Eric Evans' Domain Driven Design."
     },
     {
+        title: "Exploring Data Structures & Algorithms in Depth",
+        slug: "exploring-data-structures-and-algorithms-in-depth",
+        date: "2026-05-07",
+        tags: ["coding", "algorithms", "data_structures"],
+        description: "A dive into fundamental algorithms like two pointers, sliding window, binary search, and DFS, alongside more complex problem-solving techniques."
+    },
+    {
+        title: "Data Structures and Algorithms Essentials",
+        slug: "data-structures-and-algorithms-essentials",
+        date: "2026-05-07",
+        tags: ["coding", "algorithms", "data_structures"],
+        description: "Review of essential algorithms and data structures with a focus on two pointers, sliding window, binary search, BFS/DFS traversal techniques."
+    },
+    {
         title: "Data Structures and Algorithms: Implementations and Insights",
-        slug: "exploring-algorithmic-efficiency-in-modern-machine-learning",
+        slug: "daily-musings-diving-into-quadtrees-and-algorithmic-queries",
         date: "2026-05-06",
         tags: ["coding", "python", "algorithms", "data_structures", "optimization"],
         description: "Exploring quad trees, sliding window techniques, social network analysis, uniqueness, binary search optimizations."
-    },
-    {
-        title: "Exploring Algorithmic Efficiency in Modern Machine Learning",
-        slug: "exploring-algorithmic-efficiency-in-modern-machine-learning",
-        date: "2026-05-06",
-        tags: ["machine-learning", "algorithms", "performance-optimization"],
-        description: "Greg reflects on optimizing algorithms for better performance in ML systems, balancing complexity with speed."
     },
     {
         title: "Pondering the Limits of Predictive Modeling",
