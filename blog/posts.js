@@ -8,6 +8,13 @@ const BLOG_POSTS = [
         description: "Greg explores key concepts in Eric Evans' 'Domain Driven Design', focusing on the importance of a Ubiquitous Language and other architectural patterns to ensure software aligns closely with business logic."
     },
     {
+        title: "Data Structures and Algorithms Essentials",
+        slug: "data-structures-and-algorithms-essentials",
+        date: "2026-05-07",
+        tags: ["data-structures", "algorithms", "python"],
+        description: "Review of essential algorithms and data structures with a focus on two pointers, sliding window, binary search, BFS/DFS traversal techniques."
+    },
+    {
         title: "Data Structures and Algorithms: Implementations and Insights",
         slug: "exploring-algorithmic-efficiency-in-modern-machine-learning",
         date: "2026-05-06",
