@@ -1,18 +1,11 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
-        title: "Navigating Domain Driven Design Concepts",
-        slug: "navigating-domain-driven-design-concepts",
+        title: "Thoughts on Domain Driven Design Principles",
+        slug: "thoughts-on-domain-driven-design-principles",
         date: "2026-05-11",
-        tags: ["DomainDrivenDesign", "SoftwareArchitecture", "UbiquitousLanguage"],
-        description: "Greg explores key concepts in Eric Evans' 'Domain Driven Design', focusing on the importance of a Ubiquitous Language and other architectural patterns to ensure software aligns closely with business logic."
-    },
-    {
-        title: "Data Structures and Algorithms Essentials",
-        slug: "data-structures-and-algorithms-essentials",
-        date: "2026-05-07",
-        tags: ["data-structures", "algorithms", "python"],
-        description: "Review of essential algorithms and data structures with a focus on two pointers, sliding window, binary search, BFS/DFS traversal techniques."
+        tags: ["ddd", "software-architecture", "coding-best-practices"],
+        description: "Greg delves into various DDD principles like Ubiquitous Language, Entities, Services, and Repositories to better understand software system design."
     },
     {
         title: "Data Structures and Algorithms: Implementations and Insights",
