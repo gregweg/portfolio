@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Notes on UBIQUITOUS LANGUAGE, ENTITIES, VALUE OBJECTS, SERVICES, MODULES, AGGREGATES, FACTORIES, REPOSITORIES from Eric Evans' Domain Driven Design.">
+    <title>Understanding UBIQUITOUS LANGUAGE and Key Concepts in Domain Driven Design</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-05-11</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">domain driven design</span>
+                                    <span class="tag">ubiquitous language</span>
+                                    <span class="tag">entities</span>
+                                    <span class="tag">value objects</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Understanding UBIQUITOUS LANGUAGE and Key Concepts in Domain Driven Design</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Today's exploration centers around Eric Evans' seminal work on Domain-Driven Design (DDD). Focused on refining our team’s communication and modeling practices, I'm diving into the key aspects of DDD such as Ubiquitous Language and its implications for software projects. This foundational grounding in terminology helps bridge the gap between domain experts and technical teams.</p>
+<p><em>Exploring the concept of Ubiquitous Language as a core component of successful Domain-Driven Design (DDD).</em></p>
+<div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
+<div style="border-left: 4px solid #6b9fd4; background: #1e2630; border-radius: 0 6px 6px 0; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #d0d8e4;">
+<p style="margin: 0 0 0.5rem;"><small><em>Topics: UBIQUITOUS LANGUAGE</em></small></p>
+<ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+<li>A project faces serious problems when its language is fractured. Domain experts use their own jargon while technical team members have their own language tuned for discussing the domain in terms of design.</li>
+<li>The terminology of day-to-day discussions is disconnected from the terminology embedded in the code (ultimately the most important product of a software project). And even the same person uses different language in speech and in writing, so that the most incisive expressions of the domain often emerge in transient form that is never captured in the code or even in writing.</li>
+<li>Translation blunts communication and makes knowledge crunching anemic.</li>
+<li>Yet none of these dialects can be a common language because non serves all needs.</li>
+</ul>
+<ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+<li>Use the model as the backbone of a language. Commit the team to exercising that language relentlessly in all communication within the team and in the code. Use the same language in diagrams, writing and especially speech.</li>
+</ul>
+<p style="margin: 0.5rem 0 0;">- Design a portion of the software system to reflect the domain model in a very literal way, so that mapping is obvious. Revisit the model and modify it to be implemented more naturally in software even as you seek to make it reflect deeper insight into the domain. Demand a single model that serves both purposes well, in addition to supporting a robust UBIQUITOUS LANGUAGE.
+Draw from the model the terminology used in the design and the basic assignment of responsibilities. The code becomes an expression of the model, so a change to the code may be a change to the model. Its effect must ripple through the rest of the project’s activities accordingly.</p>
+<footer style="margin-top: 0.75rem; font-size: 0.875rem; color: #8a9ab0;">— <em>Eric Evans</em> &middot; from: <strong>Domain Driven Design</strong></footer>
+</div>
+<div style="border-left: 4px solid #6b9fd4; background: #1e2630; border-radius: 0 6px 6px 0; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #d0d8e4;">
+<p style="margin: 0 0 0.5rem;"><small><em>Topics: ENTITY</em></small></p>
+<ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+<li>Some objects are not defined primarily by their attributes. They represent a thread of identity that runs through time and often across distinct representations. Sometimes such an object must be matched with another object even though attributes differ. An object must be distinguished from other objects even though they might have the same attributes. Mistaken identity can lead to data corruption.</li>
+</ul>
+<ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+<li>An ENTITY is anything that has continuity through a life cycle and distinctions independent of attributes that are important to the application’s user.</li>
+</ul>
+<ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+<li>When an object is distinguished by its identity, rather than its attributes, make this primary to its definition in the model. Keep the class definition simple and focused on life cycle continuity and identity. Define a means of distinguishing each object regardless of its form or history. Be alert to requirements that call for matching objects by attributes. Define an operation that is guaranteed to produce a unique result for each object, possibly by attaching a symbol that is guaranteed unique. This means of identification may come from the outside, or it may be an arbitrary identifier created by and for the system, but it must correspond to the identity distinctions in the model. The model must define what it means to be the same thing.</li>
+</ul>
+<footer style="margin-top: 0.75rem; font-size: 0.875rem; color: #8a9ab0;">— <em>Eric Evans</em> &middot; from: <strong>Domain Driven Design</strong></footer>
+</div>
+<div style="border-left: 4px solid #6b9fd4; background: #1e2630; border-radius: 0 6px 6px 0; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #d0d8e4;">
+<p style="margin: 0 0 0.5rem;"><small><em>Topics: VALUE OBJECT</em></small></p>
+<ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+<li>When you care only about the attributes on an element of the model, classify it as a VALUE OBJECT. Make it express the meaning of attributes it conveys and give it related functionality. Treat the VALUE OBJECT as immutable. Don’t give it any identity and avoid the design complexities necessary to maintain ENTITIES.</li>
+</ul>
+<ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+<li>In order for an object to be shared safely, it must be immutable.</li>
+</ul>
+<ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+<li>If all instances of an object are interchangeable, we could share just one instance and point to it a hundred times. This is an example of a FLYWEIGHT pattern.</li>
+</ul>
+<footer style="margin-top: 0.75rem; font-size: 0.875rem; color: #8a9ab0;">— <em>Eric Evans</em> &middot; from: <strong>Domain Driven Design</strong></footer>
+</div>
+<div style="border-left: 4px solid #6b9fd4; background: #1e2630; border-radius: 0 6px 6px 0; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #d0d8e4;">
+<p style="margin: 0 0 0.5rem;"><small><em>Topics: SERVICE</em></small></p>
+<ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+<li>Some concepts from the domain aren’t natural to model as objects. Forcing the required domain functionality to be the responsibility of an ENTITY or VALUE either distorts the definition of a model-based object or adds meaningless artificial objects.</li>
+</ul>
+<p style="margin: 0.5rem 0 0;">A good service has three characteristics:
+1. The operation relates to a domain concept that is not a natural part of an ENTITY or VALUE OBJECT
+2. The interface is defined in terms of the other elements of the domain model.
+3. The operation is stateless.</p>
+<ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+<li>When a significant process or transformation in the domain is not a natural responsibility of an ENTITY or VALUE OBJECT, add an operation to the model as a standalone interface declared as a SERVICE. Define the interface in terms of the language of the model make sure the operation name is part of the UBIQUITOUS LANGUAGE. Make the SERVICE stateless</li>
+</ul>
+<footer style="margin-top: 0.75rem; font-size: 0.875rem; color: #8a9ab0;">— <em>Eric Evans</em> &middot; from: <strong>Domain Driven Design</strong></footer>
+</div>
+<div style="border-left: 4px solid #6b9fd4; background: #1e2630; border-radius: 0 6px 6px 0; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #d0d8e4;">
+<p style="margin: 0 0 0.5rem;"><small><em>Topics: MODULE</em></small></p>
+<ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+<li>It is a truism that there should be low coupling between MODULES and a high cohesion within them. Explanations of coupling and cohesion tend to make them sound like a technical metrics, to be judged mechanically based on the distributions of associations and interactions. Yet it isn’t just code being divided into MODULES, but concepts. There is a limit to how many things a person can think about at once (hence low coupling). Incoherent fragments of ideas are as hard to understand as an undifferentiated soup of ideas (hence high cohesion).</li>
+</ul>
+<ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+<li>Choose MODULES that tell the story of the system and contain a cohesive set of concepts. This often yields low coupling between MODULES, but if it doesn’t, look for a way to change the model to disentangle the concepts, or search for an overlooked concept that might be the basis of a MODULE that would bring the elements together in a meaningful way. Seek low coupling in the sense of concepts that can be understood and reasoned about independently of each other. Refine the model until it partitions according to high-level domain concepts and the corresponding code is decoupled as well.</li>
+</ul>
+<ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+<li>Give the MODULES names that become part of the UBIQUITOUS LANGUAGE. MODULES and their names should reflect insight into the domain.</li>
+</ul>
+<footer style="margin-top: 0.75rem; font-size: 0.875rem; color: #8a9ab0;">— <em>Eric Evans</em> &middot; from: <strong>Domain Driven Design</strong></footer>
+</div>
+<div style="border-left: 4px solid #6b9fd4; background: #1e2630; border-radius: 0 6px 6px 0; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #d0d8e4;">
+<p style="margin: 0 0 0.5rem;"><small><em>Topics: AGGREGATE</em></small></p>
+<p style="margin: 0.5rem 0 0;">- It is difficult to guarantee the consistency of changes to objects in a model with complex associations. Invariants need to be maintained that apply to closely
+related groups of objects, not just discrete objects. Yet cautious locking schems cause multiple users to interfere pointlessly with each other and make a system unusable.</p>
+<p style="margin: 0.5rem 0 0;">- Cluster the ENTITIES and VALUE OBJECTS into AGGREGATES and define boundaries around each. Choose one ENTITY to be the root of each AGGREGATE, and control all 
+access to the objects inside the boundary through the root. Allow external objects to hold references to the root only. Transient references to internal members can be passed out for use within a single operation only. Because the root controls access, it cannot be blindsided by changes to the internals. This arrangement makes it practical to enforce all invariants for objects in the AGGREGATE and for the AGGREGATE as a whole in any state change.</p>
+<footer style="margin-top: 0.75rem; font-size: 0.875rem; color: #8a9ab0;">— <em>Eric Evans</em> &middot; from: <strong>Domain Driven Design</strong></footer>
+</div>
+<div style="border-left: 4px solid #6b9fd4; background: #1e2630; border-radius: 0 6px 6px 0; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #d0d8e4;">
+<p style="margin: 0 0 0.5rem;"><small><em>Topics: FACTORIES</em></small></p>
+<ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+<li>Creation of an object can be a major operation in itself, but complex assembly operations do not fit the responsibility of the created objects. Combining such responsibility can produce ungainly designs that are hard to understand. Making the client direct construction muddies the design of the client, breaches encapsulation of the assembled object or AGGREGATE, and overly couples the client to the implementation of the created object.</li>
+</ul>
+<ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+<li>Shift the responsibility for creating instances of complex objects and AGGREGATES to a separate object, which may itself have no responsibility in the domain model but is still aprt of the domain design. Provide an interface that encapsulates all complex assembly and that does not require the client to reference the concrete classes of the objects being instantiated. Create entire AGGREGATES as a piece, enforcing their invariants.</li>
+</ul>
+<p style="margin: 0.5rem 0 0;">When designing the method signature of a FACTORY, whether standalone or FACTORY METHOD, keep in mind these two points:
+- Each operation must be atomic. You have to pass in everything needed to create a complete product in a signle interaction with the FACTORY. You also have to decide what will happen if creation fails, in the event that some invariant isn't satisfied. You could throw an exception or just return a null. TO be consistent, consider adopting a coding standard for failures in FACTORIES.
+- The FACTORY will be coupled to it's arguments. If you are not careful in your selection of input parameters, you can create a rat's nest of dependencies.The degree of coupling will depend on what you do with the argument. If it is simply plugged into the prouct, you've created a modest dependency. If you are picking parts out of the argument to use in the construction, the coupling gets tighter.</p>
+<footer style="margin-top: 0.75rem; font-size: 0.875rem; color: #8a9ab0;">— <em>Eric Evans</em> &middot; from: <strong>Domain Driven Design</strong></footer>
+</div>
+<div style="border-left: 4px solid #6b9fd4; background: #1e2630; border-radius: 0 6px 6px 0; padding: 1rem 1.25rem; margin: 1.5rem 0; color: #d0d8e4;">
+<p style="margin: 0 0 0.5rem;"><small><em>Topics: REPOSITORIES</em></small></p>
+<ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+<li>A client needs a practical means of acquiring references to pre-existing domain objects. If the infrastructure makes it easy to do so, the developers of the client may add more traversable associations, muddling the model. On the other hand, they may use queries to pull the exact data that they need from the database or to pull a few specific objects rather than navigating from AGGREGATE roots. Domain logic moves into queries and client code, and the ENTITIES and VALUE OBJECTS become mere data containers. THe sheer technical complexity of applying most database access infrastructure quickly swamps the client code, which leads developers to dumb down the domain layer, which makes the model irrelevant.</li>
+</ul>
+<ul style="margin: 0.5rem 0; padding-left: 1.25rem;">
+<li>Provide methods to add and remove objects, which will encapsulate the actual insertion or removal of data in the data store. Provide methods that select objects based on some creteria and return fully instantiated objects or collections of objects whose attribute values meet the criteria, thereby encapsulating the actual storage and query technology. Provide REPOSITORIES only for AGGREGATE roots that actually need direct access. Keep the client focused on the model, delegating all object storage and access to the REPOSITORIES.</li>
+</ul>
+<footer style="margin-top: 0.75rem; font-size: 0.875rem; color: #8a9ab0;">— <em>Eric Evans</em> &middot; from: <strong>Domain Driven Design</strong></footer>
+</div>
+<p>Topics to Research<br />
+- Enterprise Segment Pattern<br />
+- Policy ~ Strategy Patterns: motivated by the need to substitute different rules</p>
+</div>
+<hr />
+<p><em>Still chewing on:</em> Reflecting on these blocks today, I realize how crucial it is to consistently apply the Ubiquitous Language across all aspects of development. Yet, crafting this language requires ongoing dialogue between domain experts and technical teams—something that needs constant attention and effort.</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'understanding-ubiquitous-language-and-key-concepts-in-domain-driven-design';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+</body>
+</html>
