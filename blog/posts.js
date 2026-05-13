@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Efficient Data Structures for Key Problems",
+        slug: "efficient-data-structures-for-key-problems",
+        date: "2026-05-13",
+        tags: ["LRU Cache", "LFU Cache", "Data Structures", "Cache Algorithms", "Median"],
+        description: "Exploring LRU Cache, LFU Cache, Median from Data Stream, Randomized Set, Min Stack, Union Find, and Time-Based KVS."
+    },
+    {
         title: "Exploring Data Structures for Efficient Problem Solving",
         slug: "efficient-design-patterns-data-structures",
         date: "2026-05-12",
