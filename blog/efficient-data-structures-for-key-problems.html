@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Exploring LRU Cache, LFU Cache, Median from Data Stream, Randomized Set, Min Stack, Union Find, and Time-Based KVS.">
+    <title>Efficient Data Structures for Key Problems</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-05-13</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">LRU Cache</span>
+                                    <span class="tag">LFU Cache</span>
+                                    <span class="tag">Data Structures</span>
+                                    <span class="tag">Cache Algorithms</span>
+                                    <span class="tag">Median</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Efficient Data Structures for Key Problems</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Today's notes focus on optimizing data structures to solve common problems related to caching and efficient data retrieval. The theme that ties these together is the need for fast lookups, updates, and evictions in scenarios where memory usage needs to be tightly controlled but performance must remain high.</p>
+<h1>LRU Cache</h1>
+<p>LRU Cache<br />
+O(1) get<br />
+O(1) put</p>
+<p>HashMap + Doubly Linked List<br />
+- fast lookup<br />
+- fast recency updates<br />
+- fast eviction</p>
+<pre><code class="language-python">class Node:
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+        self.prev = None
+        self.next = None
+
+class LRUCache:
+    def __init__(self, capacity: int):
+        self.cache = {}
+        self.capacity = capacity
+
+        self.head = Node(0, 0)
+        self.tail = Node(0, 0)
+
+        self.head.next = self.tail
+        self.tail.prev = self.head
+
+
+    def _remove(self, node):
+        prev_node = node.prev
+        next_node = node.next
+
+        prev_node.next = next_node
+        next_node.prev = prev_node
+
+    def _insert_front(self, node):
+        first_real_node = self.head.next
+
+        self.head.next = node
+        node.prev = self.head
+
+        node.next = first_real_node
+        first_real_node.prev = node
+
+    def get(self, key: int) -&gt; int:
+        if key not in self.cache:
+            return -1
+
+        node = self.cache[key]
+        self._remove(node)
+        self._insert_front(node)
+
+        return node.value        
+
+    def put(self, key: int, value: int) -&gt; None:
+        if key in self.cache:
+            node = self.cache[key]
+            node.value = value
+            self._remove(node)
+        else:
+            node = Node(key, value)
+            self.cache[key] = node
+
+        self._insert_front(node)
+
+        if len(self.cache) &gt; self.capacity:
+            lru_node = self.tail.prev
+            self._remove(lru_node)
+            del self.cache[lru_node.key]
+
+</code></pre>
+<h1>LFU Cache (Least Frequently Used)</h1>
+<p>O(1) get<br />
+O(1) put</p>
+<p>HashMap + Frequency Buckets + Doubly Linked Lists</p>
+<ul>
+<li>fast lookup</li>
+<li>fast frequency updates</li>
+<li>fast least-frequently-used eviction</li>
+</ul>
+<p>Core Structures:</p>
+<ul>
+<li>key_to_node</li>
+<li>freq_to_list</li>
+<li>min_freq tracker</li>
+</ul>
+<p>Need BOTH:</p>
+<ul>
+<li>frequency ordering</li>
+<li>recency ordering</li>
+</ul>
+<pre><code class="language-python">from collections import defaultdict, OrderedDict
+
+class LFUCache:
+
+    def __init__(self, capacity: int):
+        self.capacity = capacity
+        self.min_freq = 0
+
+        self.key_to_val_freq = {}  # key -&gt; (value, freq)
+        self.freq_to_keys = defaultdict(OrderedDict)  # freq -&gt; keys in recency order
+
+    def _increase_freq(self, key: int) -&gt; None:
+        value, freq = self.key_to_val_freq[key]
+
+        del self.freq_to_keys[freq][key]
+
+        if not self.freq_to_keys[freq] and freq == self.min_freq:
+            self.min_freq += 1
+
+        new_freq = freq + 1
+        self.freq_to_keys[new_freq][key] = None
+        self.key_to_val_freq[key] = (value, new_freq)
+
+    def get(self, key: int) -&gt; int:
+        if key not in self.key_to_val_freq:
+            return -1
+
+        self._increase_freq(key)
+        return self.key_to_val_freq[key][0]
+
+    def put(self, key: int, value: int) -&gt; None:
+        if self.capacity == 0:
+            return
+
+        if key in self.key_to_val_freq:
+            _, freq = self.key_to_val_freq[key]
+            self.key_to_val_freq[key] = (value, freq)
+            self._increase_freq(key)
+            return
+
+        if len(self.key_to_val_freq) &gt;= self.capacity:
+            lfu_key, _ = self.freq_to_keys[self.min_freq].popitem(last=False)
+            del self.key_to_val_freq[lfu_key]
+
+        self.key_to_val_freq[key] = (value, 1)
+        self.freq_to_keys[1][key] = None
+        self.min_freq = 1
+</code></pre>
+<h1>Median From Data Stream</h1>
+<p>insert -&gt; O(log n)<br />
+findMedian -&gt; O(1)</p>
+<p>Max Heap + Min Heap</p>
+<ul>
+<li>maintain lower half</li>
+<li>maintain upper half</li>
+<li>efficient median lookup</li>
+</ul>
+<p>Purpose:<br />
+Efficiently maintain median while continuously inserting values.</p>
+<p>Core Idea:<br />
+Split values into:</p>
+<ul>
+<li>lower half</li>
+<li>upper half</li>
+</ul>
+<p>Data Structures:</p>
+<ul>
+<li>max heap -&gt; smaller half</li>
+<li>min heap -&gt; larger half</li>
+</ul>
+<pre><code class="language-python">def __init__(self):
+    self.small = []  # max heap
+    self.large = []  # min heap
+
+def addNum(self, num: int) -&gt; None:
+    heapq.heappush(self.small, -num)
+
+    heapq.heappush(self.large, -heapq.heappop(self.small))
+
+    if len(self.large) &gt; len(self.small):
+        heapq.heappush(self.small, -heapq.heappop(self.large))
+
+def findMedian(self) -&gt; float:
+    if len(self.small) &gt; len(self.large):
+        return -self.small[0]
+
+    return (-self.small[0] + self.large[0]) / 2
+</code></pre>
+<h1>Randomized Set</h1>
+<p>Runtime:</p>
+<p>insert: O(1) average<br />
+remove: O(1) average</p>
+<pre><code class="language-python">import random
+
+
+class RandomizedSet:
+    def __init__(self):
+        self.indices = {}
+        self.number_list = []
+
+    # Runtime: O(1) average
+    def insert(self, val: int) -&gt; bool:
+        if val in self.indices:
+            return False
+        self.indices[val] = len(self.number_list)
+        self.number_list.append(val)
+        return True
+
+    # Runtime: O(1) average
+    def remove(self, val: int) -&gt; bool:
+        if val not in self.indices:
+            return False
+        val_idx = self.indices[val]
+        last_val = self.number_list[-1]
+
+        self.number_list[val_idx] = last_val
+        self.indices[last_val] = val_idx
+
+        self.number_list.pop()
+        del self.indices[val]
+
+        return True
+
+    # Runtime: O(1)
+    def getRandom(self) -&gt; int:
+        return random.choice(self.number_list)
+
+</code></pre>
+<h1>Min Stack</h1>
+<p>Min Stack</p>
+<p>O(1) push<br />
+O(1) pop<br />
+O(1) top<br />
+O(1) getMin</p>
+<p>Stack + Auxiliary Min Stack</p>
+<ul>
+<li>fast push/pop</li>
+<li>fast current minimum lookup</li>
+</ul>
+<p>Purpose:<br />
+Support normal stack operations while retrieving minimum value in O(1).</p>
+<p>Core Idea:<br />
+Maintain TWO stacks:</p>
+<ul>
+<li>regular stack</li>
+<li>min tracking stack</li>
+</ul>
+<p>Mental Model:<br />
+min_stack stores historical minimums.</p>
+<pre><code class="language-python">def __init__(self):
+    self.stack = []
+    self.min_stack = []
+
+def push(self, val: int) -&gt; None:
+    self.stack.append(val)
+
+    if not self.min_stack or val &lt;= self.min_stack[-1]:
+        self.min_stack.append(val)
+
+def pop(self) -&gt; None:
+    val = self.stack.pop()
+
+    if val == self.min_stack[-1]:
+        self.min_stack.pop()
+
+def top(self) -&gt; int:
+    return self.stack[-1]
+
+def getMin(self) -&gt; int:
+    return self.min_stack[-1]
+
+</code></pre>
+<p>Runtime:</p>
+<ul>
+<li>push -&gt; O(1)</li>
+<li>pop -&gt; O(1)</li>
+<li>top -&gt; O(1)</li>
+<li>getMin -&gt; O(1)</li>
+</ul>
+<h1>Union Find / Disjoin Set Union (DSU)</h1>
+<p>find -&gt; nearly O(1)<br />
+union -&gt; nearly O(1)</p>
+<pre><code class="language-python">def __init__(self, n):
+    self.parent = [i for i in range(n)]
+
+def find(self, x):
+    if self.parent[x] != x:
+        self.parent[x] = self.find(self.parent[x])  # path compression
+
+    return self.parent[x]
+
+def union(self, a, b):
+    pa = self.find(a)
+    pb = self.find(b)
+
+    if pa != pb:
+        self.parent[pb] = pa
+</code></pre>
+<h1>Time-Based Key Value Store</h1>
+<p>set -&gt; O(1)<br />
+get -&gt; O(log n)</p>
+<p>HashMap + Binary Search</p>
+<ul>
+<li>fast insertion</li>
+<li>efficient historical lookup</li>
+</ul>
+<p>Purpose:<br />
+Store values with timestamps and retrieve most recent valid values.</p>
+<p>Core Structure:</p>
+<p>store[key] = [(timestamp, value)]</p>
+<p>Key Insight:<br />
+Timestamps are inserted in sorted order.</p>
+<p>Lookup:<br />
+Find:</p>
+<ul>
+<li>largest timedstamp &lt;= target timestamp</li>
+</ul>
+<p>Uses:</p>
+<ul>
+<li>binary search</li>
+<li>bisect_right</li>
+</ul>
+<pre><code class="language-python">from collections import defaultdict
+import bisect
+
+class TimeMap:
+  def __init__(self):
+    self.store = defaultdict(list)
+
+  def set(self, key: str, value: str, timestamp: int) -&gt; None:
+    self.store[key].append((timestamp, value))
+
+  def get(self, key: str, timestamp: int) -&gt; str:
+    values = self.store[key]
+
+    idx = bisect.bisect_right(
+        values,
+        (timestamp, chr(255))
+    ) - 1
+
+    if idx &gt;= 0:
+        return values[idx][1]
+
+    return &quot;&quot;
+</code></pre>
+<p>Why bisect_right?</p>
+<ul>
+<li>Need rightmost valid timestamp.</li>
+</ul>
+<p>Mental Model:</p>
+<ul>
+<li>Binary search over historical version</li>
+</ul>
+<p>Common Signals:</p>
+<ul>
+<li>historical lookup</li>
+<li>versioned state</li>
+<li>timestamp queries</li>
+</ul>
+<p>collections.OrderedDict - maintains insertion order efficiently.</p>
+<hr />
+<p><em>Still chewing on:</em> Understanding how these algorithms work is just the beginning; implementing them with optimal performance while maintaining clarity is a challenge I'm still grappling with. How do you balance complexity with efficiency when building such systems?</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'efficient-data-structures-for-key-problems';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+</body>
+</html>
