@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Exploring core data structure patterns like monotonic stacks to tackle efficiency in common coding problems.">
+    <title>Efficient Design Patterns in Data Structures</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-05-12</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">Data Structures</span>
+                                    <span class="tag">Coding Optimization</span>
+                                    <span class="tag">Algorithm Patterns</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Efficient Design Patterns in Data Structures</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>I've been immersing myself in data structure nuances and optimization tricks. Today's thread focuses on patterns that boost efficiency—particularly monotonic stacks, heaps, union-find sets, interval scheduling, and randomized data structures.</p>
+<p><em>Overview of the monotonically increasing stack pattern and its common problems</em></p>
+<div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
+<p>Monotonic Stack Pattern<br />
+- nearest, next, previous, first greater/smaller.<br />
+- next smaller/greater element<br />
+- nearest warmer/cooler day<br />
+- span problems<br />
+- discount/price lookup<br />
+- first element to left/right satisfying condition</p>
+<pre><code># Typical Brute-Force Pattern
+for i in range(n):
+    for j in range(i+1, n):
+        find first valid element
+</code></pre>
+<p>Core Idea</p>
+<p>Maintain a stack in sorted/monotonic order while processing elements.<br />
+- Each element pushed and popped once, which usually gives O(n) instead of O(n^2)<br />
+- Monotonically Increasing Stack - values increase bottom -&gt; top<br />
+- Monotonically Decreasing Stack - values decrease bottom -&gt; top<br />
+- Most problems store INDICES, not values<br />
+    - Allows access to nums[index]<br />
+    - preserves positions<br />
+    - needed for distance/span calculations</p>
+<p>General Template</p>
+<pre><code class="language-python">stack = []
+
+for i, val in enumerate(nums):
+
+    while stack and nums[stack[-1]] OPERATOR val: # peak top
+        idx = stack.pop() # remove top
+
+        # process answer for idx
+    stack.append(i)
+
+# EX)
+def finalPrices(self, prices: List[int]) -&gt; List[int]:
+    result = prices[:] # copy
+    stack = []
+
+    for i, price in enumerate(prices):
+        # peak at top of stack
+        while stack and prices[stack[-1]] &gt;= price:
+            idx = stack.pop()
+            result[idx] -= price
+
+        stack.append(i)
+    return result
+</code></pre>
+<p>Mental Model - Stack stores elements still "waiting" for:<br />
+- their next greater element<br />
+- next smaller element<br />
+- nearest valid neighbor</p>
+</div>
+<p><em>Typical brute-force solution to illustrate contrast with optimized approaches</em></p>
+<div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
+<p>Use when maintaining efficient access to current min/max element<br />
+- repeatedly need smallest/largest elemennt<br />
+- top-k problems<br />
+- scheudling/order by priority<br />
+- streaming min/max</p>
+<pre><code class="language-python">import heapq
+
+min_heap = []
+
+heapq.heappush(min_heap, x)
+smallest = heapq.heappop(min_heap)
+peek = min_heap[0]
+
+# Max Heap:
+heapq.heappush(heap, -x)
+largest = -heapq.heappop(heap)
+</code></pre>
+<p>Runtime:<br />
+- push/pop -&gt; O(log n)<br />
+- peek -&gt; O(1)</p>
+</div>
+<p><em>Core concept behind maintaining a monotonic stack for efficient neighbor searches</em></p>
+<div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
+<p>Effifient;y tracks connected components/groups.</p>
+<p>Core Operations:<br />
+find(x)     # find root/parent<br />
+union(a, b) # merge groups</p>
+<p>Used For:<br />
+- Connectivity problems<br />
+- Cycle detectionm<br />
+- Grouping/merging sets<br />
+- Graph components</p>
+<p>Common Problems:<br />
+- Nunber of Provinces<br />
+- Accounts Merge<br />
+- Redundant Connection<br />
+- Kruskal Minimum Spanning Tree</p>
+<p>Template</p>
+<pre><code class="language-python">parent = [i for i in range(n)]
+
+def find(x):
+    if parent[x] != x:
+        parent[x] = find(parent[x])  # path compression
+    return parent[x]
+
+def union(a, b):
+    pa, pb = find(a), find(b)
+    if pa != pb:
+        parent[pb] = pa
+</code></pre>
+<p>Optimizations:<br />
+- path compression<br />
+- union by rank/size</p>
+<p>Amortized Runtime:<br />
+Nearly O(1)</p>
+</div>
+<p><em>Python implementation template using the monotonic stack approach</em></p>
+<div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
+<p>Signals:<br />
+- overlapping ranges<br />
+- meetings/schedules<br />
+- bookings/reservations<br />
+- start/end times</p>
+<p>Common Pattern:<br />
+1. Sort intervals<br />
+2. Process sequentially<br />
+3. Merge/compare overlaps</p>
+<p>Typical Problems:<br />
+- Merge Intervals<br />
+- Insert Interval<br />
+- Meeting Rooms<br />
+- Non-overlapping Intervals</p>
+<p>Merge Template:</p>
+<pre><code>intervals.sort()
+merged = []
+
+for start, end in intervals:
+    if not merged or start &gt; merged[-1][1]:
+        merged.append([start, end])
+    else:
+        merged[-1][1] = max(merged[-1][1], end)
+</code></pre>
+<pre><code class="language-python"># Greedy Scheduling
+  # Sort by start time
+  # - process sequentially
+  # - maintain current active interval
+
+
+  # Sort: O(n log n)
+  # Scan: O(n)
+  def merge(self, intervals: List[List[int]]) -&gt; List[List[int]]:
+    intervals.sort()
+    merged = []
+
+    for start, end in intervals:
+      if not merged or start &gt; merged[-1][1]:
+        merged.append([start, end])
+      else:
+        merged[-1][1] = max(merged[-1][1], end)
+    return merged
+</code></pre>
+<p>Runtime:<br />
+O (n log n) due to sorting.</p>
+</div>
+<p><em>Conceptual takeaways on what a monotonic stack aims to achieve</em></p>
+<div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
+<pre><code class="language-python">import random
+class RandomizedSet:
+  def __init__(self):
+    self.indices = {}
+    self.number_list = []
+  # Runtime: O(1) average
+  def insert(self, val: int) -&gt; bool:
+    if val in self.indices:
+      return False
+    self.indices[val] = len(self.number_list)
+    self.number_list.append(val)
+    return True
+  # Runtime: O(1) average
+  def remove(self, val: int) -&gt; bool:
+    if val not in self.indices:
+      return False
+
+    val_idx = self.indices[val]
+    last_val = self.number_list[-1]
+
+    self.number_list[val_idx] = last_val
+    self.indices[last_val] = val_idx
+
+    self.number_list.pop()
+    del self.indices[val]
+
+    return True
+  # Runtime: O(1)
+  def getRandom(self) -&gt; int:
+    return random.choice(self.number_list)
+</code></pre>
+</div>
+<p><em>Introduction to priority queues and efficient min/max element access scenarios</em></p>
+<div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
+<p>BFS: ~ Shortest/minimum<br />
+- Shortest/minimum/fewest/nearest paths, steps, hops, or level-order traversal.<br />
+- Many paths simultaneously.<br />
+- rarely used with full path states except for advanced prob due to memory cost of all frontiers explored.</p>
+<pre><code class="language-yaml">queue = deque([start])
+
+while queue:
+    node = queue.popleft()
+
+    for neighbor in neighbors(node):
+        queue.append(neighbor)
+</code></pre>
+<pre><code class="language-python">def kthSmallest(self, root: Optional[TreeNode], k: int) -&gt; int:
+  if not root or k == 0:
+    return 0
+
+  nodes = []
+
+  def in_order(node: Optional[TreeNode]) -&gt; None:
+    if not node:
+      return      
+
+    in_order(node.left)
+    nodes.append(node.val)
+    if len(nodes) &gt;= k:
+      return
+    in_order(node.right)
+
+  in_order(root)
+  return nodes[k-1]
+</code></pre>
+<p>DFS: ~ Full exploration<br />
+- Fully exploring connected structures, traversals, reachability or recursive tree/graph exploration<br />
+- Islands, connected components, traversals, path existance</p>
+<pre><code class="language-python">visited = set()
+# implicit stack in recursive step
+def dfs(node):
+    if node in visited:
+        return
+
+    visited.add(node)
+
+    for neighbor in neighbors(node):
+        dfs(neighbor)
+
+stack = [start]
+visited = set()
+# explicit stack in iterative
+while stack:
+    node = stack.pop()
+
+    if node in visited:
+        continue
+
+    visited.add(node)
+
+    for neighbor in neighbors(node):
+        stack.append(neighbor)
+</code></pre>
+<pre><code class="language-python"># Runtime: O(row * cols)
+  # Space: O(rows * cols)
+  def numIslands(self, grid: List[List[str]]) -&gt; int:
+    rows, cols = len(grid), len(grid[0])
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+    def fill_island(r: int, c: int) -&gt; None:
+      if not (0 &lt;= r &lt; rows and 0 &lt;= c &lt; cols):
+        return
+
+      if grid[r][c] == &quot;0&quot;:
+        return
+
+      # Fill grid with water
+      grid[r][c] = &quot;0&quot;
+
+      for dr, dc in directions:
+        fill_island(r+dr, c+dc)
+
+      island_count = 0
+
+      for r in range(rows):
+        for c in range(cols):
+          if grid[r][c] == &quot;1&quot;:
+            island_count += 1
+            fill_island(r,c)
+    return island_count
+</code></pre>
+<p>DFS + Backtracking: ~ Try all combinations/paths<br />
+- When trying combinations, permutations, or candidate paths where choices must be undone.<br />
+- choose -&gt; recurse -&gt; undo choice<br />
+- visited.add(...) -&gt; dfs(...) -&gt; visited.remove(...)<br />
+- generate all, permuations, combinations, Sudoku, Word Search, N-Queens.</p>
+<pre><code class="language-python">def dfs(state):
+    if solution_found:
+        return
+
+    make_choice()
+
+    dfs(next_state)
+
+    undo_choice()
+</code></pre>
+<pre><code class="language-python"># Word Search - DFS + Backtracking
+#  Runtime: O(rows * cols * 4^len(word))
+#  Space: O(len(word))
+def exist(self, board: List[List[str]], word: str) -&gt; bool:
+  rows, cols = len(board), len(board[0])
+  visited = set()
+
+  def dfs(r, c, i):
+    if i == len(word):
+      return True
+
+    if not(0 &lt;= r &lt; rows and 0 &lt;= c &lt; cols):
+      return False
+
+    if (r, c) in visited:
+      return False
+
+    if board[r][c] != word[i]:
+      return False
+
+    visited.add((r, c))
+
+    found = (
+      dfs(r + 1, c, i + 1) or
+      dfs(r - 1, c, i + 1) or
+      dfs(r, c + 1, i + 1) or
+      dfs(r, c - 1, i + 1)
+    )
+
+    visited.remove((r, c))
+
+    return found
+
+  for r in range(rows):
+    for c in range(cols):
+      if dfs(r, c, 0):
+        return True
+  return False
+</code></pre>
+</div>
+<p><em>Usage of Python's heapq module to maintain minimum and maximum elements efficiently</em></p>
+<pre><code class="language-python">def sortedSquares(self, nums: List[int]) -&gt; List[int]:
+  left, right = 0, len(nums) - 1
+  res = [0] * len(nums)
+  write = len(nums) - 1
+
+  while left &lt;= right:
+    left_sq = nums[left] ** 2
+    right_sq = nums[right] ** 2
+
+    if left_sq &gt; right_sq:
+      res[write] = left_sq
+      left += 1
+    else:
+      res[write] = right_sq
+      right -= 1
+
+    write -= 1
+
+  return res
+</code></pre>
+<p><em>Complexity analysis of heap operations for understanding efficiency in runtime</em></p>
+</section>
+<hr />
+<p><em>Still chewing on:</em> The more I dig into these patterns, the clearer it becomes that many common problems could be approached with these data structure tricks. Still considering how these techniques extend to real-world applications beyond textbook examples.</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'efficient-design-patterns-data-structures';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+</body>
+</html>
