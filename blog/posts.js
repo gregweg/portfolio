@@ -1,12 +1,12 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
-        title: "Efficient Design Patterns in Data Structures",
+        title: "Exploring Data Structures for Efficient Problem Solving",
         slug: "efficient-design-patterns-data-structures",
         date: "2026-05-12",
-        tags: ["Data Structures", "Coding Optimization", "Algorithm Patterns"],
-        description: "Exploring core data structure patterns like monotonic stacks to tackle efficiency in common coding problems."
-    },
+        tags: ["data structures", "algorithms", "python"],
+        description: "Today\u2019s notes focus on using monotonic stacks, heaps, union-find sets, interval merging, set operations, and graph traversal techniques to solve common algorithmic challenges."
+    },,
     {
         title: "Data Structures and Algorithms: Implementations and Insights",
         slug: "exploring-algorithmic-efficiency-in-modern-machine-learning",
