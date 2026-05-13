@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Exploring core data structure patterns like monotonic stacks to tackle efficiency in common coding problems.">
-    <title>Efficient Design Patterns in Data Structures</title>
+    <meta name="description" content="Today’s notes focus on using monotonic stacks, heaps, union-find sets, interval merging, set operations, and graph traversal techniques to solve common algorithmic challenges.">
+    <title>Exploring Data Structures for Efficient Problem Solving</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,17 +37,17 @@
                             <div class="blog-card-meta">
                                 <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-05-12</span>
                                 <div class="blog-card-tags">
-                                    <span class="tag">Data Structures</span>
-                                    <span class="tag">Coding Optimization</span>
-                                    <span class="tag">Algorithm Patterns</span>
+                                    <span class="tag">data structures</span>
+                                    <span class="tag">algorithms</span>
+                                    <span class="tag">python</span>
                                 </div>
                             </div>
-                            <h1 class="blog-post-title">Efficient Design Patterns in Data Structures</h1>
+                            <h1 class="blog-post-title">Exploring Data Structures for Efficient Problem Solving</h1>
                         </header>
 
                         <div class="blog-post-body">
-                            <p>I've been immersing myself in data structure nuances and optimization tricks. Today's thread focuses on patterns that boost efficiency—particularly monotonic stacks, heaps, union-find sets, interval scheduling, and randomized data structures.</p>
-<p><em>Overview of the monotonically increasing stack pattern and its common problems</em></p>
+                            <p>Today, I’m immersing myself in various data structures that optimize solving array-based problems efficiently. Understanding monotonic stacks, heaps for min/max searches, union-find sets, merging intervals, managing random datasets, and traversing graphs through BFS/DFS provides a robust toolkit for tackling algorithmic challenges.</p>
+<p><em>Overview of the Monotonic Stack Pattern and its applications in array problems.</em></p>
 <div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
 <p>Monotonic Stack Pattern<br />
 - nearest, next, previous, first greater/smaller.<br />
@@ -100,7 +100,7 @@ def finalPrices(self, prices: List[int]) -&gt; List[int]:
 - next smaller element<br />
 - nearest valid neighbor</p>
 </div>
-<p><em>Typical brute-force solution to illustrate contrast with optimized approaches</em></p>
+<p><em>Basic brute-force approach compared to optimizing solutions with monotonic stacks.</em></p>
 <div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
 <p>Use when maintaining efficient access to current min/max element<br />
 - repeatedly need smallest/largest elemennt<br />
@@ -123,7 +123,7 @@ largest = -heapq.heappop(heap)
 - push/pop -&gt; O(log n)<br />
 - peek -&gt; O(1)</p>
 </div>
-<p><em>Core concept behind maintaining a monotonic stack for efficient neighbor searches</em></p>
+<p><em>Detailed explanation on how maintaining a stack helps improve time complexity.</em></p>
 <div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
 <p>Effifient;y tracks connected components/groups.</p>
 <p>Core Operations:<br />
@@ -158,7 +158,7 @@ def union(a, b):
 <p>Amortized Runtime:<br />
 Nearly O(1)</p>
 </div>
-<p><em>Python implementation template using the monotonic stack approach</em></p>
+<p><em>Implementation template demonstrating the monotonic stack application in Python.</em></p>
 <div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
 <p>Signals:<br />
 - overlapping ranges<br />
@@ -206,7 +206,7 @@ for start, end in intervals:
 <p>Runtime:<br />
 O (n log n) due to sorting.</p>
 </div>
-<p><em>Conceptual takeaways on what a monotonic stack aims to achieve</em></p>
+<p><em>Mental model for tracking elements waiting for their next greater/smaller counterparts.</em></p>
 <div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
 <pre><code class="language-python">import random
 class RandomizedSet:
@@ -240,7 +240,7 @@ class RandomizedSet:
     return random.choice(self.number_list)
 </code></pre>
 </div>
-<p><em>Introduction to priority queues and efficient min/max element access scenarios</em></p>
+<p><em>Details and code implementations showing the use of heaps for efficient access to current minimum or maximum elements.</em></p>
 <div style="border: 1px solid #d0d0d0; border-radius: 6px; padding: 1rem; margin: 1.5rem 0;">
 <p>BFS: ~ Shortest/minimum<br />
 - Shortest/minimum/fewest/nearest paths, steps, hops, or level-order traversal.<br />
@@ -384,7 +384,6 @@ def exist(self, board: List[List[str]], word: str) -&gt; bool:
   return False
 </code></pre>
 </div>
-<p><em>Usage of Python's heapq module to maintain minimum and maximum elements efficiently</em></p>
 <pre><code class="language-python">def sortedSquares(self, nums: List[int]) -&gt; List[int]:
   left, right = 0, len(nums) - 1
   res = [0] * len(nums)
@@ -405,10 +404,9 @@ def exist(self, board: List[List[str]], word: str) -&gt; bool:
 
   return res
 </code></pre>
-<p><em>Complexity analysis of heap operations for understanding efficiency in runtime</em></p>
 </section>
 <hr />
-<p><em>Still chewing on:</em> The more I dig into these patterns, the clearer it becomes that many common problems could be approached with these data structure tricks. Still considering how these techniques extend to real-world applications beyond textbook examples.</p>
+<p><em>Still chewing on:</em> While I’ve learned a lot about various data structures today, there are still some nuances in choosing between union-find paths compression versus ranks, or deciding the right moment to sort and merge intervals based on the specifics of each problem at hand that I believe require further exploration.</p>
                         </div>
                     </article>
 
