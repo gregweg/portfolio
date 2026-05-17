@@ -12,28 +12,42 @@ const BLOG_POSTS = [
         slug: "efficient-design-patterns-data-structures",
         date: "2026-05-12",
         tags: ["data structures", "algorithms", "python"],
-        description: "Today\u2019s notes focus on using monotonic stacks, heaps, union-find sets, interval merging, set operations, and graph traversal techniques to solve common algorithmic challenges."
-    },,
-    {
-        title: "Data Structures and Algorithms: Implementations and Insights",
-        slug: "exploring-algorithmic-efficiency-in-modern-machine-learning",
-        date: "2026-05-06",
-        tags: ["coding", "python", "algorithms", "data_structures", "optimization"],
-        description: "Exploring quad trees, sliding window techniques, social network analysis, uniqueness, binary search optimizations."
+        description: "Today’s notes focus on using monotonic stacks, heaps, union-find sets, interval merging, set operations, and graph traversal techniques to solve common algorithmic challenges."
     },
     {
-        title: "Exploring Algorithmic Efficiency in Modern Machine Learning",
-        slug: "exploring-algorithmic-efficiency-in-modern-machine-learning",
+        title: "Understanding UBIQUITOUS LANGUAGE and Key Concepts in Domain Driven Design",
+        slug: "understanding-ubiquitous-language-and-key-concepts-in-domain-driven-design",
+        date: "2026-05-11",
+        tags: ["domain driven design", "ubiquitous language", "entities", "value objects"],
+        description: "Notes on UBIQUITOUS LANGUAGE, ENTITIES, VALUE OBJECTS, SERVICES, MODULES, AGGREGATES, FACTORIES, REPOSITORIES from Eric Evans’ Domain Driven Design."
+    },
+    {
+        title: "Data Structures and Algorithms Essentials",
+        slug: "data-structures-and-algorithms-essentials",
+        date: "2026-05-07",
+        tags: ["data-structures", "algorithms", "python"],
+        description: "Review of essential algorithms and data structures with a focus on two pointers, sliding window, binary search, BFS/DFS traversal techniques."
+    },
+    {
+        title: "Exploring Data Structures & Algorithms in Depth",
+        slug: "exploring-data-structures-and-algorithms-in-depth",
+        date: "2026-05-07",
+        tags: ["Data structures", "Algorithms", "Python"],
+        description: "A dive into fundamental algorithms like two pointers, sliding window, binary search, and DFS, alongside more complex problem-solving techniques."
+    },
+    {
+        title: "Daily Musings: Dive Into QuadTrees & Algorithmic Queries",
+        slug: "daily-musings-diving-into-quadtrees-and-algorithmic-queries",
         date: "2026-05-06",
-        tags: ["machine-learning", "algorithms", "performance-optimization"],
-        description: "Greg reflects on optimizing algorithms for better performance in ML systems, balancing complexity with speed."
+        tags: ["Data Structures", "Algorithms", "Python"],
+        description: "Today’s notes explore quad tree construction, longest subarray with bounded element differences, and social network dynamics through friend grouping."
     },
     {
         title: "Pondering the Limits of Predictive Modeling",
         slug: "pondering-the-limits-of-predictive-modeling",
         date: "2026-05-05",
         tags: ["machine-learning", "data-science", "predictive-models"],
-        description: "Today, I dove into my doubts about predictive modeling's reliability and its limitations in real-world applications."
+        description: "Today, I dove into my doubts about predictive modeling’s reliability and its limitations in real-world applications."
     },
     {
         title: "What I Learned Building an AI Agent for My Personal Site",
