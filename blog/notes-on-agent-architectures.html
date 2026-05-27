@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Exploring key considerations in designing AI agents for business applications.">
+    <title>Notes on Agent Architectures</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-05-27</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">AI</span>
+                                    <span class="tag">ML Engineering</span>
+                                    <span class="tag">Agent Design</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Notes on Agent Architectures</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Today, I'm diving into the intricacies of building reliable and cost-effective AI agents that can perform a variety of tasks, from candidate screening to customer support. The core challenge is integrating multiple components like planning, tool use, and memory management while mitigating common failure modes.</p>
+<h1>Notes on Agent Architectures</h1>
+<p>LLM<br />
+V<br />
+Planning<br />
+Tool Use<br />
+Memory<br />
+Workflow Orchestration<br />
+Evaluation<br />
+Reliability</p>
+<p>Design an agent that:</p>
+<ul>
+<li>researches companies</li>
+<li>screens candidates</li>
+<li>schedules interviews</li>
+<li>summarizes documents</li>
+<li>handles customer support</li>
+<li>automates workflows</li>
+</ul>
+<p>User<br />
+ ↓<br />
+Agent API<br />
+ ↓<br />
+Planner<br />
+ ↓<br />
+Tool Router<br />
+ ↓<br />
+Tools<br />
+ ├── Search<br />
+ ├── Database<br />
+ ├── CRM<br />
+ ├── Calendar<br />
+ └── Internal APIs<br />
+ ↓<br />
+Memory<br />
+ ↓<br />
+Evaluator<br />
+ ↓<br />
+Response</p>
+<h2>Agent Failure Modes</h2>
+<h3>Hallucination - agents like to invent facts</h3>
+<p>Migitation:</p>
+<p>RAG<br />
+citations<br />
+tool verification<br />
+structured outputs</p>
+<h3>Infinite Loops - agents repeatedly call tools.</h3>
+<p>Mitigation:</p>
+<p>max iterations<br />
+budgets<br />
+termination criteria</p>
+<h3>Tool Abuse - agents repeatedly invokes expensive APIs.</h3>
+<p>Mitigation:</p>
+<p>tool limits<br />
+rate limits<br />
+cost controls<br />
+approval gates</p>
+<h3>Context Window Problems - agents forget earlier information.</h3>
+<p>Mitigation:</p>
+<p>summarization<br />
+memory stores<br />
+retrieval</p>
+<h3>Prompt Injection - agent loses earlier information.</h3>
+<p>Mitigation:</p>
+<p>tool permissions<br />
+sanboxing<br />
+input filtering<br />
+human review</p>
+<h2>Evaluation</h2>
+<h3>Three Types of Evaluation</h3>
+<h3>Unit-Level Evaluation - individual component testing</h3>
+<p>Testing:</p>
+<ul>
+<li>retrievers</li>
+<li>prompts</li>
+<li>tools</li>
+<li>parsers</li>
+</ul>
+<pre><code class="language-python">query = &quot;What is the capital of France?&quot;
+
+assert retrieve(query) == [&quot;Paris is the capital of France&quot;]
+
+</code></pre>
+<h3>Workflow Evaluation - testing for entire agent flow.</h3>
+<pre><code>User:
+Find me three backend engineer candidates.
+
+Expected:
+- retrieves candidates
+- scores candidates
+- produces ranking
+
+Evaluation Concerns:
+- completion rate
+- accuracy
+- cost
+- latency
+</code></pre>
+<h3>Product Evaluation - Live System Metrics.</h3>
+<pre><code>successful task completion
+human correctness
+tool failures
+retry frequency
+user satisfaction
+cost/request
+</code></pre>
+<h3>Offline Evaluation - Historical dataset.</h3>
+<p>Question<br />
+Expected answer<br />
+Agent answer</p>
+<p>Measure:<br />
+- accuracy<br />
+- task completion<br />
+- precision<br />
+- recall</p>
+<h3>Online Evaluation - Production metrics.</h3>
+<p>success rate<br />
+completion rate<br />
+retry rate<br />
+cost<br />
+latency<br />
+human corrections</p>
+<h3>Golden Datasets - fixed evaluation sets for comparing changes from prompt or workflow modifications.</h3>
+<p>Can be thought of as regression testing for AI.</p>
+<p>Maintain:</p>
+<p>Question<br />
+Expected Behavior<br />
+Expected Tool Usage<br />
+Expected Result</p>
+<pre><code>{
+  &quot;input&quot;: &quot;Summarize this patient's chart&quot;,
+  &quot;expected&quot;: {
+    &quot;mentions_medications&quot;: true,
+    &quot;mentions_diagnoses&quot;: true,
+    &quot;hallucinates&quot;: false
+  }
+}
+</code></pre>
+<p>Suppose we change:</p>
+<ul>
+<li>prompt</li>
+<li>model</li>
+<li>temperature</li>
+<li>retriever</li>
+<li>workflow</li>
+</ul>
+<p>To verify improvements, run against 500 known examples persay</p>
+<p>Compare before/after</p>
+<h3>Evaluation Metrics:</h3>
+<p>Accuracy: Correct answer?<br />
+Task Completion: Did workflow finish?<br />
+Hallucination Rate: Unsupported claims.<br />
+Tool Accuracy: Correct tool selected?<br />
+Latency: Time to completion.<br />
+Cost: Tokens consumed.<br />
+Human Agreement: Do reviewers agree?</p>
+<h3>LLM-as-a-Judge - another model scores outputs.</h3>
+<p>Example:</p>
+<p>Input<br />
+Inference Answer<br />
+Agent Answer</p>
+<p>Judge Prompt:</p>
+<p>Rate factual accuracy from 1-5</p>
+<p>Useful at scale.</p>
+<h2>Workflow Orchestration</h2>
+<p>Orchestration Provides</p>
+<ul>
+<li>state persistence</li>
+<li>retries</li>
+<li>recovery</li>
+<li>timeouts</li>
+<li>scheduling</li>
+<li>human approval</li>
+<li>branching logic</li>
+</ul>
+<h3>Temporal - write workflows as code.</h3>
+<p>Temporal handles:</p>
+<p>state<br />
+retries<br />
+durability<br />
+recovery</p>
+<p>ex)</p>
+<pre><code class="language-python">@workflow
+def hiring_workflow():
+    candidate = search_candidates()
+
+    approved = wait_for_manager()
+
+    if approved:
+        schedule_interview()
+</code></pre>
+<p>If worker crashes, workflow resumes instead of restarting.</p>
+<p>Without Temporal:</p>
+<p>DB tables<br />
+cron jobs<br />
+retry queues<br />
+status flags<br />
+state machines</p>
+<p>Temporal centralizes this.</p>
+<h3>Key Temporal Concepts</h3>
+<p>Workflow - Long-lived durable process.<br />
+Activity - Individual unit of work.</p>
+<pre><code class="language-python">search_candidates()
+</code></pre>
+<p>Retry Policy - Automatic retries.<br />
+Signals - External events. (Ex. actions like,  manager approved)<br />
+Queries - Read workflow state.</p>
+<p>LangGraph - specific to agent workflows</p>
+<p>Temporal = workflow engine<br />
+LangGraph = agent workflow engine</p>
+<p>Lang Graph Core Model</p>
+<p>Each Node:</p>
+<p>LLM<br />
+tool<br />
+memory<br />
+decision</p>
+<p>User Input<br />
+ ↓<br />
+Planner<br />
+ ↓<br />
+Search Tool<br />
+ ↓<br />
+Reasoning Node<br />
+ ↓<br />
+Final Response</p>
+<p>Key Concepts</p>
+<p>State - shared data passed between nodes<br />
+Edges - Transitions<br />
+Conditional Routing - branch based on outcome.<br />
+Memory - persist state between steps.<br />
+Durable Functions</p>
+<h2>Tool Calling</h2>
+<p>LLM<br />
+ ↓<br />
+search<br />
+database<br />
+calendar<br />
+CRM<br />
+filesystem</p>
+<p>Design Considerations<br />
+- schema validation<br />
+- permissions<br />
+- retries<br />
+- idempotency<br />
+- observability</p>
+<h2>Memory</h2>
+<p>Short-Term Memory<br />
+Conversation context. Stored in prompt.</p>
+<p>Long-Term Memory</p>
+<p>Persistent storage: (used across sessions)</p>
+<p>vector DB<br />
+document store<br />
+relational DB</p>
+<p>Semantic Memory - Facts about user.</p>
+<p>Episodic Memory - Past interactions.</p>
+<h2>Observability for Agents</h2>
+<h3>Logging:</h3>
+<p>prompt<br />
+model<br />
+tokens<br />
+latency<br />
+tool calls<br />
+results<br />
+failures<br />
+cost</p>
+<h3>Trace:</h3>
+<p>user requests<br />
+planner<br />
+tool invocation<br />
+memory retrieval<br />
+response generation</p>
+<h3>Metrics:</h3>
+<p>success rate<br />
+latency<br />
+tool failures<br />
+cost/request<br />
+hallucination rate<br />
+retry count</p>
+<h2>AI Cost vs Accuracy</h2>
+<h3>Large Model Tradeoffs:</h3>
+<p>Pros:</p>
+<ul>
+<li>better reasoning</li>
+</ul>
+<p>Cons:</p>
+<ul>
+<li>slower</li>
+<li>expensive</li>
+</ul>
+<h3>Small Model Tradeoffs:</h3>
+<p>Pros:</p>
+<ul>
+<li>cheap</li>
+<li>fast</li>
+</ul>
+<p>Cons:</p>
+<ul>
+<li>weaker reasoning</li>
+</ul>
+<hr />
+<p><em>Still chewing on:</em> As I review these notes, it's clear there are many moving parts in designing effective AI agents, each with its own set of challenges and trade-offs. It highlights the importance of continuous evaluation and iterative refinement to build robust systems.</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'notes-on-agent-architectures';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+</body>
+</html>
