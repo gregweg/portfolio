@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Notes on Agent Architectures",
+        slug: "notes-on-agent-architectures",
+        date: "2026-05-27",
+        tags: ["AI", "ML Engineering", "Agent Design"],
+        description: "Exploring key considerations in designing AI agents for business applications."
+    },
+    {
         title: "Efficient Data Structures for Key Problems",
         slug: "efficient-data-structures-for-key-problems",
         date: "2026-05-13",
