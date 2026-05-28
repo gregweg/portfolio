@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A deep dive into essential engineering concepts such as system behavior, performance metrics, data representation types, and more.">
+    <title>Engineering Terminology Refresh: Systems, Performance, Data & Representation</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-05-28</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">software-engineering</span>
+                                    <span class="tag">system-design</span>
+                                    <span class="tag">performance-scalability</span>
+                                    <span class="tag">data-representation</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Engineering Terminology Refresh: Systems, Performance, Data & Representation</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Today, I'm revisiting fundamental concepts in software and systems engineering. Whether it's understanding the intricacies of deterministic versus non-deterministic systems or mastering performance optimizations like batching and vectorization, these principles are crucial for building robust and scalable AI-driven applications.</p>
+<h1>Refreshing on Engineering Terminology</h1>
+<h2>System Behavior &amp; Correctness</h2>
+<ul>
+<li>guarantees</li>
+<li>reliability</li>
+<li>predictability</li>
+<li>correctness properties</li>
+</ul>
+<p><strong>Terms:</strong></p>
+<h3>Deterministic: Same Input -&gt; Same Output</h3>
+<p>Traditional Software mostly deterministic</p>
+<h3>Non-Deterministic</h3>
+<pre><code>random.random()
+datetime.now()
+thread scheduling
+LLM sampling
+</code></pre>
+<p>LLMs are often probabilistic / non-deterministic due to:<br />
+- sampling<br />
+- temperature<br />
+- model variance<br />
+- GPU execution variance</p>
+<p>AI systems are inherently probabilistic.<br />
+AI engineered systems work to combine Deterministic rules + Probabilistic AI inference.</p>
+<pre><code>if confidence &gt; 0.95:
+    auto-approve
+else:
+    human review
+</code></pre>
+<h3>Probabilistic - Outputs are likelihood-based, not guaranteed.</h3>
+<h3>Stochastic - randomness intentionally involved.</h3>
+<p>examples)<br />
+- SGD<br />
+- Sampling<br />
+- Exploration Policies</p>
+<h3>Invariant - A condition that must always remain true.</h3>
+<p>Database Invariant - user_id must exist.<br />
+Financial Invariant - balance cannot go negative.<br />
+Queue Invariant - message processed once.<br />
+AI Systems<br />
+Safety Invariant - human approval required before payout.<br />
+Workflow Invariant - policy must have valid carrier.<br />
+Agent Invariant - planner cannot directly execute shell commands.</p>
+<h3>Consistency</h3>
+<ul>
+<li>database consistency</li>
+<li>logical consistency</li>
+<li>eventual consistency</li>
+<li>output consistency</li>
+</ul>
+<h3>Idempotent - Running something multiple times yields same result.</h3>
+<pre><code>PUT /user/5/status=active
+</code></pre>
+<h3>Referential Transparency - same inputs -&gt; same outputs without side effects.</h3>
+<h3>Ephemeral - short lived.</h3>
+<p>examples)<br />
+- containers<br />
+- tokens<br />
+- workers</p>
+<h3>Durable - persistent/recoverable.</h3>
+<h3>Mutable vs Immutable - can vs can't change</h3>
+<p>Critical For:<br />
+- concurrency<br />
+- functional programming<br />
+- event sourcing</p>
+<h2>Performance &amp; Scalability</h2>
+<h3>Amortized - average cost over many operations.</h3>
+<p>Dynamic Array append.</p>
+<p>Most appends: O(1)<br />
+Occasionally: resize array -&gt; O(n)<br />
+Amortized (averaged over many appends) - amortized O(1)</p>
+<h3>Throughput vs Latency</h3>
+<p>Throughput - How much work per unit time.<br />
+Latency - How long one request takes.</p>
+<h3>Backpressure - system slowing intake because downstream overloaded.</h3>
+<p>Important For:<br />
+- queues<br />
+- streaming<br />
+- inference systems</p>
+<h3>Batching - grouping multiple operations together to reduce overhead and improve throughput.</h3>
+<ul>
+<li>Bulk database inserts</li>
+<li>Batch inference requests</li>
+<li>Kafka consumer batches</li>
+<li>Writing many rows in one transaction</li>
+</ul>
+<p>Tradeoff:<br />
+- Higher throughput<br />
+- Increased latency for individual items</p>
+<p>AI/ML:<br />
+- GPU inference is often heavily batch optimized.<br />
+- Training commonly processes batches of tensors simultaneously</p>
+<h3>Parallelism - multiple operations executing at the same time</h3>
+<p>Examples)<br />
+- Multi-core CPU processing<br />
+- GPU tensor operations<br />
+- Parallel API workers<br />
+- MapReduce jobs</p>
+<h3>Concurrency - multiple tasks making progress during overlapping periods of time.</h3>
+<p>Examples)<br />
+- async web servers<br />
+- thread scheduling<br />
+- event loops<br />
+- cooperative multitasking</p>
+<p>Concurrency often focuses on:<br />
+- coordination<br />
+- shared resources<br />
+- synchronization<br />
+- scheduling</p>
+<h3>Vectorization - applying operations across arrays/tensors simultaneously instead of iterating item-by-item.</h3>
+<p>Examples)<br />
+- NumPy operations<br />
+- GPU tensor math<br />
+- SIMD instructions<br />
+- Matrix multiplication</p>
+<pre><code class="language-python"># instead of:
+for x in arr:
+    x += 1
+
+# vectorized
+arr += 1
+
+</code></pre>
+<p>Important in ML training, inference, scientific computing, GPU acceleration</p>
+<h3>Quantization - reducing model precision to reduce memory and improve inference speed.</h3>
+<p>examples)</p>
+<ul>
+<li>FP32 -&gt; FP16</li>
+<li>FP16 -&gt; FP8</li>
+<li>8-bit -&gt; 4-bit quantization</li>
+</ul>
+<p>Tradeoff:<br />
+- smaller/faster models<br />
+- potential accuracy loss</p>
+<p>Important for:<br />
+- Ollama<br />
+- local inference<br />
+- edge deployment<br />
+- GPU memory optimization</p>
+<h3>Fan-out - distributing work from one source to many downstream workers/services.</h3>
+<p>Examples)<br />
+- Queue distributing jobs to workers<br />
+- Broadcast messaging<br />
+- Parallel inference requests<br />
+- Searcg across multiple indexes</p>
+<p>Often used to:<br />
+- scale horizontally<br />
+- parallelize workloads</p>
+<h3>Fan-in - combining results from many workers/services into a single result.</h3>
+<p>Examples)<br />
+- Aggregating worker outputs<br />
+- Combining map results<br />
+- Multi-agent synthesis<br />
+- Search result aggregation</p>
+<p>Commonly paired with:<br />
+- fan-out -&gt; processing -&gt; fan-in</p>
+<h3>Sharding - splitting data across multiple machines/databases based on some shard key</h3>
+<p>Examples)<br />
+- user_id % N<br />
+- geographic region<br />
+- tenant-based partitioning</p>
+<p>Benefits:<br />
+- horizontal scaling<br />
+- reduced load per database</p>
+<p>Tradeoffs:<br />
+- cross-shard joins become difficult<br />
+- rebalancing complexity<br />
+- operational overhead</p>
+<h3>Partitioning - dividing data into smaller logical sections.</h3>
+<p>Can be:<br />
+- horizontal partitioning (rows)<br />
+- vertical partitioning (columns)<br />
+- time partitioning<br />
+- range partitioning</p>
+<p>Examples)<br />
+- monthly telemetry tables<br />
+- partition by customer_id<br />
+- partition by date</p>
+<p>Benefits:<br />
+- faster queries<br />
+- easier maintenance<br />
+- archive management</p>
+<h2>Data &amp; Representation</h2>
+<h3>Discrete - made of separate/countable states instead of continuous values.</h3>
+<p>Examples)<br />
+- integers<br />
+- tokens<br />
+- graph npdes<br />
+- vocabulary IDs<br />
+- events</p>
+<p>opposite of continuous</p>
+<h3>Continuous - values exist on a smooth spectrum rather than separate countable states.</h3>
+<p>Examples)<br />
+- floating point tensors<br />
+- audio waveforms<br />
+- probability distributions<br />
+- embeddings</p>
+<p>Continuous systems often use:<br />
+- calculus<br />
+- gradients<br />
+- optimization</p>
+<h3>Latent - hidden/internal representation learned by a model.</h3>
+<p>Examples)<br />
+- latent variables<br />
+- latent embeddings<br />
+- latent feature space</p>
+<p>LLms and neural networks learn latent representations internally.</p>
+<p>Latent spaces often encode:<br />
+- meaning<br />
+- similarity<br />
+- structure</p>
+<h3>Embedding - continuous vector representation of data or meaning.</h3>
+<p>Exmaples)<br />
+- text embeddings<br />
+- image embeddings<br />
+- sentence embeddings</p>
+<p>Embeddings allow:<br />
+- semantic search<br />
+- clustering<br />
+- similarity comparisons<br />
+- retrieval systems</p>
+<p>Very important in:<br />
+- RAG<br />
+- vector databases<br />
+- recommendation systems</p>
+<h3>Vector Space - mathematical space where vectprs exost amd distances/relationships can be measured.</h3>
+<p>Embeddings exist within vector spaces.</p>
+<p>Important properties:<br />
+- distance<br />
+- similarity<br />
+- direction<br />
+- clustering</p>
+<p>Examples)<br />
+- cosine similarity<br />
+- nearest neighbor search<br />
+- semantic clustering</p>
+<h3>Serialization - converting structured data into a transportable/storable format.</h3>
+<p>Examples)<br />
+- JSON<br />
+- protobuf<br />
+- MessagePack<br />
+- Avro</p>
+<p>Used for:<br />
+- APIs<br />
+- Queues<br />
+- Persistence<br />
+- Networking</p>
+<p>Opposite of de-serialization</p>
+<h3>Canonical - official/source of truth representation.</h3>
+<p>Examples)<br />
+- canonical database record<br />
+- canonical API schema<br />
+- canonical event format</p>
+<p>Important for:<br />
+- consistency<br />
+- synchronization<br />
+- deduplication</p>
+<h3>Semantic - meaning-aware rather than syntax-aware.</h3>
+<p>examples)<br />
+- semantic search<br />
+- semantic similarity <br />
+- semantic clustering</p>
+<p>Sematic systems attempt to understand:<br />
+- intent<br />
+- meaning<br />
+- relationships</p>
+<p>Instead of exact keyword matching.</p>
+<h3>Tokenization - breaking data into smaller units called tokens.</h3>
+<p>Examples)<br />
+- words<br />
+- subwords<br />
+- characters<br />
+- byte-pair encodings</p>
+<p>LLMs tokenize text before inference.</p>
+<p>Example)</p>
+<pre><code class="language-python">&quot;ChatGPT is useful&quot;
+
+# might become
+[&quot;Chat&quot;, &quot;G&quot;, &quot;PT&quot;, &quot;is&quot;, &quot; useful&quot;]
+</code></pre>
+<p>Different tokenizers produce different token boundaries.</p>
+<h3>Feature - measurable property/input used by a model</h3>
+<p>Examples)<br />
+- age<br />
+- transaction count<br />
+- embedding dimensions<br />
+- word frequency<br />
+- pixel intensity</p>
+<p>Features are inputs into:<br />
+- classifiers<br />
+- regressions<br />
+- neural networks</p>
+<h3>Dimensionality = number of values/features used to represent data.</h3>
+<p>Examples)<br />
+- 3D coordinates<br />
+- 768-dimensional embeddings<br />
+- feature vectors</p>
+<p>Higher dimensionality:<br />
+- can encode richer information<br />
+- increases computational complexity</p>
+<p>High-dimensional spaces often behave unintuitively:<br />
+- sparse data<br />
+- curse of dimensionality<br />
+- difficult nearest-neighbor search</p>
+<h3>Heuristic- Rule-of-thumb solution.</h3>
+<p>Not guaranteed optimal.</p>
+<p>Often used when:<br />
+- exact optimizations is too expensive<br />
+- search space is too large<br />
+- approximate solutions are acceptable</p>
+<p>Examples)<br />
+- retrieve top 5 search results<br />
+- greedy algorithm<br />
+- recommendation ranking<br />
+- beam search</p>
+<p>Tradeoff:<br />
+- Faster/simpler<br />
+- Less optimal/correct</p>
+<h3>Latent - hidden/internal representation.</h3>
+<p>examples)<br />
+- latent space<br />
+- latent features<br />
+- latent variables</p>
+<p>Neural networks learn latent representations internally.</p>
+<p>Laten spaces often encode:<br />
+- meaning<br />
+- relationships<br />
+- similarity<br />
+- structure</p>
+<p>Embeddings are latent representations.</p>
+<h3>Emergent Behavior - Complex behavior arising unexpectedly from simpler systems.</h3>
+<p>Examples)<br />
+- Agent planning behavior<br />
+- LLM reasoning chains<br />
+- Multi-Agent collaboration<br />
+- self-correction loops</p>
+<p>Emergent behavior is often:<br />
+- difficult to predict<br />
+- not explicitly programmed<br />
+- prodcued from scale/interactions</p>
+<p>Important in:<br />
+- agents<br />
+- distributed systems<br />
+- neural networks</p>
+<h3>Convergence - System stabilizes towards a solution or steady state.</h3>
+<p>ML: <br />
+- training converges<br />
+- loss stabilizes</p>
+<p>Distributes Systems:<br />
+- Eventual convergence<br />
+- Replicas synchronize over time</p>
+<p>Optimization:<br />
+- algorithm approaches local/global optimum</p>
+<p>Failure modes:<br />
+- divergence<br />
+- oscillation<br />
+- instability</p>
+<h3>Tensors - multi-dimensional numerical arrays used heavily in ML computation.</h3>
+<p>Examples)<br />
+- scalars (0D tensor)<br />
+- vectors (1D tensor)<br />
+- matrices (2D tensor)<br />
+- higher-dimensional tensors</p>
+<p>Deep learning frameworks:<br />
+- PyTorch<br />
+- TensorFlow<br />
+- JAX</p>
+<p>Tensors are optimized for:<br />
+- GPU computation<br />
+- parallel math<br />
+- vectorized operations</p>
+<h3>Classifiers - models that assign categories/labels to inputs.</h3>
+<p>Examples)<br />
+- spam detection<br />
+- fraud classificatioj<br />
+- image recognition<br />
+- sentiment analysis</p>
+<p>Classifier outputs are often:<br />
+- probabilities<br />
+- confidence score<br />
+- labels</p>
+<p>Examples)</p>
+<p>email -&gt; spam<br />
+transaction -&gt; fraud<br />
+image -&gt; cat</p>
+<p>Common classifier types:<br />
+- logistic regression<br />
+- random forest<br />
+- neural network<br />
+- transofrmer classifier</p>
+<h3>Hallucination - model generates plausible but incorrect information.</h3>
+<p>Hallucinations are often:<br />
+- statistically plausible<br />
+- high-confidence<br />
+- factually incorrect</p>
+<p>Causes:<br />
+- insufficient grounding<br />
+- weak retrieval<br />
+- probabilistic generation<br />
+- training data limitations</p>
+<p>Mitigations:<br />
+- RAG<br />
+- grounding<br />
+- evals<br />
+- tool calling<br />
+- structured outputs</p>
+<h3>Grounding - constraining model outputs using external truth/data/context.</h3>
+<p>Examples)<br />
+- retrieval augmented generation (RAG)<br />
+- database lookups<br />
+- web search<br />
+- tool calling</p>
+<p>Grounding reduces:<br />
+- hallucinations<br />
+- unsupported claims<br />
+- fabricated outputs</p>
+<p>Important in:<br />
+- enterprise AI<br />
+- agents<br />
+- production AI systems</p>
+<h3>Evals (Evaluation Engineering) - testing againt benchmark datasets.</h3>
+<p>Testing:<br />
+- prompts<br />
+- workflows<br />
+- agents<br />
+- outputs</p>
+<p>Examples)<br />
+- golden datasets<br />
+- regression testing<br />
+- benchmark scoring<br />
+- human review pipelines</p>
+<h3>Topology - Structure/layout of a system/network</h3>
+<p>Examples)<br />
+- microservice topology<br />
+- network topology<br />
+- cluster topology<br />
+- graph topology</p>
+<p>Topology describes:<br />
+- connectivity<br />
+- relationships<br />
+- communication paths</p>
+<p>Important in:<br />
+- distributed systems<br />
+- Kubernetes<br />
+- agent orchestration<br />
+- networking</p>
+<h3>Fan-out / Fan-in - Parallel distribution and recombination patterns.</h3>
+<p>Fan-out:<br />
+- distribute work to many workers/services</p>
+<p>Fan-out:<br />
+- combine many results into one result</p>
+<p>Examples)<br />
+- distributed search<br />
+- parallel inference<br />
+- map/reduce systems<br />
+- multi-agent workflows</p>
+<p>Pattern:</p>
+<pre><code>request
+   ↓
+fan-out
+   ↓
+parallel workers
+   ↓
+fan-in
+   ↓
+aggregated result
+</code></pre>
+<h3>Meta-Prompting - prompts that generate, improve, evaluate, or orchestrate other prompts.</h3>
+<p>Examples)<br />
+- prompt optimization<br />
+- self-reflection prompts<br />
+- prompt generation systems<br />
+- DSPy workflows<br />
+- recursive prompting</p>
+<p>Common patterns:<br />
+- critique/revise loops<br />
+- planner/executor prompts<br />
+- chain-of-thought refinement<br />
+- automatic prompt optimization</p>
+<p>Meta-prompting is heavily used in:<br />
+- agents<br />
+- orchestration systems<br />
+- evaluation systems<br />
+- autonomous workflows</p>
+<hr />
+<p><em>Still chewing on:</em> While refreshing on these technical terms, I'm reflecting on how they interplay in designing resilient and efficient systems. It's fascinating to see how concepts from discrete mathematics align with probabilistic models in modern AI.</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'engineering-terminology-refresh';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+</body>
+</html>

@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Engineering Terminology Refresh: Systems, Performance, Data & Representation",
+        slug: "engineering-terminology-refresh",
+        date: "2026-05-28",
+        tags: ["software-engineering", "system-design", "performance-scalability", "data-representation"],
+        description: "A deep dive into essential engineering concepts such as system behavior, performance metrics, data representation types, and more."
+    },
+    {
         title: "Notes on Agent Architectures",
         slug: "notes-on-agent-architectures",
         date: "2026-05-27",
