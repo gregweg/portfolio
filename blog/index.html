@@ -27,25 +27,15 @@
     <main>
         <section class="page-header">
             <div class="container">
-                <h1 class="page-title">Blog</h1>
-                <p class="page-description">Technical insights, lessons learned, and personal reflections</p>
+                <h1 class="page-title">Engineering Log</h1>
+                <p class="page-description">A chronological feed of deep dives, notes, and technical updates</p>
             </div>
         </section>
 
         <section class="blog-section">
             <div class="container">
-                <div class="blog-layout">
-                    <div class="blog-main" id="blog-posts-list">
-                        <!-- Posts injected by JS -->
-                    </div>
-                    <aside class="blog-sidebar">
-                        <div class="sidebar-widget">
-                            <h3 class="sidebar-title">All Posts</h3>
-                            <ul class="sidebar-post-list" id="sidebar-post-list">
-                                <!-- Links injected by JS -->
-                            </ul>
-                        </div>
-                    </aside>
+                <div class="timeline-feed" id="timeline">
+                    <!-- Entries injected by JS -->
                 </div>
             </div>
         </section>
@@ -59,39 +49,50 @@
 
     <script src="posts.js"></script>
     <script>
-        function formatDate(dateStr) {
-            const [year, month, day] = dateStr.split('-').map(Number);
-            return new Date(year, month - 1, day).toLocaleDateString('en-US', {
-                year: 'numeric', month: 'long', day: 'numeric'
+        function formatMonthYear(dateStr) {
+            const [year, month] = dateStr.split('-').map(Number);
+            return new Date(year, month - 1, 1).toLocaleDateString('en-US', {
+                year: 'numeric', month: 'long'
             });
         }
 
-        const postsList = document.getElementById('blog-posts-list');
-        const sidebarList = document.getElementById('sidebar-post-list');
+        function formatShortDate(dateStr) {
+            const [year, month, day] = dateStr.split('-').map(Number);
+            return new Date(year, month - 1, day).toLocaleDateString('en-US', {
+                month: 'short', day: 'numeric'
+            });
+        }
+
+        const timeline = document.getElementById('timeline');
+        let currentMonthKey = null;
 
         BLOG_POSTS.forEach(post => {
+            const monthKey = post.date.slice(0, 7);
             const href = post.slug + '.html';
 
-            // Main post card
-            const card = document.createElement('article');
-            card.className = 'blog-card';
-            card.innerHTML = `
-                <div class="blog-card-meta">
-                    <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> ${formatDate(post.date)}</span>
-                    <div class="blog-card-tags">
-                        ${post.tags.map(t => `<span class="tag">${t}</span>`).join('')}
-                    </div>
-                </div>
-                <h2 class="blog-card-title"><a href="${href}">${post.title}</a></h2>
-                <p class="blog-card-description">${post.description}</p>
-                <a href="${href}" class="project-link">Read more <i class="fas fa-arrow-right"></i></a>
-            `;
-            postsList.appendChild(card);
+            if (monthKey !== currentMonthKey) {
+                currentMonthKey = monthKey;
+                const label = document.createElement('div');
+                label.className = 'timeline-month-label';
+                label.textContent = formatMonthYear(post.date);
+                timeline.appendChild(label);
+            }
 
-            // Sidebar link
-            const li = document.createElement('li');
-            li.innerHTML = `<a href="${href}" class="sidebar-post-link">${post.title}</a>`;
-            sidebarList.appendChild(li);
+            const entry = document.createElement('div');
+            entry.className = 'timeline-entry';
+            entry.innerHTML = `
+                <span class="timeline-dot"></span>
+                <div class="timeline-content">
+                    <div class="timeline-meta">
+                        <span class="timeline-date">${formatShortDate(post.date)}</span>
+                        <div class="timeline-tags">${post.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+                    </div>
+                    <h2 class="timeline-title"><a href="${href}">${post.title}</a></h2>
+                    <p class="timeline-description">${post.description}</p>
+                    <a href="${href}" class="timeline-read-more">Read more <i class="fas fa-arrow-right"></i></a>
+                </div>
+            `;
+            timeline.appendChild(entry);
         });
     </script>
 </body>
