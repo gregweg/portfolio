@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Threads, Processes, and Memory Management in Python",
+        slug: "threads-processes-memory-management-python",
+        date: "2026-05-31",
+        tags: ["python", "concurrency", "memory"],
+        description: "Exploring the nuances of threads and processes, along with memory management concepts in Python."
+    },
+    {
         title: "Engineering Terminology Refresh: Systems, Performance, Data & Representation",
         slug: "engineering-terminology-refresh",
         date: "2026-05-28",

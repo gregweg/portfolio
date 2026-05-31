@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Exploring the nuances of threads and processes, along with memory management concepts in Python.">
+    <title>Threads, Processes, and Memory Management in Python</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-05-31</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">python</span>
+                                    <span class="tag">concurrency</span>
+                                    <span class="tag">memory</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Threads, Processes, and Memory Management in Python</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Today’s notes delve into the inner workings of Python's execution model, focusing on how processes and threads help manage tasks efficiently. As an engineer working on systems that require both CPU-intensive computation and I/O operations, understanding these concepts is crucial to balancing performance and isolation.</p>
+<h2>Process - an independent running program program with it's own isolated memory and resources.</h2>
+<p>A process contains:<br />
+* virtual memory space<br />
+* program stack<br />
+* heap<br />
+* threads<br />
+* file handles<br />
+* OS-managed resources<br />
+Processes are isolated from one another by the operating system.</p>
+<p>Examples)</p>
+<ul>
+<li>Chrome browser process</li>
+<li>Python application</li>
+<li>Database server process</li>
+</ul>
+<p>Processes communicate through:</p>
+<ul>
+<li>sockets</li>
+<li>pipes</li>
+<li>shared memory</li>
+<li>IPC mechanisms</li>
+</ul>
+<p>Tradeoff:</p>
+<ul>
+<li>safer isolation</li>
+<li>heavier than threads</li>
+</ul>
+<h2>Thread - a lightweight prcoess, shared everything with parent process that spawned it up. Only things that absolutely require, technically access to entirev virtual memory of parent process.</h2>
+<p>Threads within the same process share:</p>
+<ul>
+<li>virtual memory</li>
+<li>heap</li>
+<li>file handles</li>
+<li>global variables</li>
+</ul>
+<p>Each thread has its own:</p>
+<ul>
+<li>stack</li>
+<li>registers</li>
+<li>instruction pointer</li>
+</ul>
+<p>Threads are useful when tasks need shared memory access.</p>
+<p>Examples)</p>
+<ul>
+<li>web server request handling</li>
+<li>background workers</li>
+<li>UI thread + worker thread</li>
+<li>concurrent API calls</li>
+</ul>
+<p>Tradeoff:</p>
+<ul>
+<li>cheaper than processes</li>
+<li>shared state introduces synchronization complexity</li>
+</ul>
+<p>Failure modes:</p>
+<ul>
+<li>race conditions</li>
+<li>deadlocks</li>
+<li>data corruption</li>
+</ul>
+<p>When to use:</p>
+<ul>
+<li>shared in-memory state</li>
+<li>I/O concurrency</li>
+<li>lightweight parallelism</li>
+<li>async task coordination</li>
+</ul>
+<p>When NOT to use:</p>
+<ul>
+<li>CPU-heavy Python workloads under the GIL</li>
+<li>strict isolation requirements</li>
+</ul>
+<h2>Program Stack - memory region storing function call state and local variables.</h2>
+<p>The stack contains:</p>
+<ul>
+<li>local variables</li>
+<li>function arguments</li>
+<li>return addresses</li>
+<li>stack frames</li>
+</ul>
+<p>Characteristics:</p>
+<ul>
+<li>automatically managed</li>
+<li>very fast</li>
+<li>typically smaller than heap</li>
+<li>grows/shrinks with function calls</li>
+</ul>
+<p>Example)</p>
+<pre><code class="language-python">def add(a, b):
+    result = a + b
+    return result
+# Variables like:
+a
+b
+result
+</code></pre>
+<p>typically live on the stack.</p>
+<p>Failure mode:</p>
+<ul>
+<li>stack overflow</li>
+</ul>
+<h2>Program Heap - memory region used for dynamically allocated memory.</h2>
+<p>Heap memory is used for:</p>
+<ul>
+<li>objects</li>
+<li>large data structures</li>
+<li>dynamic allocation</li>
+</ul>
+<p>Characteristics:</p>
+<ul>
+<li>larger than stack</li>
+<li>slower allocation</li>
+<li>manually managed in some languages</li>
+<li>garbage collected in others</li>
+</ul>
+<p>Examples)</p>
+<ul>
+<li>Python objects</li>
+<li>Java objects</li>
+<li>dynamically allocated arrays</li>
+</ul>
+<p>Heap memory persists beyond function scope until released.</p>
+<h2>Virtual Memory - abstraction layer allowing processes to believe they own contiguous memory.</h2>
+<p>The operating system maps:</p>
+<p>virtual addresses<br />
+    ↓<br />
+physical memory pages</p>
+<p>Benefits:</p>
+<ul>
+<li>process isolation</li>
+<li>memory protection</li>
+<li>larger apparent memory space</li>
+<li>simplified programming model</li>
+</ul>
+<p>Virtual memory allows:</p>
+<ul>
+<li>paging</li>
+<li>swapping</li>
+<li>memory-mapped files</li>
+</ul>
+<h2>memory-mapped files - files mapped directly into a process’s virtual memory space.</h2>
+<p>Instead of:</p>
+<pre><code class="language-python">file.read()
+</code></pre>
+<p>the OS maps the file into memory.</p>
+<p>File on Disk<br />
+      ↓<br />
+Virtual Memory Mapping<br />
+      ↓<br />
+Access like normal memory</p>
+<p>Benefits:</p>
+<ul>
+<li>Fast file access</li>
+<li>OS manages caching</li>
+<li>Efficient for large files</li>
+<li>Multiple processes can share mappings</li>
+</ul>
+<p>Common uses:</p>
+<ul>
+<li>databases</li>
+<li>search indexes</li>
+<li>large datasets</li>
+<li>machine learning datasets</li>
+</ul>
+<p>Examples:</p>
+<ul>
+<li>SQLite</li>
+<li>LMDB</li>
+<li>Lucene</li>
+<li>vector databases</li>
+</ul>
+<h2>Page -  fixed-size block of memory used by virtual memory systems.</h2>
+<p>Memory is divided into pages.</p>
+<p>Typical size: 4 KB</p>
+<p>The OS maps:</p>
+<p>virtual pages<br />
+    ↓<br />
+physical pages</p>
+<p>Paging enables:</p>
+<ul>
+<li>memory isolation</li>
+<li>swapping</li>
+<li>efficient memory management</li>
+</ul>
+<p>Important concepts:</p>
+<ul>
+<li>page faults</li>
+<li>page tables</li>
+<li>swapping</li>
+<li>TLB (Translation Lookaside Buffer)</li>
+</ul>
+<p>Performance issue:</p>
+<ul>
+<li>excessive page faults can severely slow systems</li>
+</ul>
+<h2>Virtual Pages vs Physical Pages</h2>
+<p>Modern systems use virtual memory.</p>
+<p>Each process sees: Virtual Address Space<br />
+while actual RAM contains: Physical Memory</p>
+<p>The OS maps: Virutal Pages -&gt; Physical Pages</p>
+<p>Process Believes:<br />
+Address 0x1000<br />
+Address 0x2000<br />
+Address 0x3000</p>
+<p>exist continuously, but internally:</p>
+<p>Virtual Page A → Physical Page 57<br />
+Virtual Page B → Physical Page 103<br />
+Virtual Page C → Physical Page 12</p>
+<p>Benefits:</p>
+<ul>
+<li>process isolation</li>
+<li>memory protection</li>
+<li>simplified programming model</li>
+<li>memory sharing</li>
+</ul>
+<h2>Kernel - core component of the operating system.</h2>
+<p>The kernel manages:<br />
+- memory<br />
+- processes<br />
+- threads<br />
+- hardware access<br />
+- scheduling<br />
+- filesystems<br />
+- networking</p>
+<p>The kernel is the intermediary between applications &lt;-&gt; hardware.</p>
+<p>i.e. Linux kernel, XNU kernel (macOS), Windows NT kernel</p>
+<h2>Synchronous - operations execute in a sequence and wait for completion before continuing.</h2>
+<pre><code class="language-python">data = fetch_data() # execution blocks until process finishes
+process(data)
+</code></pre>
+<p>Characteristics:<br />
+- simpler reasoning<br />
+- easier debugging<br />
+- blocking behavior</p>
+<p>Good for:<br />
+- simple workflows<br />
+- deterministic execution<br />
+- low concurrency requirements</p>
+<h2>Asynchronous - operations can make progress without blocking the current execution flow.</h2>
+<pre><code class="language-python">data = await fetch_data()
+</code></pre>
+<p>while waiting:<br />
+- other tasks can execute<br />
+- event loop continues<br />
+- resources are utilized efficiently</p>
+<p>Good for:<br />
+- network I/O<br />
+- APIs<br />
+- databases<br />
+- high-concurrency servers</p>
+<p>Important concepts:<br />
+- event loop<br />
+- future/promises<br />
+- coroutines<br />
+- callbacks</p>
+<p>Async improves:<br />
+- concurrency<br />
+- throughput</p>
+<p>Async does NOT necessarily improve:<br />
+- CPU-bound computation</p>
+<h2>Multithreading - multiple threads executing within the same process.</h2>
+<p>Threads share:<br />
+- heap<br />
+- virtual memory<br />
+- process resources</p>
+<p>Benefits:</p>
+<ul>
+<li>lightweight concurrency</li>
+<li>shared memory access</li>
+<li>lower overhead than processes</li>
+</ul>
+<p>Common use cases:</p>
+<ul>
+<li>web servers</li>
+<li>background tasks</li>
+<li>UI responsiveness</li>
+<li>concurrent I/O</li>
+</ul>
+<p>Tradeoffs:</p>
+<ul>
+<li>synchronization complexity</li>
+<li>race conditions</li>
+<li>deadlocks</li>
+</ul>
+<p>Python note:</p>
+<ul>
+<li>CPython has the GIL (Global Interpreter Lock)</li>
+<li>CPU-heavy Python threads may not execute truly in parallel</li>
+</ul>
+<h2>Multiprocessing - multiple independent processes executing concurrently.</h2>
+<p>Each process has:</p>
+<ul>
+<li>separate memory space</li>
+<li>separate virtual memory</li>
+<li>separate heap</li>
+</ul>
+<p>Benefits:</p>
+<ul>
+<li>true parallelism</li>
+<li>stronger isolation</li>
+<li>bypasses Python GIL</li>
+</ul>
+<p>Tradeoffs:</p>
+<ul>
+<li>heavier memory usage</li>
+<li>IPC overhead</li>
+<li>process startup cost</li>
+</ul>
+<p>Good for:</p>
+<ul>
+<li>CPU-heavy workloads</li>
+<li>ML preprocessing</li>
+<li>distributed computation</li>
+<li>parallel workers</li>
+</ul>
+<p>Examples)</p>
+<ul>
+<li>worker pools</li>
+<li>distributed systems</li>
+<li>data pipelines</li>
+</ul>
+<p>question</p>
+<h2>what releases heap memory in Python?</h2>
+<p>Reference Counting (Most Common)</p>
+<p>Every Python object keeps a count of how many references point to it.<br />
+Reference count = 0.</p>
+<p>At that moment CPython immediately frees the object.</p>
+<p>Garbage Collector (Cycles)</p>
+<p>Reference counting cannot handle cycles.</p>
+<p>the two objects still reference each other.</p>
+<p>Reference count never reaches 0.</p>
+<p>Python’s cyclic garbage collector detects this and cleans it up later.</p>
+<p>Function Scope Cleanup</p>
+<p>When a function returns:<br />
+data goes out of scope.</p>
+<p>Reference count drops to 0.</p>
+<p>Memory becomes eligible for release.</p>
+<p>Explicit Deletion</p>
+<p>You can remove a reference:</p>
+<p>del my_list</p>
+<p>This does not directly free memory.</p>
+<p>It removes the name: my_list<br />
+from the current scope.</p>
+<p>If no references remain:</p>
+<p>then the object is freed.</p>
+<h2>Swap - disk space used as overflow memory when RAM becomes full.</h2>
+<p>The operating system can move inactive memory pages from RAM to disk.</p>
+<p>RAM Full<br />
+   ↓<br />
+Move inactive pages<br />
+   ↓<br />
+Swap Space (Disk)</p>
+<p>Benefits:</p>
+<ul>
+<li>Allows more memory than physical RAM</li>
+<li>Prevents immediate process termination</li>
+</ul>
+<p>Tradeoffs:</p>
+<ul>
+<li>Disk is much slower than RAM</li>
+<li>Excessive swapping causes severe performance degradation</li>
+</ul>
+<h3>Thrashing - Excessive swapping causes severe performance degradation</h3>
+<p>Occurs when:</p>
+<pre><code>Page In
+Page Out
+Page In
+Page Out
+</code></pre>
+<p>happens constantly.</p>
+<p>System spends more time moving memory than executing work.</p>
+<h2>Page Fault - occurs when a process accesses a virtual page that is not currently available in RAM.</h2>
+<p>Process:</p>
+<pre><code>Access Virtual Page
+       ↓
+Page Missing
+       ↓
+Page Fault
+       ↓
+OS Loads Page
+       ↓
+Execution Continues
+</code></pre>
+<p>Page faults are normal.</p>
+<p>Examples:</p>
+<ul>
+<li>accessing swapped memory</li>
+<li>accessing memory-mapped files</li>
+<li>first access after allocation</li>
+</ul>
+<p>Types:</p>
+<p>Minor Page Fault</p>
+<p>Page already exists in memory.<br />
+Only page table update needed.</p>
+<p>Major Page Fault</p>
+<p>Page must be loaded from disk.</p>
+<p>Major page faults are expensive.</p>
+<p>Symptoms:</p>
+<ul>
+<li>application pauses</li>
+<li>high disk activity</li>
+<li>poor performance</li>
+</ul>
+<h2>Segmentation Fault (Seg Fault) - process attempts to access memory it is not allowed to access.</h2>
+<pre><code>int* ptr = NULL;
+*ptr = 5;
+</code></pre>
+<p>or:<br />
+Read invalid address<br />
+Write invalid address<br />
+Execute invalid address</p>
+<p>Operating System response: SIGSEGV</p>
+<p>Process terminates.</p>
+<p>Common causes:</p>
+<ul>
+<li>null pointer dereference</li>
+<li>buffer overflow</li>
+<li>use-after-free</li>
+<li>invalid memory access</li>
+</ul>
+<p>Python rarely produces seg faults because memory is managed.</p>
+<p>Seg faults are more common in:</p>
+<ul>
+<li>C</li>
+<li>C++</li>
+<li>Rust (unsafe code)</li>
+<li>native extensions</li>
+</ul>
+<h1>Python Runtime Concepts</h1>
+<h2>Python GIL (Global Interpreter Lock)</h2>
+<p>A lock inside CPython that allows only one thread to execute Python bytecode at a time.</p>
+<p>Conceptually:</p>
+<pre><code>Thread A
+Thread B
+Thread C
+
+      ↓
+
+Only one thread executes Python bytecode
+at a given moment
+</code></pre>
+<p>Benefits:</p>
+<ul>
+<li>simplifies memory management</li>
+<li>simplifies reference counting</li>
+<li>reduces interpreter complexity</li>
+</ul>
+<p>Tradeoffs:</p>
+<ul>
+<li>limits CPU-bound thread parallelism</li>
+<li>multiple threads cannot fully utilize multiple CPU cores</li>
+</ul>
+<p>Example:</p>
+<p>CPU-heavy workload:</p>
+<pre><code class="language-python">for i in range(1_000_000_000):
+    ...
+</code></pre>
+<p>Multiple threads often do not speed this up significantly.</p>
+<p>However:</p>
+<p>I/O-bound workloads</p>
+<p>still benefit greatly:</p>
+<ul>
+<li>HTTP requests</li>
+<li>Database calls</li>
+<li>File operations</li>
+<li>Network I/O</li>
+</ul>
+<p>because the GIL is released while waiting.</p>
+<p>Rule of thumb:<br />
+CPU-bound → multiprocessing<br />
+I/O-bound → threading or async</p>
+<h2>CPython -  the standard and most widely used implementation of Python.</h2>
+<p>Features:</p>
+<ul>
+<li>written primarily in C</li>
+<li>uses reference counting</li>
+<li>includes cyclic garbage collector</li>
+<li>contains the GIL</li>
+</ul>
+<p>Most Python behavior people discuss refers specifically to CPython.</p>
+<p>Reference Counting<br />
+Garbage Collection<br />
+Memory Management<br />
+Object Model<br />
+Python GIL</p>
+<p>One useful mental model:</p>
+<pre><code>Process
+ ├── Virtual Memory
+ │     ├── Virtual Pages
+ │     └── Memory-Mapped Files
+ │
+ ├── Threads
+ │     └── CPython GIL
+ │
+ └── Heap Objects
+       ↓
+Reference Counting
+       ↓
+Garbage Collection
+</code></pre>
+<h2>Python Object Model -  Everything in Python is an object.</h2>
+<p>Identity - id(x) - memory identity<br />
+Equality -  a == b - Value equality.<br />
+Object Identity - a is b - Same object.</p>
+<p>Mutable vs Immutable</p>
+<p>Immutable</p>
+<ul>
+<li>int</li>
+<li>float</li>
+<li>str</li>
+<li>tuple</li>
+<li>frozenset</li>
+</ul>
+<p>Mutable</p>
+<ul>
+<li>list</li>
+<li>dict</li>
+<li>set</li>
+<li>custom objects</li>
+</ul>
+<pre><code class="language-python">def foo(x=[]):
+    x.append(1)
+    return x
+# Most people assume:
+#-&gt;  new list created every call
+# But Python evaluates default arguments:
+def foo(x=None):
+    if x is None:
+        x = []
+
+    x.append(1)
+    return x
+</code></pre>
+<h2>Shallow Copy vs Deep Copy</h2>
+<pre><code class="language-python">import copy
+
+copy.copy()
+copy.deepcopy()
+</code></pre>
+<p>Important for:</p>
+<ul>
+<li>recursion</li>
+<li>object graphs</li>
+<li>DTOs</li>
+<li>agent state</li>
+</ul>
+<p>Functions &amp; Closures</p>
+<p>First-Class Functions</p>
+<p>Functions can be:</p>
+<ul>
+<li>stored</li>
+<li>passed</li>
+<li>returned</li>
+</ul>
+<pre><code class="language-python">def make_adder(n):
+    def add(x):
+        return x + n
+    return add
+</code></pre>
+<h2>Closures</h2>
+<p>Function remembers surrounding variables.</p>
+<p>Important for:</p>
+<ul>
+<li>decorators</li>
+<li>factories</li>
+<li>callbacks</li>
+</ul>
+<pre><code class="language-python">def make_adder(n):
+    def add(x):
+        return x + n
+
+    return add
+add5 = make_adder(5)
+#add5
+# ├── code: x + n
+# └── captured:
+#        n = 5
+</code></pre>
+<p>Python still has access to: n = 5, even though make_adder() finished long ago.</p>
+<pre><code class="language-python">def multiplier(factor):
+    def multiply(x):
+        return x * factor
+
+    return multiply
+
+double = multiplier(2)
+triple = multiplier(3)
+
+double(5)
+# 10
+
+triple(5)
+# 15
+</code></pre>
+<p>Each closure has its own captured state.</p>
+<h2>Decorators</h2>
+<p>takes a function<br />
+returns a function</p>
+<pre><code class="language-python">def log(func):
+    def wrapper(*args, **kwargs):
+        print(func.__name__)
+        return func(*args, **kwargs)
+    return wrapper
+
+@log
+def foo():
+    pass
+
+@log
+def hello():
+    print(&quot;Hello&quot;)
+#Python converts this to:
+def hello():
+    print(&quot;Hello&quot;)
+
+hello = log(hello)
+</code></pre>
+<p>Used everywhere:</p>
+<ul>
+<li>FastAPI</li>
+<li>Flask</li>
+<li>pytest</li>
+<li>caching</li>
+</ul>
+<h2>Iteration &amp; Generators</h2>
+<h3>Iterator</h3>
+<p>Implements:</p>
+<pre><code class="language-python">__iter__()
+__next__()
+</code></pre>
+<h3>Generator - produces on demand values with yield.</h3>
+<p>Uses:</p>
+<pre><code class="language-python">yield
+
+#example)
+def count():
+    n = 0
+    while True:
+        yield n
+        n += 1
+</code></pre>
+<p>function pauses.</p>
+<p>State is preserved.</p>
+<p>Benefits:</p>
+<ul>
+<li>lazy evaluation</li>
+<li>lower memory</li>
+</ul>
+<p>When To Use Generators</p>
+<p>Streaming Large Files</p>
+<pre><code class="language-python">data = file.readlines() # Bad, loads entire file.
+for line in file: # Good, Generator behavior.
+    ...
+</code></pre>
+<p>Paginated APIs:</p>
+<pre><code class="language-python">def users():
+    while page:
+        yield from fetch_page(page)
+</code></pre>
+<p>Pipelines</p>
+<pre><code class="language-python">def parse():
+    yield ...
+
+def transform():
+    yield ...
+
+def save():
+    yield ...
+</code></pre>
+<p>Infinite Sequences:</p>
+<pre><code class="language-python">def ids():
+    i = 0
+
+    while True:
+        yield i
+        i += 1
+</code></pre>
+<h3>Generator Expressions</h3>
+<pre><code class="language-python">(x*x for x in range(100))
+# vs
+[x*x for x in range(100)]
+</code></pre>
+<h2>Concurrency</h2>
+<h3>Threading</h3>
+<p>Good for:</p>
+<p>I/O<br />
+HTTP<br />
+DB<br />
+Files</p>
+<p>Not ideal for CPU-heavy work, due to GIL.</p>
+<h3>Multiprocessing - True parallelism.</h3>
+<p>Each process:</p>
+<ul>
+<li>own memory</li>
+<li>own interpreter</li>
+</ul>
+<p>Good for:</p>
+<ul>
+<li>ETL</li>
+<li>ML preprocessing</li>
+<li>CPU-intensive workloads</li>
+</ul>
+<h3>Asyncio - Event loop concurrency</h3>
+<pre><code class="language-python">async def
+await
+</code></pre>
+<p>Example)</p>
+<pre><code class="language-python">async def fetch():
+    await client.get(...)
+</code></pre>
+<p>Used heavily in:</p>
+<ul>
+<li>FastAPI</li>
+<li>agents</li>
+<li>AI workflows</li>
+</ul>
+<h3>asyncio.gather()</h3>
+<pre><code class="language-python">results = await asyncio.gather(
+    task1(),
+    task2(),
+    task3(),
+)
+</code></pre>
+<p>Runs concurrently.</p>
+<h3>GIL (Global Interpreter Lock)</h3>
+<pre><code class="language-python">def work():
+    for _ in range(100_000_000):
+        pass
+
+thread1.start()
+thread2.start()
+</code></pre>
+<p>you might expect:<br />
+2 cores<br />
+2x speed</p>
+<p>But often: ~1x speed, due to GIL</p>
+<p>If CPU Bound:</p>
+<pre><code class="language-python">for x in range(1_000_000_000):
+</code></pre>
+<ul>
+<li>use multiprocessing</li>
+</ul>
+<p>I/O Bound</p>
+<pre><code class="language-python">requests.get(...)
+</code></pre>
+<h2>Typing</h2>
+<h3>Type Hints</h3>
+<pre><code class="language-python">def add(a: int, b: int) -&gt; int:
+    return a + b
+</code></pre>
+<h3>Optional</h3>
+<pre><code class="language-python">Optional[str]
+# or
+str | None
+</code></pre>
+<h3>Union</h3>
+<pre><code class="language-python">str | int
+</code></pre>
+<h3>Generic Types</h3>
+<pre><code class="language-python">list[str]
+dict[str, int]
+</code></pre>
+<h3>Protocol</h3>
+<p>Protocol asks: Does this object have the methods I need?<br />
+rather than: Does this object inherit from my base class?</p>
+<p>Structural typing.</p>
+<pre><code class="language-python">from typing import Protocol
+
+class Repository(Protocol):
+    def save(self, item): ...
+# PostgresRepository is automatically valid.
+class PostgresRepository:
+    def save(self, item):
+        print(&quot;saved&quot;)
+</code></pre>
+<p>Excellent for:</p>
+<ul>
+<li>DDD</li>
+<li>testing</li>
+<li>dependency injection</li>
+</ul>
+<p>Why?</p>
+<pre><code class="language-python">class StudentRepository:
+    ...
+
+class AssignmentRepository:
+    ...
+# Protocol lets services depend on behavior:
+class ClassroomService:
+    def __init__(self, repository: Repository):
+        self.repository = repository
+</code></pre>
+<p>instead of concrete implementations.</p>
+<p>Very useful for:</p>
+<ul>
+<li>dependency injection</li>
+<li>testing</li>
+<li>clean architecture</li>
+<li>adapters</li>
+</ul>
+<h2>Data Modeling</h2>
+<h3>Dataclasses</h3>
+<pre><code class="language-python">from dataclasses import dataclass
+
+@dataclass
+class User:
+    name: str
+</code></pre>
+<h3>Pydantic</h3>
+<pre><code class="language-python">class User(BaseModel):
+    name: str
+</code></pre>
+<p>Provides:</p>
+<ul>
+<li>validation</li>
+<li>serialization</li>
+<li>schemas</li>
+</ul>
+<p>Very useful in:</p>
+<ul>
+<li>FastAPI</li>
+<li>agents</li>
+<li>tool calling</li>
+</ul>
+<h2>Memory &amp; Performance</h2>
+<h3>List Comprehensions</h3>
+<pre><code class="language-python">[x*x for x in nums]
+</code></pre>
+<p>Prefer over loops when simple.</p>
+<h3>Sets vs Lists</h3>
+<pre><code class="language-python">x in my_list.   # O(n)
+x in my_set     # O(1)
+</code></pre>
+<h3>Dict Internals</h3>
+<h3>Slots</h3>
+<p>Normally Python objects store attributes in a dict. Every object carries attribute dictionary overhead.</p>
+<pre><code class="language-python">class User:
+    __slots__ = (&quot;name&quot;, &quot;email&quot;)
+
+u = User()
+u.name = &quot;Mark&quot; # works.
+u.phone = &quot;123&quot; # fails.
+</code></pre>
+<h2>Testing</h2>
+<h3>pytest</h3>
+<pre><code class="language-python">def test_add():
+    assert add(1,2) == 3
+</code></pre>
+<h3>Fixtures</h3>
+<pre><code class="language-python">@pytest.fixture
+def db():
+    ...
+</code></pre>
+<h3>Mocking</h3>
+<pre><code class="language-python">from unittest.mock import Mock
+</code></pre>
+<h2>Python for AI Engineers</h2>
+<h3>Context Managers</h3>
+<pre><code class="language-python">with open(&quot;file.txt&quot;) as f:
+    ...
+
+# custom
+__enter__()
+__exit__()
+</code></pre>
+<h3>Serialization</h3>
+<pre><code class="language-python">json
+pickle
+msgpack
+protobuf
+</code></pre>
+<h3>Structured Outputs</h3>
+<p>Pydantic models for LLMs.</p>
+<pre><code class="language-python">class ResearchReport(BaseModel):
+    title: str
+    summary: str
+</code></pre>
+<h3>Dependency Injection</h3>
+<p>Pattern:</p>
+<pre><code class="language-python">class Service:
+    def __init__(self, repository):
+        self.repository = repository
+</code></pre>
+<hr />
+<p><em>Still chewing on:</em> While today's exploration clarified many aspects of process and thread management, it left me thinking about practical scenarios where multiprocessing might outperform multithreading despite the overhead. Is there a rule of thumb for determining when to lean towards processes over threads?</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'threads-processes-memory-management-python';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+</body>
+</html>
