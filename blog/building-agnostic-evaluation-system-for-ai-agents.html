@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Exploring the architecture, evaluation methods, and tradeoffs of a comprehensive system to assess AI agents.">
+    <title>Building an Agnostic Evaluation System for AI Agents</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-05-31</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">AI</span>
+                                    <span class="tag">Machine Learning</span>
+                                    <span class="tag">Evaluation Systems</span>
+                                    <span class="tag">Agentic Reasoning</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Building an Agnostic Evaluation System for AI Agents</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Today, I am pondering how to construct an agnostic evaluation framework that can consistently measure performance across multiple dimensions for AI agents. The objective is clear: ensure that the correct actions are taken with proper tools and within cost-effective limits. This exploration matters greatly in my work as it drives the reliable performance of intelligent systems.</p>
+<h1>Modern AI / Agentic Evaluation Systems</h1>
+<p>Did this agent produce the right result, using the right reasoning path, witht he right tools, at acceptable cost/latency/safety?</p>
+<h2>Core Architecture</h2>
+<pre><code>User / CI / Scheduled Eval
+        |
+        v
+Eval Orchestrator
+        |
+        +--&gt; Dataset Service
+        |       - golden datasets
+        |       - production traces
+        |       - synthetic cases
+        |
+        +--&gt; Agent Runner
+        |       - prompt version
+        |       - model version
+        |       - tools enabled
+        |       - retrieval config
+        |
+        +--&gt; Trace Collector
+        |       - model calls
+        |       - tool calls
+        |       - intermediate steps
+        |       - latency/cost/tokens
+        |
+        +--&gt; Evaluator Service
+        |       - deterministic checks
+        |       - semantic similarity
+        |       - LLM-as-judge
+        |       - trajectory/tool-call scoring
+        |       - human review
+        |
+        +--&gt; Results Store
+        |       - scores
+        |       - traces
+        |       - experiment metadata
+        |
+        +--&gt; Dashboard / CI Gate / Alerting
+</code></pre>
+<h2>Core Tables / Domain Objects</h2>
+<pre><code>Dataset
+- id
+- name
+- version
+- tags
+
+EvalCase
+- id
+- dataset_id
+- input
+- expected_output
+- expected_tool_calls
+- metadata
+- difficulty
+- category
+
+Experiment
+- id
+- dataset_id
+- app_version
+- prompt_version
+- model
+- retrieval_config
+- tool_config
+- created_at
+
+Run
+- id
+- experiment_id
+- eval_case_id
+- status
+- final_output
+- trace_id
+- latency_ms
+- token_count
+- cost_cents
+
+Trace
+- id
+- run_id
+- spans: model_call | tool_call | retrieval | router | planner
+
+Score
+- id
+- run_id
+- evaluator_name
+- score
+- pass_fail
+- explanation
+</code></pre>
+<h2>Eval Types</h2>
+<h3>Unit-Style Deterministic Evals - clear correctness.</h3>
+<ul>
+<li>JSON schema is valid</li>
+<li>required fields present</li>
+<li>citation IDs exist</li>
+<li>tool call arguments match expected values</li>
+<li>SQL query does not contain unsafe operation</li>
+<li>API response includes correct ID</li>
+</ul>
+<p>Cheap, reliable and should run in CI.</p>
+<h3>Golden dataset regression evals</h3>
+<p>A fixed set of representative cases. This is the equivalent of regresstion tests for AI.</p>
+<p>Detect regressions before deployment as prompt/model changes can improve overall average while hurting specific slices.</p>
+<pre><code class="language-yaml">Dataset: customer-support-agent-v12
+Cases:
+- refund request
+- ambiguous billing issue
+- angry customer
+- prompt injection attempt
+- multi-turn account lookup
+- tool timeout recovery
+</code></pre>
+<p>Run this on every prompt/model/tool change.</p>
+<h3>LLM-as-judge evals</h3>
+<p>Useful when there is no exact answer (non-deterministic).</p>
+<p>Judge rubric example:</p>
+<pre><code>Score 1-5:
+- factual correctness
+- completeness
+- follows instructions
+- tone
+- safety
+- groundedness
+</code></pre>
+<p>Weakness is judge bias and inconsistency, for calibration: use fixed rubrics, few-shot examples, judge versioning, and periodic human audits.</p>
+<h3>Agent trajectory evals</h3>
+<p>You evaluate:</p>
+<pre><code class="language-sql">- Did the agent call the right tool?
+- Did it call tools in the right order?
+- Did it pass correct arguments?
+- Did it avoid unnecessary tool calls?
+- Did it recover from tool errors?
+- Did it stop instead of looping?
+</code></pre>
+<p>For agentic eval: traces, graders, datasets and eval runs for agent workflows. <br />
+LangSmith supports experiments tied to datasets with outputs, evaluator scores and execution traces for comparison.</p>
+<h3>RAG evals</h3>
+<p>For retrieval-augmented agents, evaluate retrieval and answer separately.</p>
+<p>Retrieval metrics:<br />
+- recall@k<br />
+- precision@k<br />
+- MRR<br />
+- context relevance</p>
+<p>Generation metrics:<br />
+- answer correctness<br />
+- citation accuracy<br />
+- groundedness<br />
+- hallucination rate</p>
+<p>Arize Pheonix (Open Source Oversability) tracing can capture retrieval, embedding, model calls, and responser generation in the request timeline</p>
+<h3>Online Production Evals</h3>
+<p>Offline evals are not enough. </p>
+<p>On Prod monitor:<br />
+- user thumbs up/down<br />
+- escalation rate<br />
+- task completion<br />
+- abandon rate<br />
+- latency<br />
+- cost per successful task<br />
+- tool error rate<br />
+- hallucination reports<br />
+- safety violations</p>
+<p>THen sample production traces into future datasets.</p>
+<p>Log Production Traces: Tools like Arize Phoenix monitor your live application, recording exactly what the user said, how the LLM responded, the exact prompts used, and retriever latency.</p>
+<p>Filter and Sample: You do not use all data. You sample a subset, focusing heavily on:Edge cases: Weird or unexpected user inputs.Failures: Sessions where users gave a thumbs-down or the AI hallucinated.Successes: Perfect examples of complex multi-step reasoning.</p>
+<h3>Offline vs Online Evals:</h3>
+<pre><code class="language-yaml">Offline evals:
+- run before deployment
+- fixed datasets
+- reproducible
+- compare versions
+- CI/CD gating
+
+Online evals:
+- run against production traces
+- monitor drift
+- detect regressions after release
+- collect human feedback
+- feed dataset curation
+</code></pre>
+<p>Datasets created from curated cases, production traces or synthetic generation<br />
+Evalutators - human review, code rules, LLM-as-judge, and pairwise comparison.</p>
+<h2>CI/CD Flow</h2>
+<pre><code>Developer changes prompt/model/tool
+        |
+        v
+Run smoke eval suite
+        |
+        v
+Run golden dataset
+        |
+        v
+Compare against baseline
+        |
+        +--&gt; pass: deploy to canary
+        |
+        +--&gt; fail: block deploy
+</code></pre>
+<pre><code>- correctness must not drop more than 2%
+- safety pass rate must be 100%
+- cost per task must not increase more than 15%
+- latency p95 must stay below 5 seconds
+- tool-call accuracy must stay above 98%
+</code></pre>
+<h2>Important Tradeoffs</h2>
+<pre><code class="language-yaml">Deterministic checks:
++ cheap, stable, explainable
+- only work for structured correctness
+
+LLM judges:
++ flexible, good for open-ended tasks
+- expensive, noisy, can be biased
+
+Human review:
++ highest quality signal
+- slow and expensive
+
+Production feedback:
++ real user behavior
+- noisy, delayed, hard to attribute
+
+Synthetic data:
++ helps cover edge cases
+- may not match real users
+</code></pre>
+<p>The eval system I would design would be a platform which includes both offline evals and online feedback. Each agent<br />
+run emits a structured trace: prompt version, model version, retrieval context, tool calls, intermediate steps, final response,<br />
+latency, token usage, and cost. We store those traces and use them to build versioned eval datasets. FOr every change to the agent,<br />
+we run an experiment against golden datasets and score it with a mix of deterministic validators, LLM judges, trajectory evaluators,<br />
+and huan review for high-risk cases. The output is a comparison against a baselines, with CI/CD gates for correctness, safety, <br />
+latency, and cost. In production, we monitor user feedback, task success, escalation rate, and drift, then promoting<br />
+interesting failures back into the eval dataset.</p>
+<h2>Additional Detail Considerations</h2>
+<pre><code class="language-javascript">Version everything:
+- prompts
+- models
+- tools
+- retrieval index
+- datasets
+- judges
+- grading rubrics
+
+Slice metrics:
+- by customer
+- by intent
+- by difficulty
+- by language
+- by tool
+- by prompt version
+
+Protect against flaky evals:
+- repeat stochastic runs
+- use confidence intervals
+- pin temperature for evals
+- calibrate LLM judges against human labels
+
+Handle privacy:
+- redact PII from traces
+- encrypt stored prompts/responses
+- use tenant isolation
+- control who can view production traces
+
+Scale:
+- async workers for eval runs
+- queue-based orchestration
+- batch model calls
+- cache deterministic steps
+- store traces in object storage or columnar analytics store
+</code></pre>
+<p>Stochastic is a subset of non-determinism, which is dtermined by elements of randomness or probabilistic distribution</p>
+<hr />
+<p><em>Still chewing on:</em> Reflecting on these considerations, I realize there's a fine balance between deterministic checks for reliability and LLM judgments for nuanced tasks. How do we effectively integrate human review and production feedback into an automated evaluation system without breaking the budget?</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'building-agnostic-evaluation-system-for-ai-agents';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+</body>
+</html>
