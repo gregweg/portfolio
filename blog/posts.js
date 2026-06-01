@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Building an Agnostic Evaluation System for AI Agents",
+        slug: "building-agnostic-evaluation-system-for-ai-agents",
+        date: "2026-05-31",
+        tags: ["AI", "Machine Learning", "Evaluation Systems", "Agentic Reasoning"],
+        description: "Exploring the architecture, evaluation methods, and tradeoffs of a comprehensive system to assess AI agents."
+    },
+    {
         title: "Threads, Processes, and Memory Management in Python",
         slug: "threads-processes-memory-management-python",
         date: "2026-05-31",
