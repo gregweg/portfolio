@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Agentic Design Patterns & Reinforcement Learning in AI",
+        slug: "agentic-design-patterns-rl-in-ai",
+        date: "2026-06-01",
+        tags: ["AI Agents", "Reinforcement Learning", "Design Patterns", "Sandbox Environment"],
+        description: "Exploring design patterns for autonomous agents and applying reinforcement learning techniques to refine their capabilities."
+    },
+    {
         title: "Building an Agnostic Evaluation System for AI Agents",
         slug: "building-agnostic-evaluation-system-for-ai-agents",
         date: "2026-05-31",

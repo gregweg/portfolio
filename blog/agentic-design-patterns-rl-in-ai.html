@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Exploring design patterns for autonomous agents and applying reinforcement learning techniques to refine their capabilities.">
+    <title>Agentic Design Patterns & Reinforcement Learning in AI</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-06-01</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">AI Agents</span>
+                                    <span class="tag">Reinforcement Learning</span>
+                                    <span class="tag">Design Patterns</span>
+                                    <span class="tag">Sandbox Environment</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Agentic Design Patterns & Reinforcement Learning in AI</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Today, I'm focusing on the evolving architecture of AI agents and how they learn from both design principles and feedback mechanisms. Understanding agentic patterns is key for building robust, self-improving systems. Reinforcement learning through human feedback and supervised fine-tuning adds a critical layer in refining these agents' capabilities.</p>
+<h1>Agentic Design Patterns, Agentic Factory Exploration</h1>
+<h2>Agentic AI Design Patterns</h2>
+<h3>Reflection</h3>
+<p>Enables AI to evaluate and improve performance by analyzing its own inputs, decisions and reasoning processes.</p>
+<ul>
+<li>Self-evaluation: AI's ability to review it's own outputs</li>
+<li>Error identification: Finding potential issues or inconsistencies</li>
+<li>Improvement suggestions: Proposing ways to enhance the output</li>
+<li>Iterative improvement: Refining results through multiple cycles</li>
+</ul>
+<h3>Tool Use</h3>
+<p>Allows AI to leverage external tools and resources, expanding its capabilities beyond language processing alone.</p>
+<p>External Resource Utilization: external tools (APIs, Databases, etc.)</p>
+<p>Capability Extension: perform complex tasks</p>
+<p>Dynamic Interaction: Interact with external systems</p>
+<p>Various Applications: </p>
+<h3>Planning</h3>
+<p>Empowers AI to break down complex tasks into manageable steps, developing structured approaches to problem-solving.</p>
+<p>Task Decomposition: Breaks complex goals into managable subtasks.</p>
+<p>Strategic Structuring: Systematically organizes steps for goal achievement.</p>
+<p>Efficient Execution: Performs tasks according to plan &amp; monitor progress.</p>
+<p>Flexible Adjustment: Modifies and adapts plans as needed.</p>
+<h3>Multi-Agent Collaboration</h3>
+<p>Facilitates multiple AI agents working together, each with specialized roles, to tackle complex problems more effectively.</p>
+<p>Task Division: Decompose complex problems into smaller tasks</p>
+<p>Specialization: Agents specialize in the specific roles or functions</p>
+<p>Collaboration: Agents exchange information and share results</p>
+<p>Result Integration: Combines individual results to generate the final output.</p>
+<h2>Reinforcement Learning</h2>
+<h3>Skill-Matching via AI Interview</h3>
+<ul>
+<li>Experts undergo interview by voice agent. on background, system design decisions, or domain-specific logic to asses their capability</li>
+<li>Creates routing index for Expert</li>
+</ul>
+<h3>RLHF (Reinforcement Learning from Human Feedback) - experts evaluate and rank complex AI outputs (assess medical diagnosis, debug code)</h3>
+<ul>
+<li>Multi-Modal Output Comparison: Expert is show specific, highly complex prompts alongside two or more blind, model-generated responses</li>
+<li>Structured Rubric: Expert evaluates the outputs against a granular multi-tier rubric (scoring factoring, safety, logical consistency, tone)</li>
+<li>Partial Correctness Capturing: Allows for nuanced response A was better then B here.</li>
+</ul>
+<h3>SFT (Supervised Fine-Tuning): Experts write high-quality ground-truth data and reasoning chains for models to replicate.</h3>
+<ul>
+<li>Ground-Truth Writing: Experts are given an instruction or a prompt and must author the absoulte "gold-standard" response from scratch, explictly writing out the step by steps instructions on how to get there.</li>
+<li>Specialized Tooling Environments: For technical tasks, Mercor integrats sandbox environments. For data-agent traning, experts work in live spreadsheet modules to execute four-step tasks to show the model the exact, repeatable actions an agent should take.</li>
+</ul>
+<h2>Verification &amp; Agent Sandbox Layer</h2>
+<p>Sandbox ~ Archipelago - Docker-based evaluation harness for training multi-step AI agents. Experts interact with AI agents inside these simulated work environments. Grading the multi-turn actions in real time.</p>
+<p>Fraud &amp; Quality - Prevents experts from simply using  Tracks behavioral signals during data submission, monitoring full-screen focus, anomolies in keyboard typing cadences and sudden dumping of carge blocks of flawless text without manual edits or cursor movements</p>
+<h1>Archipelago</h1>
+<p>Archipelago is a docker-first framework designed to spin up, state-manage and spin down ephemeral, multi-service sandboxes</p>
+<p>Docker Project Wrapped in an Orchestration Layer</p>
+<h2>Core Infrastructure (Docker &amp; Local Primitives)</h2>
+<ul>
+<li>Ephemeral Databases: Sandboxes spin up their own isolated DB instance (typically PostgreSQL)</li>
+<li>Cloud Primitives(LocalStack) - run inside the container to emulate AWS infra without hitting live cloud accounts.</li>
+<li>Agent has access to mock S3 buckets, AWS Lambda functions, DynamoDB tables, and Kineses Streams</li>
+</ul>
+<h2>The Application Layer (Simulated Corporate Office)</h2>
+<p>To simulate the actual desktop knowledge-work, the Docker cluster runs headless, open-source instances of standard enterprise productivity applications</p>
+<ul>
+<li>Communication &amp; Ticketing: Mock Slack (Mattermost) for team chat. MailHog for intercepting and verifying outgoing emails and Zammad or Plane for handling issue tickets.</li>
+<li>Data Rooms: An initialized workspace populated with messy, realistic seed data (PDFs, multi-tab Excel sheets, slide presentations, and raw server logs) pulled dynamically from an S3 storage back-end upon container initialization.</li>
+</ul>
+<h2>The Connectivity Protocol: Model Context Protocol (MCP)</h2>
+<ul>
+<li>Archipelago sets up a headless environment that exposes an MCP Gateway.</li>
+<li>The MCP server dynamicaly routes requests, exposing local subsystems (ex. container's virtual /filesystem or software tools) as hot-swappable tools the LLM can explicitly call.</li>
+</ul>
+<pre><code>[ Human Expert UI ] ──(Monitor/Prompts)──► [ AI Agent ]
+                                                 │
+                                           (MCP Tool Calls)
+                                                 ▼
+                                     ┌───────────────────────┐
+                                     │  ARCHIPELAGO SANDBOX  │
+                                     │   (Docker Container)  │
+                                     │                       │
+                                     │ ┌───────────────────┐ │
+                                     │ │ LocalStack (AWS)  │ │
+                                     │ └───────────────────┘ │
+                                     │ ┌───────────────────┐ │
+                                     │ │ PostgreSQL / Logs │ │
+                                     │ └───────────────────┘ │
+                                     │ ┌───────────────────┐ │
+                                     │ │ Mattermost / Mail │ │
+                                     │ └───────────────────┘ │
+                                     └───────────────────────┘
+                                                 │
+                                        (Snapshot Diff)
+                                                 ▼
+                                     [ Verifier / Grading ]
+</code></pre>
+<h3>/assign_task</h3>
+<p>1) Population &amp; Spin-up: <br />
+- Runner script:<br />
+    - starts Docker container<br />
+    - downloads specific "world snapchat"<br />
+    - configure MCP servers<br />
+    - hand terminal/API access over to the AI agent.</p>
+<p>2) The Trajectory: <br />
+- Agent attempts to complete a long-horizon task. <br />
+  - (ex. Read the legal contracts in the folder, <br />
+    find the conflicting compliance clause, <br />
+    and message the manager on Mattermost with a fix")<br />
+  - Expert monitors the trajectory, human in the loop to rate individual actions or correct pathing.</p>
+<p>3) State Snapshotting &amp; Grading:<br />
+- Once agent finishes or runs out of steps.<br />
+  - crates a .tar.gz archive for the entire final environmnet state <br />
+  (including full FS diffs and system logs) and streams it back.</p>
+<p>4) The Verifier Layer:<br />
+- Automated "verifiers" <br />
+  - compute snapshot diffs to ensure the databse entries actually updated corretly <br />
+  or that filers were modified precisely to the expert's gold standard criteria, <br />
+  generating deterministic pass/fail qualtiy score.</p>
+<h3>Trajectory</h3>
+<p>When dealing with LLM agents, reinforcement learning (RL), or sequential decision-making systems, a trajectory refers to the complete history of states, actions, and rewards an agent experiences from the start of a task to its completion.Mathematically and structurally, a trajectory $\tau$ is represented as a sequence:$$\tau = (s_0, a_0, r_0, s_1, a_1, r_1, \dots, s_T)$$Where:$s_t$ is the state of the world at time $t$ (e.g., the current files in the sandbox, the visible terminal screen, or open database entries).$a_t$ is the action the agent takes (e.g., executing a command via the Model Context Protocol, writing a file, or calling an API).$r_t$ is the reward or grading feedback received (either immediate or calculated at the terminal step $T$).</p>
+<p>LocalStack is a mix of custom state engines and curated open-source mock frameworks, unified to act like a single operating system.</p>
+<h3>Data &amp; Storage Persistence</h3>
+<ul>
+<li><strong>S3 (Simple Storage Service):</strong> Built on a heavily optimized iteration of <code>Moto</code> (an open-source AWS mocking library). When you stream a file to a local S3 bucket, it isn't executing complex distributed file logic; it writes the binary directly to a structured directory path inside the container's file system (<code>/var/lib/localstack</code>).</li>
+<li><strong>DynamoDB:</strong> Uses a lightweight Java-based embedded DynamoDB Local binary or a Python equivalent. It runs a single-file SQLite database under the hood to simulate partitioned NoSQL key-value lookups, supporting global secondary indexes (GSIs) and DynamoDB Streams.</li>
+</ul>
+<h3>Messaging &amp; Event Routing</h3>
+<ul>
+<li><strong>SQS &amp; SNS:</strong> Emulated using lightning-fast in-memory queues. When an agent fires an event to an SNS topic, LocalStack computes the subscription filters instantly and drops the payload into the emulated SQS buffer, turning a multi-second cloud async operation into a sub-millisecond execution.</li>
+</ul>
+<h2>Thought Topics</h2>
+<p>Owning your Agent Harness<br />
+Pi Coding Agent<br />
+Agent Harness<br />
+Multi Team<br />
+Build the system that builds the system.</p>
+<p>Setup Lead<br />
+Brand Lead<br />
+UI Generation Lead</p>
+<h3>DSL - Domain-Specific Language Spec for Agents</h3>
+<pre><code class="language-yaml">name: marketing_agent
+purpose: Create and schedule social content for Virya
+model_policy:
+  default: local/qwen2.5:14b
+  escalate_to: claude-opus
+tools:
+  - read_brand_docs
+  - generate_caption
+  - create_image_brief
+  - save_markdown
+permissions:
+  can_read:
+    - brand_docs
+    - product_catalog
+  can_write:
+    - drafts/social_posts
+  requires_approval:
+    - publish_instagram
+    - send_email
+memory:
+  type: project
+  namespace: virya.marketing
+evals:
+  - brand_voice_check
+  - factuality_check
+  - no_unapproved_claims
+handoffs:
+  - ops_agent
+  - human_reviewer
+</code></pre>
+<h3>Agent Factory Loop</h3>
+<pre><code>1. Describe desired capability
+2. Generate AgentSpec
+3. Validate spec
+4. Scaffold agent
+5. Attach tools
+6. Attach policies
+7. Generate evals
+8. Run smoke tests
+9. Human approves
+10. Deploy into harness
+11. Observe traces
+12. Improve spec/template
+</code></pre>
+<h3>AI Workflow</h3>
+<p>Ideate<br />
+Bounce ideas off of ChatGPT ~ Pair Ideate<br />
+Generate feature spec<br />
+Review and Refine feature Spec</p>
+<p>Prompt AI Harness with feature spec</p>
+<p>Build factories, not features -- on spec, every time<br />
+ADW - AI Developer Workflow</p>
+<p>Teach your agents to build just like you when you build your factories, template your engineering.<br />
+Engineer that builds the system + AI that builds software on your half</p>
+<h3>TODO</h3>
+<p>Agent Communication System</p>
+<p>Pi Agent Harness</p>
+<p>helper gemini-3.5-fla<br />
+presentation</p>
+<p>Agent Team<br />
+Sandbox Tool</p>
+<p>Engineering Patterns</p>
+<p>Pi to Pi Harness</p>
+<p>Agent Chain Harness</p>
+<p>DevOps Harness</p>
+<p>Testing Harness</p>
+<p>Billing Harness</p>
+<h2>Verifier Harness</h2>
+<ul>
+<li>Pi teams</li>
+<li>Context Gatherer - Information Retrieval Agent - specialized data pipeline that isolates, parses and surfaces project level details so dwnstream worker agents can code accurately without drowning in token bloat.<br />
+-- Messaging agent: email campaigns, campaign planning and approvals<br />
+-- Additional ops monitors (SSL expiry, performance, log alerts)<br />
+-- Agent-to-agent coordination for cross-domain workflows<br />
+-- Additional planner tools (habit tracking, goal review)</li>
+</ul>
+<h2>Context Gatherer - Information Retrieval Agent - specialized data pipeline that isolates, parses and surfaces project level details so dwnstream worker agents can code accurately without drowning in token bloat.</h2>
+<h3>Just-in-Time (JIT) File Scoping</h3>
+<p>Instead of feeding an entire repository into a worker agent, Context Gatherer keeps a lightweight index of file paths, dependency graphs, and module connections<br />
+- when a coding ticket arrives, it executes targeted queries to retrieve only the five to ten most crtical code files, keeping the worker's narrowly scoped and focused</p>
+<h3>AST-Based Structured Chunking</h3>
+<p>-Vector DBs cut code at arbitrary line liits, ruining coding logic, COntext Gatherer uses Abstract Syntax Tree (AST) parsing<br />
+- Extracts code as logical blocks (full functions, classes, interfaces) enriched with structural metadata (file path, line numbers, symbol types) before converting them to embeddings</p>
+<h3>Ephemeral Prompt Caching Management</h3>
+<p>When the Gatherer uses a model with a massive context window (like Gemini 3.1 Pro), it can load massive amounts of codebase data -- including comprehensive repository rules, environment architecture, domain APIs, and schemas into memory once.<br />
+- It manages the caching headers, allowing downstream worker agents to quickly call into this pre-loaded cache at a fraction of standard inference costs.</p>
+<h3>Context Compaction &amp; Summarization</h3>
+<p>When agent workflows iterate over multiple debug loop,s token windows fill up with redundant compiler error dumps and duplicate terminal outputs.<br />
+- Context Gatherer runs parallel compaction steps: it distills interaction history into a brief summary of architectural choices made and bugs encountered, discarding the noise while preserving critical constraints.</p>
+<hr />
+<p><em>Still chewing on:</em> How do we balance the autonomy of AI agents with the need for continuous oversight and refinement? The interplay between design patterns and reinforcement learning presents exciting possibilities, but also challenges in maintaining control over increasingly complex systems.</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'agentic-design-patterns-rl-in-ai';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+</body>
+</html>
