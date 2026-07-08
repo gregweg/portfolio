@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Exploring concurrency, parallelism, and multithreading in software engineering, alongside designing a robust webhook processor system.">
+    <title>Concurrency, Parallelism, Multithreading & High-Throughput Webhook Processing</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-07-08</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">concurrency</span>
+                                    <span class="tag">parallelism</span>
+                                    <span class="tag">multithreading</span>
+                                    <span class="tag">webhooks</span>
+                                    <span class="tag">system-design</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Concurrency, Parallelism, Multithreading & High-Throughput Webhook Processing</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Today's exploration dives into the nuanced differences between concurrency, parallelism, and multithreading. It also tackles the architectural challenges of building a high-throughput webhook processor capable of handling millions of incoming messages per second without dropping packets or violating strict ordering rules within user sessions.</p>
+<h2>Concurrency vs Parallelism vs Multithreading</h2>
+<p>Concurrency (Dealing with multiple tasks)</p>
+<p>A single processing core rapidly switches( context switches) between tasks so that each tasks makes progress without waiting for others to finish.</p>
+<p>Concurrency: A single barista taking orders from three diffent custoemrs. They take one order, start brewing the cofee, quickly take the next order, continue until done.</p>
+<p>Parallelism (Doing multiple tasks simultaneously)</p>
+<p>Multi-core processors, tasks are literally running at the same microsecond on separate processing units. Used for CPU-bound operations such as heavy data processing, image rendering or scientific simulations.</p>
+<p>Parallelism: Three braista working at three different espresso machines, making three coffees at the exact same time.</p>
+<p>Multithreading (The Tool)</p>
+<p>Single-core machine, multithreading achieves concurrency because the processor interleaves the execution of threads. On a multi-core machine, multithreading can achieve parallelism because the OS can assign different threads to different cores.</p>
+<p>Multithreading: The overal system of having a single kitchen workspace (the process) with multiple people (threads) cooperating to get the job done faster.</p>
+<h2>System Design: High-Throughput Webhook Processor (The Meta API Ingestion)</h2>
+<p>Webhook - lightweight, event-driven mechanism that allows one application to send real-time data to another application as soon as a specific event occurs. A reverse API calling or automated notification between servers.</p>
+<p>Anatomy of a Webhook Request:<br />
+- A Target URL: A public endpoint exposed by the receiving application.<br />
+- An HTTP Method: Almost always a POST request, as it is pushing new data to your server.<br />
+- Headers: Often contains authorization tokens or cryptographic signatures (like an X-Hub-Signature) so the receiver can verify that the data actually came from a trusted source (like Meta or Stripe) and not a random hacker.<br />
+- A Payload (Body): The actual data being delivered, typically structured as JSON.</p>
+<p>Common Use Cases<br />
+- Payment Gateways: Stripe uses webhooks to notify your server the exact milisecond a customer's credit card payment clears or fails. <br />
+- E-commerce: Shopify uses webhooks to tell your inventory app that an item was just purchased.<br />
+- CI/CD Pipelines: GitHub uses webhooks to trigger an automated deployment system whenever a developer pushes new code to a repository.</p>
+<p>System/WhatsApp context<br />
+1. The Event: A customer sends a WhatsApp message to a retailer's business phone number.<br />
+2. The Trigger: Meta's servers receive that message and immediately look up the webhook URL that we registered for that specific business acount.<br />
+3. The Payload: Meta wraps up the details of the message (the text, the sender's phone number, the timestamp) into an HTTP POST request, usually formatted as JSON.<br />
+4. The Delivery: Meta acts like a browser makinga web request, firing an asynchronous HTTP POST directly to our public URL (https://api.mysite.ai/v1/webhooks/whatsapp)<br />
+5. The Acknowledgement: Server receives the payload, verifies it, and instantly replies with an HTTP 200 OK status code to let Meta know the message was successfully received.</p>
+<p>The Challenge: How to ingest millions of incoming messages per second without dropping packets, ensuring strict ordering per user session, and handling sudden traffic bursts.</p>
+<p>What to focus on:</p>
+<p>Decoupling with Kafka: Using a lightweight API gateway/ingestion layer that instantly drops incoming webhooks into a Kafka topic to guarantee durability and shield downstream services.</p>
+<p>Partitioning Keys: Discussing how you would partition Kafka topics (e.g., partitioning by user_id or phone_number) to ensure messages from the same chat session are processed sequentially while maintaining horizontal scalability across workers.</p>
+<p>Idempotency: WhatsApp can retry webhook deliveries. You'll need an idempotency layer (using a fast key-value store or DynamoDB conditional writes) to ensure a single incoming message isn't processed or answered twice.</p>
+<h3>Core Entities</h3>
+<ul>
+<li>Business Account (WABA): Retailer owning their own WhatsApp number</li>
+<li>Customer / Contact: The unique individual messaging the business.</li>
+<li>Session: An active conversational window (often 24 hrs based on WhatsApp's billing logic)</li>
+<li>Message: Single immutable event (inbound/outbound)</li>
+</ul>
+<h3>Storage Schema Design:</h3>
+<p>DynamoDB for fast, high-volume idempotency checks and active session tracking<br />
+Postgres for complex relational data (business metadata, structured order tracking)</p>
+<p>A. Idempotency Layer (DynamoDB)<br />
+Before processing a message, we must check if Meta has sent it before. We use DynamoDB for its predictable sub-10ms single-key writes and automatic data eviction.</p>
+<p>DynamoDB processes ConditionExpression writes atomically at the database engine partition level. If two identical WAMIDs arrive at the same time, one will succeed and the other will fail the condition check, guaranteeing absolute deduplication accuracy without locking application databases.</p>
+<p>Step-by-Step Deduplication Flow<br />
+1. Pulling from Queue: The Python worker pulls a batch of events from its assigned Kafka partition.<br />
+2. Extracting the Token: The worker extracts the id (WAMID.ABGG...) from the message payload.<br />
+3. The Atomic Check (DynamoDB): The worker executes a PutItem operation to the whatsapp_processed_messages DynamoDB table with a Condition Expression.</p>
+<p>Table Name: whatsapp_processed_messages</p>
+<p>Partition Key (PK): message_id (The unique WAMID string supplied by Meta)</p>
+<p>Attributes:</p>
+<p>status: (e.g., PROCESSING, COMPLETED)</p>
+<p>ttl: Unix timestamp (set to 7 days in the future). DynamoDB will automatically drop this row after a week to keep storage costs zero.</p>
+<p>B. Conversational State &amp; Messages (DynamoDB)<br />
+Because conversational text flows are high-velocity key-value patterns, keeping active sessions in DynamoDB prevents Postgres connection pools from locking up during a marketing blast.</p>
+<p>Table Name: whatsapp_chats</p>
+<p>Partition Key (PK): waba_id#customer_phone (Combines the business account and customer number)</p>
+<p>Sort Key (SK): entity_type#id (Allows storing both session metadata and individual messages in the same table for single-query retrieval via a begins_with condition)</p>
+<pre><code>Partition Key (PK) | Sort Key (SK) | Attributes | Description
+WABA_123#1234567890 | SESSION#SESS_999 | status: &quot;ACTIVE&quot;assigned_to: &quot;AI_AGENT&quot; updated_at: 1783382400 | The global context of the ongoing chat.t
+WABA_123#1234567890 | MESSAGE#1783382400 | message_id: &quot;WAMID.ABGG...&quot;direction: &quot;INBOUND&quot;type: &quot;text&quot;body: &quot;What is my order status?&quot; | An individual message event.
+</code></pre>
+<pre><code class="language-yaml">Partition Key (PK)  | Sort Key (SK) | Record Type   | Attributes
+
+USER#14155551234    | SESSION#current   | Session | Metadata    
+session_id: &quot;sess_98234&quot;
+status: &quot;LLM_MODE&quot; (or &quot;HUMAN_MODE&quot;)
+created_at: &quot;2026-07-07T12:00:00Z&quot;
+ttl: 1783452300 (auto-expires active chat after 24 hours)
+
+USER#14155551234    | MSG#20260707T163000#msg_abc123    | Chat Message | direction: &quot;INBOUND&quot;
+text: &quot;Hey, I need help resetting my password.&quot;
+sender_id: &quot;14155551234&quot;
+status: &quot;DELIVERED&quot;
+
+USER#14155551234    | MSG#20260707T163015#msg_xyz789    | Chat Message | direction: &quot;OUTBOUND&quot;
+text: &quot;I can help with that! Let me fetch your details...&quot;
+sender_id: &quot;LLM_AGENT&quot;
+</code></pre>
+<p>The Data Flow:</p>
+<p>Message ID in a WhatsApp environment would be generated by meta</p>
+<pre><code class="language-json">&quot;messages&quot;: [
+  {
+    &quot;from&quot;: &quot;1234567890&quot;,
+    &quot;id&quot;: &quot;WAMID.ABGGFl9A9ghYIgeg...&quot;,  &lt;--- THIS IS YOUR MESSAGE_ID
+    &quot;timestamp&quot;: &quot;1783382400&quot;,
+    &quot;type&quot;: &quot;text&quot;,
+    ...
+  }
+]
+</code></pre>
+<p>Decoupling with Kafka: Using a lightweight API gateway/ingestion layer that instantly drops incoming webhooks into a Kafka topic to guarantee durability and shield downstream services.</p>
+<p>Partitioning Keys: Discussing how you would partition Kafka topics (e.g., partitioning by user_id or phone_number) to ensure messages from the same chat session are processed sequentially while maintaining horizontal scalability across workers.</p>
+<p>Idempotency: WhatsApp can retry webhook deliveries. You'll need an idempotency layer (using a fast key-value store or DynamoDB conditional writes) to ensure a single incoming message isn't processed or answered twice.</p>
+<ol>
+<li>
+<p>Ingress: Meta hits /v1/webhooks/whatsapp<br />
+API Gateway checks the payload signature, extracts the waba_id drops the raw JSON into KAfka on a topic named whatsapp.inbound.raw. The mesagges key is set to the customer's phone number (1234567890) to ensure all messages from this consumer end up on the exact same Kafka partition, guaranteeing chronological order.</p>
+</li>
+<li>
+<p>Ingress Returns: The API immediately gives Meta a 200 OK</p>
+</li>
+<li>
+<p>Worker Processing: A python worker cluster consumes from kafka. </p>
+</li>
+<li>
+<p>Deduplication: The worker attempts a conditional write into the DynamoDB Idempotency table using the message_id. If the item already exists, the worker safely drops the duplicate message.</p>
+</li>
+<li>
+<p>State Mutation: The worker reads/updates the active state row (SESSION#SESS_999) in the second DynamoDB table, appends the new message event, and determines whether to pass this task to the LLM agent pipeline or route it to a human agent queue.</p>
+</li>
+</ol>
+<p>Semantic Partitioning </p>
+<p>API layer pushes the event to Kafka, it defines a specific Partition Key</p>
+<p>customer_phone_number or waba_id + customer_phone_number</p>
+<p>Hash(key) (mod N) where N is the number of partitions, because the phone number is identical for both messages, they are guaranteed to land on the exact same partition</p>
+<p>A single Kafka consumer stream handles that partition sequentially. Message #2 will sit safely in th equeue until the worker completely finishes processing and committing message #1.</p>
+<p>API Gateway Integration - Most modern API Gateways can perform a direct service integration with Kafka without qa custome compute layer sitting in the middle.</p>
+<p>[Meta Webhook] ---&gt; [AWS API Gateway] ---&gt; [Kafka Topic] ---&gt; (200 OK to Meta)</p>
+<ol>
+<li>
+<p>Verification &amp; Ingestion: API Gateway acts as the public reverse proxy. It receives HTTPS POST request from Meta.</p>
+</li>
+<li>
+<p>Direct Proxying: Gateway is configured to automatically parse the inbound header, validate the Meta signature and forward the payload directly to the Kafka HTTP Bridge or cluster.</p>
+</li>
+<li>
+<p>Immediate Acknowledgement: The gateway receives the acknowledgement from Kafka that the write was durable, and immediately fires back a 200 OK to Meta. This keeps your API layer entirely stateless, CPU-light, and capable of handling tens of thousands of requests per second out-of-the-box.</p>
+</li>
+</ol>
+<hr />
+<p><em>Still chewing on:</em> The balance between leveraging Kafka's partitioning keys for order preservation and ensuring message deduplication through DynamoDB remains an intriguing challenge. How can we further optimize the system to handle even more complex event streams efficiently?</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'concurrency-webhooks';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script>
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    </script>
+</body>
+</html>

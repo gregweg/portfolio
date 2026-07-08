@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Concurrency, Parallelism, Multithreading & High-Throughput Webhook Processing",
+        slug: "concurrency-webhooks",
+        date: "2026-07-08",
+        tags: ["concurrency", "parallelism", "multithreading", "webhooks", "system-design"],
+        description: "Exploring concurrency, parallelism, and multithreading in software engineering, alongside designing a robust webhook processor system."
+    },
+    {
         title: "Designing Efficient AI Agents for Voice Pipelines",
         slug: "designing-efficient-ai-agents-for-voice-pipelines",
         date: "2026-07-08",
