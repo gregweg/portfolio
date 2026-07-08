@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Exploring Generative AI with Code",
+        slug: "exploring-generative-ai-with-code",
+        date: "2026-07-08",
+        tags: ["generative-AI", "machine-learning", "backend-systems"],
+        description: "A dive into the intricacies of generative AI, reflecting on its applications and limitations."
+    },
+    {
         title: "Async Job Processing & Eventual Consistency in Systems Design",
         slug: "async-job-processing-eventual-consistency-systems-design",
         date: "2026-07-08",
