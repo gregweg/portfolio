@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Exploring a structured approach to software development using LLMs for specification creation.">
+    <title>My Modern Programming Approach</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-07-08</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">software engineering</span>
+                                    <span class="tag">programming</span>
+                                    <span class="tag">spec-driven design</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">My Modern Programming Approach</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Today, I'm diving into how I structure my programming tasks and workflows. This method aims to create clear specifications with the help of large language models (LLMs), ensuring that every part of a project is thought through carefully before execution.</p>
+<h1>My Modern Programming Approach</h1>
+<h2>Goal Task Deconstruction</h2>
+<h2>Plan-Then-Execute</h2>
+<h2>Approach</h2>
+<ul>
+<li>
+<p>Internalize Domain and Utilities</p>
+</li>
+<li>
+<p>Spec Driven Design</p>
+</li>
+<li>
+<p>Ideate with LLM to craft spec</p>
+</li>
+<li>
+<p>Clarify and Identify ambiguities</p>
+</li>
+<li>
+<p>Finalize Spec &amp; Evaluation / Success Criteria</p>
+</li>
+<li>
+<p>Covering for Edge Cases</p>
+</li>
+</ul>
+<h1>Spec-Driven Agentic Development Workflow</h1>
+<h2>1. Intent Capture</h2>
+<p>Input:<br />
+- Human request<br />
+- Business goal<br />
+- User problem<br />
+- Existing repo/context</p>
+<p>Output:<br />
+- Problem statement<br />
+- Success criteria<br />
+- Non-goals<br />
+- Open questions</p>
+<h2>2. Spec Generation</h2>
+<p>Agent creates:<br />
+- Functional requirements<br />
+- Non-functional requirements<br />
+- Data model changes<br />
+- API/interface changes<br />
+- UX/admin behavior<br />
+- Security/permissions<br />
+- Observability needs<br />
+- Acceptance criteria</p>
+<h2>3. Spec Refinement</h2>
+<p>Loop until stable:<br />
+- Identify ambiguity<br />
+- Ask targeted questions<br />
+- Split large scope into phases<br />
+- Define edge cases<br />
+- Mark assumptions explicitly</p>
+<h2>4. Design / Architecture Plan</h2>
+<p>Create:<br />
+- Components touched<br />
+- Ownership boundaries<br />
+- Data flow<br />
+- Failure modes<br />
+- Rollback plan<br />
+- Migration strategy<br />
+- Dependency risks</p>
+<h2>5. Implementation Plan</h2>
+<p>Create small executable tasks:<br />
+- Task ID<br />
+- Files likely touched<br />
+- Expected behavior<br />
+- Test expectations<br />
+- Definition of done</p>
+<h2>6. Build Execution</h2>
+<p>Coding agent works task-by-task:<br />
+- Reads spec<br />
+- Implements smallest safe change<br />
+- Updates docs/tests<br />
+- Produces PR summary</p>
+<h2>7. Testing</h2>
+<p>Run:<br />
+- Unit tests<br />
+- Integration tests<br />
+- Contract/API tests<br />
+- Migration tests<br />
+- Permission tests<br />
+- Regression tests</p>
+<h2>8. Evaluation</h2>
+<p>Evaluate against:<br />
+- Golden scenarios<br />
+- Acceptance criteria<br />
+- Edge cases<br />
+- Security constraints<br />
+- Performance budget<br />
+- Hallucination/spec-drift checks</p>
+<h2>9. Review</h2>
+<p>Reviewer checks:<br />
+- Does code match spec?<br />
+- Did agent overbuild?<br />
+- Were assumptions introduced?<br />
+- Are tests meaningful?<br />
+- Are eval failures explained?</p>
+<h2>10. Feedback Loop</h2>
+<p>Failures update:<br />
+- Spec<br />
+- Test cases<br />
+- Eval dataset<br />
+- Agent instructions<br />
+- Implementation plan</p>
+<hr />
+<p><em>Still chewing on:</em> Reflecting on this process, I wonder about the balance between rigorously defining specs upfront versus allowing flexibility for emergent design as projects evolve.</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'my-modern-programming-approach';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script>
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    </script>
+</body>
+</html>

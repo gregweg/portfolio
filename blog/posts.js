@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "My Modern Programming Approach",
+        slug: "my-modern-programming-approach",
+        date: "2026-07-08",
+        tags: ["software engineering", "programming", "spec-driven design"],
+        description: "Exploring a structured approach to software development using LLMs for specification creation."
+    },
+    {
         title: "Exploring Generative AI with Code",
         slug: "exploring-generative-ai-with-code",
         date: "2026-07-08",
