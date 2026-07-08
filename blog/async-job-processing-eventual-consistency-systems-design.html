@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Exploring asynchronous workflows, eventual consistency, and high-throughput system design for managing complex AI agent tasks.">
+    <title>Async Job Processing & Eventual Consistency in Systems Design</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-07-08</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">asynchronous processing</span>
+                                    <span class="tag">eventual consistency</span>
+                                    <span class="tag">system design</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Async Job Processing & Eventual Consistency in Systems Design</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Today's notes delve into the intricacies of designing systems that handle asynchronous job processing, eventual consistency, and the orchestration of AI agents. Greg is focusing on how to manage long-running workflows, ensure data integrity through state management and retry policies, and optimize performance with modular architecture.</p>
+<h1>Asynchronous Job Processing, Eventual Consistency, High-Throughput Marketplaces, Distributed Data Ingestion/Orchestration</h1>
+<h2>Orchestration vs. Choreography (Temporal/Workflows):</h2>
+<p>long-running, asynchronous and complex workflows <br />
+- (managing an end-to-end multi-step automate hiring/interview pipeline)<br />
+- Tracking agent prgress<br />
+Processing global multi-currency payouts<br />
+- How to manage failed steps without losing data integrity:<br />
+    - State<br />
+    - Retries<br />
+    - Compensation logic</p>
+<h2>Relational vs. Analytical Data Tiering</h2>
+<p>Postgres/MySQL alongside Snowflake and DuckDB.</p>
+<p>Think about how you can design a schema that keeps the operational database fast (OLTP)<br />
+While effectively streaming data (via Change Data Capture or event buses) into analytical databases (OLAP) for running heavy AI-driven matching algorithms or evaluation metrics</p>
+<h2>Handling Asynchronous AI Agent State</h2>
+<h1>System Design Approach</h1>
+<h2>Scope &amp; Scale (0 - 5)</h2>
+<ul>
+<li>How many concurrent users/agents are active?</li>
+<li>What is the peak write throughput for event data?</li>
+<li>Do tasks need real-time execution, or are they long-running background processes?</li>
+</ul>
+<h2>API &amp; Data Schema</h2>
+<ul>
+<li>Define core API endpoints</li>
+<li>Sketch out the strict DB relational schemas</li>
+</ul>
+<p>How can I show that I can design data models at scale?</p>
+<h2>High-Level Architecture to Deep Dive</h2>
+<ul>
+<li>Draw end-to-end block diagram.</li>
+<li>Immediately identify the bottleneck. <ul>
+<li>(LLM processing or payment gateway takes 30 seconds to respond)</li>
+<li>A synchronous HTTP pool will exhaust quickly.</li>
+<li>Transition to an asynchronous worker queue or durable workflow orchestration engine like Temporal.</li>
+</ul>
+</li>
+</ul>
+<p>Temporal<br />
+- Eliminates need for queues entirely by <br />
+    - automatically persisting the state of your code<br />
+    - handling retries<br />
+    - managing timeouts,<br />
+    - ensuring reliable execution through code-as-configuration.</p>
+<h2>Trade-offs &amp; Edge Cases</h2>
+<ul>
+<li>Retry policies</li>
+<li>Dead Letter Queues</li>
+<li>Data Consistency</li>
+</ul>
+<p># Coding Section Prep</p>
+<p>## Explicit Error Handling &amp; Edge Cases:</p>
+<p>Do noy wrap entire logic in a generic try/except Exception<br />
+ Catch specific errors<br />
+    - network timeout<br />
+    - missing dictionary keys<br />
+    - malformed payloads</p>
+<p>If Parsing data or Processing data from an external AI/API payload<br />
+ Handle:<br />
+ - null<br />
+ - missing<br />
+ - corrupt fields explicitly</p>
+<h2>Type Safety &amp; Validation:</h2>
+<ul>
+<li>Pydantic/FastAPI</li>
+<li>strict type hinting</li>
+</ul>
+<p>If problem involves data transformers or handling nested JSON payloads, structuring your solution around clean class schemas or Pydantic models will signal Seniority</p>
+<h2>Modular and Extensible Design</h2>
+<p>NO single, massive 150 line function, isolate concerns.</p>
+<ul>
+<li>Keep data parsing, business logic, and external interaction (I/O) completely distinct</li>
+<li>Use clean interfaces or dependency injection where appropriate, making it obvious to reviewer how code base could be unit tested.</li>
+</ul>
+<h2>Writing Tests: 10-15 minutes to specifically write unit tests (pytest)</h2>
+<ul>
+<li>include simple paths</li>
+<li>boundary conditions<ul>
+<li>empty arrays</li>
+<li>negative numbers</li>
+<li>missing values</li>
+</ul>
+</li>
+</ul>
+<h2>Strategy</h2>
+<h3>First 5 Minutes: Read, List Assumptions, Data Structures</h3>
+<p>Write out into a commented block at the top.</p>
+<p>"""<br />
+SYSTEM DESIGN &amp; ALGORITHMIC ASSUMPTIONS:<br />
+1. Input Scale &amp; Mutability: Trajectory logs are ingested as immutable JSON streams. <br />
+   Processing uses streaming generators to maintain an O(1) memory footprint per run.<br />
+2. Deduplication &amp; Lookup: Evaluation criteria keys use a Python hash set / dictionary <br />
+   to ensure step-verification matching drops from O(N) to O(1) time complexity.<br />
+3. Network Flakiness &amp; External Systems: All external I/O integrations (saving metrics <br />
+   to the operational data layer or sending alerts) handle downstream rate limits via <br />
+   exponential backoff logic.<br />
+4. Data Anomaly Tolerance: Out-of-order execution timestamps within the agent logs <br />
+   are natively handled via explicit sorting before computing delta latencies.<br />
+"""</p>
+<h3>Next 35 Minutes: (Core Logic)</h3>
+<p>Build the solution incrementally. <br />
+Get the skeleton working first,<br />
+Apply strict type hints and robust error handling as you code.</p>
+<h4>Tailored Schema &amp; Pydantic Models</h4>
+<pre><code class="language-python">from datetime import datetime
+from typing import List, Dict, Any, Optional
+from pydantic import BaseModel, Field, field_validator
+
+class AgentStep(BaseModel):
+    step_id: str = Field(..., description=&quot;Unique UUID for the trajectory step&quot;)
+    tool_called: str = Field(..., min_length=1)
+    execution_timestamp: datetime
+    output_payload: Dict[str, Any]
+    latency_ms: int
+
+    @field_validator(&quot;latency_ms&quot;)
+    @classmethod
+    def validate_latency(cls, value: int) -&gt; int:
+        if value &lt; 0:
+            raise ValueError(&quot;Latency cannot be negative&quot;)
+        return value
+
+class EvaluationCriteria(BaseModel):
+    required_tools: List[str]
+    max_total_latency_ms: int
+    expected_output_keys: List[str]
+
+class TrajectoryEvaluationReport(BaseModel):
+    trajectory_id: str
+    is_successful: bool
+    final_score: float
+    tools_utilized: List[str]
+    anomalies_detected: List[str]
+</code></pre>
+<h4>Modular &amp; Extensible Design (Separation of Concerns)</h4>
+<p>Core Business Logic Should be Pure (No direct filesystem, database or API calls) making it infinitely testable</p>
+<pre><code class="language-python">import json
+import time
+
+# ==========================================
+# LAYER 1: DATA PARSING &amp; INGESTION
+# ==========================================
+class TrajectoryParser:
+    &quot;&quot;&quot;Handles raw payload transformation and schema ingestion borders.&quot;&quot;&quot;
+
+    @staticmethod
+    def parse_raw_payload(raw_json: str) -&gt; List[AgentStep]:
+        try:
+            data = json.loads(raw_json)
+            return [AgentStep(**step) for step in data.get(&quot;steps&quot;, [])]
+        except (json.JSONDecodeError, KeyError) as error:
+            raise ValueError(f&quot;Malformed trajectory payload: {str(error)}&quot;)
+
+# ==========================================
+# LAYER 2: EXTERNAL SYSTEM I/O (MOCKED)
+# ==========================================
+class EvaluationMetricsClient:
+    &quot;&quot;&quot;Manages external system state and database side-effects.&quot;&quot;&quot;
+
+    def __init__(self, retries: int = 3):
+        self.max_retries = retries
+
+    def save_evaluation_report(self, report: TrajectoryEvaluationReport) -&gt; bool:
+        &quot;&quot;&quot;Persists evaluation telemetry to downstream DB layers with simple retry.&quot;&quot;&quot;
+        for attempt in range(self.max_retries):
+            try:
+                # In real life, this targets a Postgres connection pool or an internal API endpoint
+                print(f&quot;[I/O] Successfully saved trajectory report {report.trajectory_id}&quot;)
+                return True
+            except Exception:
+                if attempt == self.max_retries - 1:
+                    raise RuntimeError(&quot;Downstream operational layer unavailable.&quot;)
+                time.sleep(0.1)
+        return False
+</code></pre>
+<h3>Next 10 Minutes: (Refactoring)</h3>
+<p>Clean up any magic numbers, <br />
+split heavy logic into helper functions<br />
+ensure variable names are explicitly descriptive</p>
+<pre><code class="language-python"># ==========================================
+# LAYER 3: CORE EVALUATION BUSINESS LOGIC
+# ==========================================
+class AgentTrajectoryVerifier:
+    &quot;&quot;&quot;
+    Evaluates whether an agent's execution sequence successfully satisfied 
+    the targeted benchmark evaluation requirements.
+    &quot;&quot;&quot;
+    # Explicit configurations replacing hidden magic numbers
+    PERFECT_SCORE_PERCENTAGE = 100.0
+    LATENCY_PENALTY_FACTOR = 0.15
+    MINIMUM_VIABLE_SCORE = 70.0
+
+    def __init__(self, criteria: EvaluationCriteria):
+        self.criteria = criteria
+
+    def evaluate_trajectory(self, trajectory_id: str, steps: List[AgentStep]) -&gt; TrajectoryEvaluationReport:
+        if not steps:
+            return TrajectoryEvaluationReport(
+                trajectory_id=trajectory_id,
+                is_successful=False,
+                final_score=0.0,
+                tools_utilized=[],
+                anomalies_detected=[&quot;Empty execution trajectory sequence.&quot;]
+            )
+
+        # 1. Transform arrays to sets for fast, O(1) membership evaluations
+        unique_tools_used = {step.tool_called for step in steps}
+        required_tools_set = set(self.criteria.required_tools)
+
+        # 2. Extract metrics using clear helper calculations
+        total_latency = sum(step.latency_ms for step in steps)
+        anomalies = self._detect_anomalies(steps, total_latency)
+
+        # 3. Score calculation based on criteria requirements
+        score = self._calculate_trajectory_score(unique_tools_used, required_tools_set, total_latency)
+
+        # Determine strict success criteria bounds
+        meets_score_bar = score &gt;= self.MINIMUM_VIABLE_SCORE
+        has_critical_failures = len(anomalies) &gt; 0 and total_latency &gt; self.criteria.max_total_latency_ms
+
+        return TrajectoryEvaluationReport(
+            trajectory_id=trajectory_id,
+            is_successful=meets_score_bar and not has_critical_failures,
+            final_score=round(score, 2),
+            tools_utilized=list(unique_tools_used),
+            anomalies_detected=anomalies
+        )
+
+    def _detect_anomalies(self, steps: List[AgentStep], total_latency: int) -&gt; List[str]:
+        &quot;&quot;&quot;Helper function focused strictly on structural trajectory telemetry faults.&quot;&quot;&quot;
+        detected_faults = []
+        if total_latency &gt; self.criteria.max_total_latency_ms:
+            detected_faults.append(f&quot;Total latency exceeded threshold by {total_latency - self.criteria.max_total_latency_ms}ms&quot;)
+
+        # Track out-of-order timelines
+        for index in range(len(steps) - 1):
+            if steps[index].execution_timestamp &gt; steps[index + 1].execution_timestamp:
+                detected_faults.append(f&quot;Chronological anomaly detected at step index {index}&quot;)
+                break
+
+        return detected_faults
+
+    def _calculate_trajectory_score(self, tools_used: set, required_tools: set, total_latency: int) -&gt; float:
+        &quot;&quot;&quot;Helper function computing performance scores against target criteria metrics.&quot;&quot;&quot;
+        if not required_tools:
+            return self.PERFECT_SCORE_PERCENTAGE
+
+        matched_tools = tools_used.intersection(required_tools)
+        coverage_ratio = len(matched_tools) / len(required_tools)
+        base_score = coverage_ratio * self.PERFECT_SCORE_PERCENTAGE
+
+        # Apply structural deduction penalty if execution is sluggish
+        if total_latency &gt; self.criteria.max_total_latency_ms:
+            base_score -= (base_score * self.LATENCY_PENALTY_FACTOR)
+
+        return max(0.0, base_score)
+</code></pre>
+<h3>Final 10 Minutes (Testing &amp; Documentation)</h3>
+<ul>
+<li>write and execute your test suit.</li>
+<li>add a very concise docstring explaining my approach and any architectural trade-offs made under the time constraint.</li>
+</ul>
+<pre><code class="language-python"># ==========================================
+# APPLICATION INTEGRATION AND TEST SUITE
+# ==========================================
+def execute_test_suite():
+    &quot;&quot;&quot;Runs functional assertions against the evaluation framework.&quot;&quot;&quot;
+    print(&quot;\n--- INITIATING SYSTEM VERIFICATION SUITE ---&quot;)
+
+    # 1. Mocking incoming database criteria configurations
+    mock_criteria = EvaluationCriteria(
+        required_tools=[&quot;SearchEngineAPI&quot;, &quot;PostgresExecutor&quot;],
+        max_total_latency_ms=5000,
+        expected_output_keys=[&quot;records_mutated&quot;]
+    )
+
+    # 2. Creating high-fidelity payload strings simulating a clean operational run
+    clean_trajectory_payload = &quot;&quot;&quot;{
+        &quot;steps&quot;: [
+            {
+                &quot;step_id&quot;: &quot;9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d&quot;,
+                &quot;tool_called&quot;: &quot;SearchEngineAPI&quot;,
+                &quot;execution_timestamp&quot;: &quot;2026-06-01T12:00:00Z&quot;,
+                &quot;output_payload&quot;: {&quot;query&quot;: &quot;expert_payouts&quot;},
+                &quot;latency_ms&quot;: 1200
+            },
+            {
+                &quot;step_id&quot;: &quot;1c1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6e&quot;,
+                &quot;tool_called&quot;: &quot;PostgresExecutor&quot;,
+                &quot;execution_timestamp&quot;: &quot;2026-06-01T12:00:02Z&quot;,
+                &quot;output_payload&quot;: {&quot;records_mutated&quot;: 42},
+                &quot;latency_ms&quot;: 1500
+            }
+        ]
+    }&quot;&quot;&quot;
+
+    # 3. Test Execution 1: Happy Path Ingestion &amp; Score Validation
+    parsed_steps = TrajectoryParser.parse_raw_payload(clean_trajectory_payload)
+    verifier = AgentTrajectoryVerifier(criteria=mock_criteria)
+    report = verifier.evaluate_trajectory(trajectory_id=&quot;run_001&quot;, steps=parsed_steps)
+
+    assert report.is_successful is True, &quot;Validation Failed: Clean trajectory flagged as unsuccessful.&quot;
+    assert report.final_score == 100.0, f&quot;Expected 100.0 score, calculated {report.final_score}&quot;
+    print(&quot;[PASS] Test Case 1: Clean execution path validated successfully.&quot;)
+
+    # 4. Test Execution 2: Validation Bounds Enforcement
+    try:
+        corrupted_payload = &quot;&quot;&quot;{&quot;steps&quot;: [{&quot;step_id&quot;: &quot;err&quot;, &quot;tool_called&quot;: &quot;API&quot;, &quot;latency_ms&quot;: -500}]}&quot;&quot;&quot;
+        TrajectoryParser.parse_raw_payload(corrupted_payload)
+        wrapped_assertion_triggered = False
+    except ValueError:
+        wrapped_assertion_triggered = True
+
+    assert wrapped_assertion_triggered, &quot;Validation Failed: Runtime schema failed to block a negative latency constraint.&quot;
+    print(&quot;[PASS] Test Case 2: Out-of-bounds schema exceptions successfully enforced.&quot;)
+
+    # 5. External I/O Verification
+    io_client = EvaluationMetricsClient()
+    io_success = io_client.save_evaluation_report(report)
+    assert io_success is True, &quot;Validation Failed: Report failed to hand off cleanly to infrastructure client.&quot;
+
+    print(&quot;--- SYSTEM VERIFICATION SUITE COMPLETE: ALL PASS ---&quot;)
+
+if __name__ == &quot;__main__&quot;:
+    execute_test_suite()
+</code></pre>
+<h3>Inbound Data: Agent Trajectory Payload</h3>
+<p>tracks the step-by-step actions, tool arguments, database mutations, and latencies of an AI agent trying to solve a user task</p>
+<pre><code class="language-pyton">{
+  &quot;steps&quot;: [
+    {
+      &quot;step_id&quot;: &quot;8fa3c1b2-11a2-4d56-bd99-7f3c2b1d0a5f&quot;,
+      &quot;tool_called&quot;: &quot;SearchEngineAPI&quot;,
+      &quot;execution_timestamp&quot;: &quot;2026-06-01T12:00:01.102Z&quot;,
+      &quot;output_payload&quot;: {
+        &quot;query&quot;: &quot;Mercor international talent payout compliance 2026&quot;,
+        &quot;results_returned&quot;: 14,
+        &quot;top_match&quot;: &quot;Section 4A: Contractor Tax Classifications&quot;
+      },
+      &quot;latency_ms&quot;: 1150
+    },
+    {
+      &quot;step_id&quot;: &quot;4c9de3f4-22b3-4e67-ae00-8f4d3c2e1b6a&quot;,
+      &quot;tool_called&quot;: &quot;PostgresExecutor&quot;,
+      &quot;execution_timestamp&quot;: &quot;2026-06-01T12:00:03.450Z&quot;,
+      &quot;output_payload&quot;: {
+        &quot;target_table&quot;: &quot;expert_contracts&quot;,
+        &quot;operation&quot;: &quot;UPDATE&quot;,
+        &quot;records_mutated&quot;: 1,
+        &quot;status&quot;: &quot;SUCCESS&quot;
+      },
+      &quot;latency_ms&quot;: 850
+    },
+    {
+      &quot;step_id&quot;: &quot;2b8cd4e5-33c4-4f58-bf11-9a5e4d3f2c7b&quot;,
+      &quot;tool_called&quot;: &quot;SlackNotifierAPI&quot;,
+      &quot;execution_timestamp&quot;: &quot;2026-06-01T12:00:04.910Z&quot;,
+      &quot;output_payload&quot;: {
+        &quot;channel&quot;: &quot;#ops-payouts&quot;,
+        &quot;message_delivered&quot;: true
+      },
+      &quot;latency_ms&quot;: 3400
+    }
+  ]
+}
+
+# Successful Run
+{
+  &quot;trajectory_id&quot;: &quot;traj_01JK88XRPV54M1Z9A772QWBCDE&quot;,
+  &quot;is_successful&quot;: true,
+  &quot;final_score&quot;: 100.0,
+  &quot;tools_utilized&quot;: [
+    &quot;SearchEngineAPI&quot;,
+    &quot;PostgresExecutor&quot;,
+    &quot;SlackNotifierAPI&quot;
+  ],
+  &quot;anomalies_detected&quot;: []
+}
+
+# Degraded Run (execution run 6200 ms)
+{
+  &quot;trajectory_id&quot;: &quot;traj_01JK88Y5A319B4C8D773FXWZ99&quot;,
+  &quot;is_successful&quot;: false,
+  &quot;final_score&quot;: 85.0,
+  &quot;tools_utilized&quot;: [
+    &quot;SearchEngineAPI&quot;,
+    &quot;PostgresExecutor&quot;,
+    &quot;SlackNotifierAPI&quot;
+  ],
+  &quot;anomalies_detected&quot;: [
+    &quot;Total latency exceeded threshold by 1200ms&quot;
+  ]
+}
+</code></pre>
+<h3>System Border and Route Mapping -</h3>
+<pre><code class="language-python">from fastapi import FastAPI, Depends, HTTPException, status
+from typing import List
+import pydantic
+
+# Custom exceptions defined in your business logic or core layer
+class CriteriaNotFoundError(Exception):
+    &quot;&quot;&quot;Raised when the requested evaluation criteria is missing from the DB.&quot;&quot;&quot;
+    pass
+
+class OperationalLayerTimeoutError(Exception):
+    &quot;&quot;&quot;Raised when external downstream infrastructure (like Temporal or Postgres) fails to respond.&quot;&quot;&quot;
+    pass
+
+app = FastAPI()
+
+@app.post(&quot;/v1/trajectories/{trajectory_id}/evaluate&quot;, response_model=TrajectoryEvaluationReport)
+async def evaluate_agent_trajectory(
+    trajectory_id: str,
+    steps: List[AgentStep],
+    metrics_client: EvaluationMetricsClient = Depends(get_metrics_client)
+):
+    try:
+        # 1. Simulate fetching criteria (Could throw a database/criteria missing error)
+        # criteria = database.fetch_criteria(trajectory_id)
+        if not trajectory_id.startswith(&quot;valid_&quot;):
+            raise CriteriaNotFoundError(f&quot;No benchmark criteria mapped to trajectory target '{trajectory_id}'&quot;)
+
+        verifier = AgentTrajectoryVerifier(criteria=target_criteria)
+        evaluation_report = verifier.evaluate_trajectory(trajectory_id=trajectory_id, steps=steps)
+
+        # 2. Persist metrics (Could throw an infrastructure timeout or connection error)
+        metrics_client.save_evaluation_report(evaluation_report)
+
+        return evaluation_report
+
+    # =========================================================================
+    # EXPLICIT ERROR BOUNDARIES (Specific Catch Blocks)
+    # =========================================================================
+    except CriteriaNotFoundError as error:
+        # Catching data/lookup issues: Map to a 404 Not Found
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                &quot;error_code&quot;: &quot;CRITERIA_NOT_FOUND&quot;,
+                &quot;message&quot;: str(error)
+            }
+        )
+
+    except OperationalLayerTimeoutError as error:
+        # Catching downstream infrastructure issues: Map to a 503 Service Unavailable
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={
+                &quot;error_code&quot;: &quot;DOWNSTREAM_TIMEOUT&quot;,
+                &quot;message&quot;: &quot;The evaluation engine timed out contacting the persistence layer. Please retry.&quot;
+            }
+        )
+
+    except pydantic.ValidationError as error:
+        # Catching late-stage mutations or schema mismatches: Map to 422 Unprocessable Entity
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                &quot;error_code&quot;: &quot;SCHEMA_VALIDATION_ERROR&quot;,
+                &quot;errors&quot;: error.errors()
+            }
+        )
+
+    except Exception as error:
+        # The ultimate fallback guard: Only catches completely unexpected runtime bugs (e.g., SyntaxError, KeyError)
+        # Map to a 500 Internal Server Error, and log the traceback securely.
+        # logger.critical(f&quot;Unhandled system error: {str(error)}&quot;, exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                &quot;error_code&quot;: &quot;INTERNAL_SERVER_ERROR&quot;,
+                &quot;message&quot;: &quot;An unexpected error occurred internally within the verifier engine.&quot;
+            }
+        )
+</code></pre>
+<h3>Streaming Generators for O(1) memory per run</h3>
+<p>Memory stays roughly O(1) because you only hold:<br />
+- current event<br />
+- small accumulator<br />
+- current state</p>
+<pre><code class="language-python">events = load_all_events(run_id) # instead of loading all events into memory at once
+for event in events:
+    process(event)
+
+def stream_agent_events(run_id):
+    for row in db.cursor(&quot;SELECT * FROM agent_logs WHERE run_id = ?&quot;, run_id):
+        yield row # stream one event at a time.
+
+for event in stream_agent_events(run_id):   # process them incrementally
+    update_metrics(event)
+    write_intermediate_result(event)
+</code></pre>
+<h3>External I/O with exponential backoff</h3>
+<p>Any external write can fail or be rate-limited:<br />
+Metrics DB<br />
+Alerting service<br />
+Slack/PagerDuty<br />
+Warehouse<br />
+Logging system</p>
+<pre><code class="language-python">import time
+import random
+
+def retry_with_backoff(fn, max_attempts=5):
+    delay = 1
+
+    for attempt in range(max_attempts):
+        try:
+            return fn()
+        except RateLimitError:
+            jitter = random.uniform(0, 0.25)
+            time.sleep(delay + jitter)
+            delay *= 2
+
+    raise Exception(&quot;Max retries exceeded&quot;)
+</code></pre>
+<h3>Out-of-order Execution Timestamps</h3>
+<p>Agent logs can arrive out of order b/c of:</p>
+<p>async tool calls<br />
+parallel steps<br />
+network delays<br />
+batched writes<br />
+multiple workers<br />
+clock skew</p>
+<pre><code class="language-python">#nbad assumption that the events are sorted when received
+events = sorted(events, key=lambda e: (e.timestap, e.sequence))
+
+# Then Calculate Latencies
+
+previous_ts = None
+
+for event in sorted_events:
+    if previous_ts is not None:
+        delta_ms = event.timestamp - previous_ts
+
+    previous_ts = event.timestamp
+</code></pre>
+<p>Another nice option is a monotonic sequence number from the agent runtime:</p>
+<pre><code>run_id
+step_id
+parent_step_id
+sequence_number
+started_at
+ended_at
+</code></pre>
+<h3>Managing Failed Steps without losing Data Integrity</h3>
+<h4>State</h4>
+<p>Each agent run should have explicit state:<br />
+PENDING<br />
+RUNNING<br />
+STEP_FAILED<br />
+RETRYING<br />
+COMPLETED<br />
+FAILED<br />
+COMPENSATING<br />
+COMPENSATED</p>
+<p>Each step should also have state:<br />
+NOT_STARTED<br />
+STARTED<br />
+SUCCEEDED<br />
+FAILED<br />
+RETRYABLE_FAILED<br />
+PERMANENT_FAILED<br />
+SKIPPED</p>
+<p>Example Tables</p>
+<pre><code>agent_run
+- id
+- status
+- current_step
+- started_at
+- completed_at
+
+agent_step
+- id
+- run_id
+- step_name
+- status
+- attempt_count
+- input
+- output
+- error
+</code></pre>
+<h4>Retries - should be safe and controlled</h4>
+<p>Use retries for transient failures:</p>
+<p>timeout<br />
+429 rate limit<br />
+temporary network failure<br />
+database connection issue</p>
+<p>Do not blindly retry permanent failures:</p>
+<p>bad request<br />
+invalid credentials<br />
+schema violation<br />
+permission denied</p>
+<p>Good Retry Metadata:</p>
+<p>attempt_count<br />
+last_error<br />
+next_retry_at<br />
+max_attempts<br />
+idempotency_key</p>
+<p>If a step is retried, it should not duplicate side effects.</p>
+<pre><code class="language-python">retry charge_customer() # could charge twice
+
+charge_customer(idempotency_key=&quot;run_123_step_4&quot;) # Better
+</code></pre>
+<h4>Compensation Logic</h4>
+<p>Compensation - undo or counteract a previous successful step.</p>
+<p>You may need to compensate:</p>
+<p>refund customer<br />
+release inventory<br />
+mark order failed</p>
+<p>Similar to a Saga pattern</p>
+<pre><code>forward action       compensation
+--------------------------------------
+reserve item    -&gt;   release item
+charge card     -&gt;   refund charge
+create ticket   -&gt;   close ticket
+send email      -&gt;   send correction email
+</code></pre>
+<p>For Agents:</p>
+<pre><code class="language-sql">create calendar event   -&gt; delete event
+create draft email      -&gt; delete draft
+post Slack message      -&gt; post correction / mark invalid
+save CRM note           -&gt; append correction record
+</code></pre>
+<p>Can we discuss Betweenness centrality?</p>
+<p>Degree Centrality - How many roads enter the city?<br />
+Closenss Centrality - How quickly can I reach everyone?<br />
+Betweenness Centrality - How many travelers pass through me?</p>
+<h2>Exact KNN</h2>
+<p>Traditional Nearest Neighbors.<br />
+- Compute distance to EVERY vector<br />
+- Sort<br />
+- Return top K</p>
+<p>Runtime: O(N)<br />
+Accuracy: 100%</p>
+<p>Query:<br />
+Find closest candidate</p>
+<p>Database:<br />
+50M embeddings</p>
+<p>Must compare all 50M</p>
+<h2>ANN - Approximate Nearest Neighbor</h2>
+<p>Don't search everything.<br />
+Search likely regions.</p>
+<p>Accuracy: 95-99%<br />
+Speed: 100x+ faster</p>
+<p>ANN trades a small amount of recall for dramatically improved query latency and scalability.</p>
+<h2>HNSW - Hierarchical Navigable Small World Graph</h2>
+<p>Used by:<br />
+* Milvus/Zilliz<br />
+* pgvector<br />
+* Pinecone</p>
+<pre><code class="language-yaml">Candidate A
+     |
+Candidate B ---- Candidate C
+     |
+Candidate D
+
+Nearby vectors connect.
+
+Start at top layer
+Jump toward similar regions
+Descend layers
+Find nearest neighbors
+
+Layer 3
+      A
+
+Layer 2
+   B     C
+
+Layer 1
+D E F G H I
+
+
+Search starts:
+
+A -&gt; C -&gt; H -&gt; target
+
+instead of scanning entire dataset.
+</code></pre>
+<p>Pros:<br />
+* Excellent recall<br />
+* Fast queries<br />
+* Works well for dynamic update</p>
+<p>Cons:<br />
+* Large memory footprint<br />
+* Slower index construction</p>
+<h2>IVF - Inverted File Index</h2>
+<p>Cluster vectors first.</p>
+<p>Example:</p>
+<p>Cluster 1: Backend Engineers<br />
+Cluster 2: Data Scientists<br />
+Cluster 3: Lawyers<br />
+Cluster 4: Doctors</p>
+<p>Query: Senior Python Engineer<br />
+Only Search: Cluster 1</p>
+<p>instead of all clusters.</p>
+<pre><code>Database
+
+Bucket A
+
+Bucket B
+
+Bucket C
+
+Bucket D
+
+Query
+
+  |
+
+Nearest Bucket
+
+  |
+
+Search Inside
+</code></pre>
+<p>Pros:<br />
+* Lower memory<br />
+* Fast<br />
+* Easy to scale</p>
+<p>Cons:<br />
+* Lower recall<br />
+* Can miss boundary vectors</p>
+<h2>Hard Filtering</h2>
+<p>Hard Filters: Must Be True, before vector search.</p>
+<p>Example:</p>
+<p>Location = US<br />
+Years Experience &gt;= 5<br />
+Language = English<br />
+Availability = Full Time</p>
+<pre><code>Query
+
+     |
+     v
+
+Metadata Filters
+
+     |
+     v
+
+ANN Search
+
+     |
+     v
+
+Re-ranking
+
+     |
+     v
+
+Results
+</code></pre>
+<pre><code class="language-python">query_embedding = embed(
+    &quot;&quot;&quot;
+    Senior Backend Engineer
+    Python
+    Kubernetes
+    Distributed Systems
+    Payments Experience
+    &quot;&quot;&quot;
+)
+
+collection.search(
+    data=[query_embedding],
+    anns_field=&quot;embedding&quot;,
+    filter=&quot;&quot;&quot;                          
+        country == 'US'
+        and years_experience &gt;= 5
+        and domain == 'software_engineering'
+    &quot;&quot;&quot;, # Hard Filter ~ Business Constraints ~ Who is Eligible
+    limit=20
+)
+</code></pre>
+<h3>Embedding - Answers who looks similar?</h3>
+<h3>Hard Filters - Who is eligible?</h3>
+<h3>Candidate Ontology</h3>
+<p>Candidate</p>
+<ul>
+<li>location</li>
+<li>country</li>
+<li>timezone</li>
+<li>languages</li>
+<li>years_experience</li>
+<li>domain</li>
+<li>certifications</li>
+<li>availability</li>
+<li>pay_rate</li>
+<li>clearance_level</li>
+</ul>
+<p>Hard Filters</p>
+<p>Geography</p>
+<p>US<br />
+Canada<br />
+Europe</p>
+<p>Reason: Legal requirements.</p>
+<p>Language</p>
+<p>English<br />
+German<br />
+Japanese</p>
+<p>Reason: Required.</p>
+<p>Domain Expertise</p>
+<p>Software Engineering<br />
+Medicine<br />
+Law<br />
+Finance</p>
+<p>Reason: Huge filter.</p>
+<p>Experience Level</p>
+<p>Junior<br />
+Mid<br />
+Senior<br />
+Staff<br />
+|| <br />
+Years &gt;= 5</p>
+<p>Availability<br />
+Certification<br />
+Compensation Range</p>
+<h3>Hybrid Search</h3>
+<p>Metadata Filter<br />
++<br />
+ANN<br />
++<br />
+Keyword Search</p>
+<h3>HOW WOULD YOU DESIGN Real Time Vs BATCH?</h3>
+<h2>WHAT COMOINENTS WOULD CHANGE AND WHY?</h2>
+<h2>Vector Databases</h2>
+<h3>KNN(Exact) - KNN is a brute-force algorithm. O(N)</h3>
+<ul>
+<li>To find nearest neighbor, computes distance from query point to every single point in the dataset.</li>
+</ul>
+<h3>ANN(Approximate) - ANN trades perfect accuracy for speed. O(logN)</h3>
+<ul>
+<li>Instead of checking every point, uses data structures like <ul>
+<li>graphs (HSNW) </li>
+<li>trees</li>
+<li>inverted files with quantization (IVF-PQ) <br />
+to guess wehere nearest neighbors are. Aims for high recall without checking the whole dataset.</li>
+</ul>
+</li>
+</ul>
+<p>At production scale latency of KNN </p>
+<h3>PGVector</h3>
+<p>Pros:<br />
+Lives in Postgres<br />
+Easy integration<br />
+ACID<br />
+Joins<br />
+Metadata filtering</p>
+<p>Cons:<br />
+Not ideal at billion scale</p>
+<p>Great for:<br />
+100k - 50M vectors</p>
+<h3>Pinecone</h3>
+<p>Pros:<br />
+Easy<br />
+Scales automatically<br />
+Good HNSW</p>
+<p>Cons:<br />
+Vendor lock-in<br />
+More expensive</p>
+<h3>Milvus/Zilliz</h3>
+<p>HSNW - Hierarchichal Navigable Small World Graph</p>
+<p>Skip Linked List - Variant of a LinkedList with a Skip Pointer, further down the list</p>
+<p>Pros:<br />
+Built specifically for vectors<br />
+Multiple ANN indexes<br />
+Huge scale</p>
+<p>Supports:<br />
+HNSW<br />
+IVF<br />
+PQ<br />
+DiskANN</p>
+<p>In order to Hard Filter, need metadata with the vector db</p>
+<p>OPEN QUESTIONS<br />
+Can we discuss different Vector Databases such as pgvector/pinecone and zilliz? Can we discuss their indexing approaches (HNSW, IVF)<br />
+Can we discuss ANN vs KNN?<br />
+Can we discuss Hard Filtering specifically in the case with mercor such as applying metadata filters before entering ANN search? What fields would I want to likely filter on?</p>
+<p>Vector embedding stored sepearately from raw content. Would raw content be kept in an object store like S3?</p>
+<p>Can we discuss Brandes Algorithm?</p>
+<p>Brandes Algorithm: BFS phase, from each source, run BFS, track the number of shortest paths to each node (sigma) and track predecessors.</p>
+<p>Can we discuss Cost vs. Time Tradeoffs<br />
+merge sort<br />
+parallelism stategies<br />
+Error-ruling strategies</p>
+<p>How does ANN search work?<br />
+Why exact KNN doesn't scale<br />
+What are the tradeoffs between recall and latency?</p>
+<p>Be able to name at least one pgvector/pinecone and explain it;s indexing approach (HNSW, IVF)</p>
+<p>async functionality? any requirements other than await?<br />
+MCP gives agents a common way to access things<br />
+MCP portable and re-useable</p>
+<p>Context - what the model sees<br />
+- prompt<br />
+- history<br />
+- retreived docs<br />
+- memory<br />
+- screenshots<br />
+- logs<br />
+- state on the current turn</p>
+<p>Tools - what the model can do<br />
+- search<br />
+- query<br />
+- read<br />
+- write<br />
+- test<br />
+- message<br />
+- call systems outside the model itself</p>
+<p>Local Functions - Domain-specific tools you write and provide to agents.<br />
+CLI / Shell - Give the agent a terminal, maximally flexible, harder to constrain.<br />
+MCP - a protocol for exposing tools to agents across services.</p>
+<p>Loop - how the agent keeps moving</p>
+<p>Prompt -&gt; Decide -&gt; Tool Call -&gt; Tool Result -&gt; Interpet -&gt; Continue || Stop</p>
+<p>Harnesses - max steps, explicit completion criteria<br />
+Governance - What bounds autonomy<br />
+- permissions<br />
+- approvals<br />
+- sandboxing<br />
+- auditability<br />
+- blast-radius design</p>
+<p>Ontology - a structured model of concepts and relationships in a domain.</p>
+<p>Meaningful Entities in the RLHF / expert-evaluation ecosystem and their relationships.</p>
+<p>Core Entities<br />
+- Domain Expert<br />
+- Task<br />
+- Model<br />
+- Evaluation<br />
+- Dataset<br />
+- Customer<br />
+- Project</p>
+<p>Expert ~ Human Expert<br />
+- expert_id<br />
+- name<br />
+- skills<br />
+- expertise_level<br />
+- certifications<br />
+- languages<br />
+- hourly_rate<br />
+- reliability_score</p>
+<p>Ex) Software Engineer, Lawyer, Doctor</p>
+<p>Project ~ Work requested by a customer.<br />
+Project<br />
+- project_id<br />
+- customer_id<br />
+- domain<br />
+- budget<br />
+- objectives</p>
+<p>Ex) Train coding model</p>
+<p>Task - Unit of work assigned to experts.</p>
+<p>Task<br />
+- task_id<br />
+- project_id<br />
+- task_type<br />
+- difficulty<br />
+- reward</p>
+<p>Ex) Rank responses, Write ideal answer, Find hallucinations.</p>
+<p>Model - AI model being trained or evaluated</p>
+<p>Model<br />
+- model_id<br />
+- model_name<br />
+- version<br />
+- provider</p>
+<p>Ex) GPT, Claude, Gemini, Llama, Internal Model</p>
+<p>Evaluation - judgement produced by an expert or automated evaluator.</p>
+<p>Evaluation<br />
+- evaluation_id<br />
+- task_id<br />
+- expert_id<br />
+- score<br />
+- explanation</p>
+<p>Dataset - collection of examples</p>
+<p>Dataset<br />
+- dataset_id<br />
+- version<br />
+- domain<br />
+- source</p>
+<p>Ex) Coding Dataset, Legal Dataset, Medical Dataset, Math Dataset</p>
+<p>Customer - Entity paying for the work.</p>
+<p>Customer<br />
+- customer_id<br />
+- company_name<br />
+- industry</p>
+<p>Skill</p>
+<p>Rubric</p>
+<p>HNSW - Hierarchical Navigable Small World - Algorithm for finding Approximate Nearest Neighbors search.<br />
+Creates multiple layered hierarchies<br />
+- Top layers have fewer elements, allowing for "long jumps" across the layererd hierarchies</p>
+<p>Multi-Layer Hierarchy<br />
+- Layer 0 (Bottom Layer): Contains every single data point in dataset, linked together in a dense graph.</p>
+<p>Relationships</p>
+<pre><code>Expert performs Task
+
+Task belongs to Project
+
+Project belongs to Customer
+
+Task evaluates Model
+
+Evaluation generated by Expert
+
+Evaluation contributes to Dataset
+
+Dataset trains Model
+
+# Graphically
+
+Customer
+    |
+    v
+Project
+    |
+    v
+Task
+    |
+    +------&gt; Model
+    |
+    v
+Expert
+    |
+    v
+Evaluation
+    |
+    v
+Dataset
+    |
+    v
+Model
+</code></pre>
+<p>Skillset<br />
+/grill-me: debatably better at aligning in plan mode</p>
+<p>Grill Me on this Feature</p>
+<p>Product Requirements Document</p>
+<p>/ubiquitous-language -&gt; creates ubiquoutous_language.md </p>
+<p>Feedback Loops<br />
+- Static Types<br />
+- Browser Access<br />
+- Automated Tests</p>
+<p>Test Driven Development</p>
+<p>Spec-Driven Testing for Agents<br />
+- An agent spec is not just a test dataset.<br />
+- Needs explicit rules (never offer more than a 10% discount)<br />
+- Domain ontologies (an airline agent only needs to know about destinations that airline actually flies to)</p>
+<p>Writing these independently of the implementation so they can survive a model swap and can drive both security testing and iterative improvement.</p>
+<p>Can you explain how we might process using streaming generators to maintain O(1) memory footprint per run<br />
+How All external I/O integrations (saving metrics to the operational data layer or sending alerts) handle downstream rate limits via exponential backoff logic.<br />
+Out-of-order execution timestamps within the agent logs are natively handled via explicit sorting before computing delta latencies.<br />
+How to manage failed steps without losing data integrity:<br />
+    - State<br />
+    - Retries<br />
+    - Compensation logic<br />
+What does ontologies mean?</p>
+<p>John Dee // Edward Kelly </p>
+<p>Invocation - channeling intelligence into you, merge Thoth<br />
+Evocation - evoke spirit/angel/ancestors protection<br />
+Gnocchian - language</p>
+<h3>Edge Router - first component that receives external traffic</h3>
+<p>Responsible For:</p>
+<p>Authentication<br />
+Rate Limiting<br />
+TLS Termination<br />
+Request Validation<br />
+Tenant Identification<br />
+Load Balancing<br />
+Routing<br />
+Observability</p>
+<p>For Ex)</p>
+<pre><code class="language-yaml">POST /chat
+Authorization: Bearer abc123
+</code></pre>
+<p>Edge router might:<br />
+1. Validate token<br />
+2. Determine customer<br />
+3. Apply rate limits<br />
+4. Log request<br />
+5. Forward internally</p>
+<p>Internal Multiplexer<br />
+Multiplexer - Take one incoming stream and distribute it among many downstream options.</p>
+<p>Responsibilities:</p>
+<p>Routing<br />
+Fan-out<br />
+Aggregation<br />
+Model selection<br />
+Agent selection<br />
+Cost optimization</p>
+<pre><code>Internet
+                     |
+                     v
+            +----------------+
+            | Edge Router    |
+            +----------------+
+                     |
+                     v
+            +----------------+
+            | Agent API      |
+            +----------------+
+                     |
+                     v
+            +----------------+
+            | Internal Mux   |
+            +----------------+
+             /      |      \
+            /       |       \
+           v        v        v
+
+    Planning  Coding  Research
+      Agent    Agent    Agent
+</code></pre>
+<p>Multiplexor chooses:<br />
+Which agent?<br />
+Which model?<br />
+Which tools?</p>
+<hr />
+<p><em>Still chewing on:</em> As I explore these concepts further, questions arise about the best practices for managing failed steps in distributed systems without compromising data integrity. How do we effectively balance retries against permanent failures to maintain system resilience?</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'async-job-processing-eventual-consistency-systems-design';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script>
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    </script>
+</body>
+</html>

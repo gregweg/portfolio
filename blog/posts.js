@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Async Job Processing & Eventual Consistency in Systems Design",
+        slug: "async-job-processing-eventual-consistency-systems-design",
+        date: "2026-07-08",
+        tags: ["asynchronous processing", "eventual consistency", "system design"],
+        description: "Exploring asynchronous workflows, eventual consistency, and high-throughput system design for managing complex AI agent tasks."
+    },
+    {
         title: "Full-Stack Coding Round Prep: Member Search Interface",
         slug: "full-stack-coding-round-prep-member-search-interface",
         date: "2026-07-08",
