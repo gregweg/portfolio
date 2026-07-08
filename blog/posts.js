@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Greg's Notes on Modern Programming Approach",
+        slug: "gregs-notes-on-modern-programming-approach",
+        date: "2026-07-08",
+        tags: ["programming", "software engineering", "spec-driven design"],
+        description: "Exploring modern programming approaches focusing on goal task deconstruction, spec-driven development, and leveraging LLMs."
+    },
+    {
         title: "Agentic Design Patterns & Reinforcement Learning in AI",
         slug: "agentic-design-patterns-rl-in-ai",
         date: "2026-06-01",
