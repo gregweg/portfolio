@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Designing Efficient AI Agents for Voice Pipelines",
+        slug: "designing-efficient-ai-agents-for-voice-pipelines",
+        date: "2026-07-08",
+        tags: ["AI Engineering", "System Design", "Voice Pipeline"],
+        description: "Exploring the architecture, efficiency, and technical details of building an AI screening agent with real-time voice communication."
+    },
+    {
         title: "Exploring AI in Reasoning and Structuring a Member Search API",
         slug: "exploring-ai-in-reasoning-and-structuring-a-member-search-api",
         date: "2026-07-08",

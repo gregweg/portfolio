@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Exploring the architecture, efficiency, and technical details of building an AI screening agent with real-time voice communication.">
+    <title>Designing Efficient AI Agents for Voice Pipelines</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-07-08</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">AI Engineering</span>
+                                    <span class="tag">System Design</span>
+                                    <span class="tag">Voice Pipeline</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Designing Efficient AI Agents for Voice Pipelines</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Today's notes revolve around designing efficient AI agents for voice pipelines, focusing on how to streamline system architecture without compromising functionality. I'm particularly interested in optimizing the call handling process and the interplay between speech-to-text and text-to-speech technologies.</p>
+<p>Headroom<br />
+- agent efficiency</p>
+<p>drawio - architecture diagram</p>
+<p>ponytail - reduces code bloat, fights over-engineering<br />
+Supabase PostgresQL + RowLevel Security (user_id = auth.id())</p>
+<p>Handy - free open source, and extensible speed-to-text application that works completely offline.<br />
+improve - code base auditor. Agent kill that audits any codebase and writes implementation plans for other agents to execute.<br />
+SkillSpector - scans and audits skills<br />
+compound-engineering - spec driven development</p>
+<p>HashMap<br />
+Hash Index - Hash Kept In Memory</p>
+<p>BTree Index - Database Index which is a self-balancing tree, kept entirely on disk (durability). Meaning no limit to size and range queries supported</p>
+<h2>Logical Structure</h2>
+<pre><code>[ Emma ]
+
+                         /        \
+
+                        /          \
+
+                       /            \
+
+              [ Charlie ]        [ Grace ]
+
+              /        \          /      \
+
+             /          \        /        \
+
+      [Alice,Bob]  [David] [Frank] [Henry,Ivy]
+</code></pre>
+<h2>B-Tree Properties</h2>
+<p>Every node:</p>
+<ul>
+<li>Contains sorted keys</li>
+<li>Has multiple children</li>
+<li>Keeps tree balanced</li>
+</ul>
+<pre><code>[40]
+
+         /    \
+
+        /      \
+
+   [10,20]   [60,80]
+</code></pre>
+<p>BTreeMap<br />
+SebSocket - Real time, bi-directional communication, real time data<br />
+WebHook - Event driven with http callback for asynchronous communication.<br />
+Webhook -<br />
+Rust </p>
+<p>AI Screening Agent</p>
+<p>Entry &amp; Session Management: Inbound call handler, session initializer (candidate ID, job role, 30-min timer), and conversation state manager.</p>
+<p>Voice Pipeline: Speech-to-text → LLM orchestrator → text-to-speech, with a real-time audio streaming layer.</p>
+<p>Can you help me to understand the following topics for the context of a system design interview:<br />
+SIIP / PSTN Gateway</p>
+<p>PTSN Gateway - (Public Switched Telephone Network) - traditional phone system. When someone calls a number it travles over PSTN.</p>
+<p>SIP (Session Initiation Protocol) - protocol that bridges PSTN to VoIP/internet. A SIP/PSTN Gateway converts analog/digital phone signals into SIP packets your sytem can process. "Front Door" - twilio, vonage, signalwire</p>
+<p>Real-time WebSockets - WebSockets hold a persistent bidirectional connection so data chunks can stream coninuously both ways wtih ~ 50-100 ms latency. In a voice pipeline, the aduio media stream RTP from SIP gets bridged to a WebSocket that your orchestration layer listens to. HTTP request/response would be too slow for things like gaming/voice</p>
+<p>Whisper / Transcription - OpenAI's speech to text model (STT). Streaming-capable STT service that emits partial transcripts as the caller is still spoeaking, with a final transcript on silence/pause detection. The transcript then fires into the LLM orchestrator. </p>
+<p>Voice Synthesis - Text-to-speech converts the LLM's response to audip. For low-latency, you stream the TTS - the LLM output tokens, you pipe them to a TTS service (ElevenLabs) which starts generating the audio before the full response is ready. This is called streaming TTS with sentence-level chunking -- you send sentence by sentence rather than waiting for the full LLM response. Target is under 500 ms time-to-first-audio.</p>
+<p>Session Initializer<br />
+- The session initializer bootstraps everything at call start. It's job:<br />
+- allocation a session ID tied to this call<br />
+- Pull candidate contest (from ATS: name, applied role, resume summary)<br />
+- Set conversation state (current workflow moduel = "intro", time remaining = 30 min)<br />
+- Initialize the sytsem prompt with job-specific context<br />
+- Start the timer/watchdog</p>
+<p>Factory that hands the orchestrator a fully-loaded context object before first word is spoken.</p>
+<p>Branching &amp; Sentiment<br />
+Branching logic lives in the orchestrator, after each cnadidatre turn orchestrator evaluates the transcript and decides: continue current module, branch to deep-dive or advance to next phase. This can be rule-based (keyword triggers), LLM-evaluated (structured output from the same LLM), or a lightweight classifier<br />
+Sentiment/confidence scoring - typically a side-channel run in parallel not blocking the main loop. Lightweight modle scores each candidate response and writes to the session state. Orchestrator cna read those scores when making branching decisions but sentiment scoring doesn't sit in the critical path.</p>
+<p>One stateful orchestrator instance per chall. Each inbound call spins up it's own isolated orchestrator process/container with its own:<br />
+- session state<br />
+- conversation history<br />
+- timer<br />
+- module pointer</p>
+<p>Session Initializer in the orchestration layer is</p>
+<p>In an orchestated system, once workflow modules are completed where is the decision logic handled? what are branching &amp; sentiment ar ethey sent back to the orchestrator to decide? Would there be a dedicated agent per phone call handling logic or would it all be a master orchestrator deciding</p>
+<hr />
+<p><em>Still chewing on:</em> Reflecting on today’s exploration, I’m still pondering whether a dedicated orchestrator instance per phone call is necessary or if there could be a more scalable solution. The balance between flexibility and resource efficiency seems crucial.</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'designing-efficient-ai-agents-for-voice-pipelines';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script>
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    </script>
+</body>
+</html>
