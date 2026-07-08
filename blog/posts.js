@@ -8,6 +8,13 @@ const BLOG_POSTS = [
         description: "Exploring the architecture, efficiency, and technical details of building an AI screening agent with real-time voice communication."
     },
     {
+        title: "Multi-Modal RAG Ingestion Pipeline: A Journey Through Text and Vision",
+        slug: "multi-modal-rag-ingestion-pipeline-a-journey-through-text-and-vision",
+        date: "2026-07-08",
+        tags: ["ML engineering", "RAG systems", "text extraction", "vision models"],
+        description: "Greg Wegman explores the intricacies of building a multi-modal retrieval augmentation generation system, focusing on ingestion pipelines for text and visual data."
+    },
+    {
         title: "Exploring AI in Reasoning and Structuring a Member Search API",
         slug: "exploring-ai-in-reasoning-and-structuring-a-member-search-api",
         date: "2026-07-08",
