@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Greg Wegman explores the intricacies of building a multi-modal retrieval augmentation generation system, focusing on ingestion pipelines for text and visual data.">
+    <title>Multi-Modal RAG Ingestion Pipeline: A Journey Through Text and Vision</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-07-08</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">ML engineering</span>
+                                    <span class="tag">RAG systems</span>
+                                    <span class="tag">text extraction</span>
+                                    <span class="tag">vision models</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Multi-Modal RAG Ingestion Pipeline: A Journey Through Text and Vision</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Today, I'm diving deep into the challenges and opportunities of creating an ingestion pipeline for multimodal RAG (Retrieval-Augmented Generation) systems. The goal is to build a robust system that can handle various file types—ranging from simple text documents to complex images and PDFs—and convert them into structured data ready for machine learning models. This work is crucial as I aim to create an efficient, scalable solution that leverages both local and cloud-based AI resources.</p>
+<h1>Multi-Modal RAG Ingestion Pipeline</h1>
+<h2>Multi-Modal RAG Ingestion Pipeline</h2>
+<pre><code class="language-plaintext">User uploads files
+  ↓
+Raw object storage
+  S3/GCS/local MinIO
+  Stores PDFs, images, docs, screenshots
+  ↓
+Ingestion queue
+  SQS/RabbitMQ/Kafka
+  ↓
+File classifier
+  PDF / image / HTML / text / docx / spreadsheet
+  ↓
+Extraction layer
+  Text extraction
+  OCR
+  Image captioning
+  Diagram/table extraction
+  Page screenshots
+  ↓
+LLM enrichment router
+  GPT / Claude for high-quality extraction
+  Ollama/Qwen fallback for cheap/local extraction
+  ↓
+Chunking
+  Text chunks
+  Image-derived chunks
+  Table chunks
+  Page-level chunks
+  ↓
+Embedding generation
+  Text embeddings
+  Optional image/multimodal embeddings
+  ↓
+Vector DB + metadata DB
+  pgvector / Milvus / Pinecone / Zilliz
+  Postgres for source metadata
+  ↓
+Tutor retrieval
+  Hybrid search + rerank
+  ↓
+Answer generation with citations
+</code></pre>
+<h2>OpenAI &amp; Claude both support vision workflows for image understanding, OCR-like extractions, charts, diagrams, and document/image reasoning. OpenAI's vision models can analyze images and text inside images, while Claude's vision/PDF docs describe visual understanding for images and PDFs, including charts and layouts.</h2>
+<p>Ollama is useful as the local model runner for open models and fallbacks.</p>
+<p>RAG System, ingestion in three phases.</p>
+<pre><code class="language-plaintext">1. Raw source
+   - original PDF/image/text
+   - stored unchanged
+
+2. Extracted learning content
+   - text
+   - OCR
+   - image descriptions
+   - diagram explanations
+   - table markdown
+   - equations
+   - page summaries
+
+3. Retrieval chunks
+   - small chunks for search
+   - metadata-rich
+   - connected back to page/image coordinates
+</code></pre>
+<p>Example chunk:</p>
+<pre><code class="language-JSON">{
+  &quot;chunk_id&quot;: &quot;doc_123_page_4_chunk_2&quot;,
+  &quot;source_id&quot;: &quot;doc_123&quot;,
+  &quot;modality&quot;: &quot;image+text&quot;,
+  &quot;text&quot;: &quot;This diagram explains photosynthesis...&quot;,
+  &quot;page&quot;: 4,
+  &quot;bbox&quot;: [120, 80, 500, 360],
+  &quot;grade_level&quot;: &quot;middle_school&quot;,
+  &quot;subject&quot;: &quot;biology&quot;,
+  &quot;concepts&quot;: [&quot;photosynthesis&quot;, &quot;chloroplast&quot;, &quot;light energy&quot;],
+  &quot;embedding&quot;: &quot;...&quot;
+}
+</code></pre>
+<p>Instead of embedding raw images directly as our only representation. Convert images into useful readable text:</p>
+<pre><code class="language-plaintext">Image / PDF page
+  ↓
+Vision model
+  ↓
+Structured extraction:
+  - caption
+  - OCR text
+  - detected diagram/table/equation
+  - educational explanation
+  - possible quiz concepts
+  ↓
+Embed that extracted content
+</code></pre>
+<p>Tiered Model Routing:</p>
+<pre><code class="language-plaintext">Tier 1: Cheap/local
+  Ollama + Qwen
+  - simple OCR cleanup
+  - summarization
+  - classification
+  - concept tagging
+  - duplicate detection
+  - low-risk chunks
+
+Tier 2: Cloud quality
+  GPT / Claude
+  - complex diagrams
+  - handwritten notes
+  - charts
+  - math reasoning
+  - ambiguous pages
+  - final validation
+
+Tier 3: Human review / async retry
+  - failed extraction
+  - low confidence
+  - important curriculum material
+</code></pre>
+<p>Simplified Router:</p>
+<pre><code class="language-python">if document_is_simple_text:
+    use_local_qwen()
+
+elif image_has_dense_diagram_or_math:
+    use_claude_or_gpt_vision()
+
+elif local_extraction_confidence &lt; threshold:
+    escalate_to_gpt_or_claude()
+
+else:
+    use_local_qwen()
+</code></pre>
+<p>collect golden examples from GPT/Claude outputs, then fine-tune Qwen on your domain-specific tasks</p>
+<pre><code>GPT/Claude extraction outputs
+  ↓
+Human review / eval filtering
+  ↓
+Golden dataset
+  ↓
+Fine-tune Qwen
+  ↓
+Use Qwen for cheaper repeatable extraction
+</code></pre>
+<p>Fine Tuning Targets:</p>
+<pre><code>- Turn textbook page into structured JSON
+- Extract quiz concepts
+- Classify subject/grade level
+- Summarize diagrams
+- Normalize OCR output
+- Generate tutor-friendly explanations
+- Detect prerequisite concepts
+</code></pre>
+<p>GPT/Claude for hard visual reasoning, local Qwen for predictable structured tasks.</p>
+<pre><code class="language-plaintext">Question from student
+  ↓
+Query classifier
+  - subject
+  - grade level
+  - modality needed?
+  ↓
+Hybrid retrieval
+  - vector search
+  - keyword search
+  - metadata filter
+  ↓
+Reranker
+  ↓
+Tutor answer model
+  ↓
+Cited answer with source snippets/images
+</code></pre>
+<p>Metadata:</p>
+<pre><code class="language-plaintext">subject
+grade_level
+curriculum_unit
+source_type
+page_number
+modality
+concepts
+difficulty
+student_id / tenant_id
+school_id
+visibility
+</code></pre>
+<p>Postgres + Vector DB ()</p>
+<pre><code>Postgres
+  documents
+  document_pages
+  chunks
+  extraction_jobs
+  model_runs
+  tenants
+  permissions
+
+Vector DB
+  chunk_id
+  embedding
+  searchable text
+  metadata filters
+</code></pre>
+<p>Never make ingestion depend on one model provider.</p>
+<pre><code class="language-python">class VisionExtractor:
+    def extract(self, file_page) -&gt; ExtractedPage:
+        ...
+
+class OpenAIVisionExtractor(VisionExtractor):
+    ...
+
+class ClaudeVisionExtractor(VisionExtractor):
+    ...
+
+class OllamaQwenExtractor(VisionExtractor):
+    ...
+</code></pre>
+<pre><code class="language-plaintext">try GPT/Claude
+  ↓ fail/rate-limit
+try other cloud provider
+  ↓ fail
+try Ollama/Qwen local fallback
+  ↓ fail
+mark extraction job failed + retry later
+</code></pre>
+<h2>Ingestion System</h2>
+<pre><code class="language-plaintext">Upload API
+  → Object Storage
+  → Ingestion Job Queue
+  → Parser Worker
+  → OCR/Vision Worker
+  → LLM Enrichment Worker
+  → Chunking Worker
+  → Embedding Worker
+  → Index Writer
+  → Eval/QA Worker
+</code></pre>
+<h3>Parser Worker</h3>
+<pre><code class="language-plaintext">What kind of file is this?
+How many pages/slides/sheets/images does it contain?
+Can we extract text directly?
+Do we need OCR or vision?
+
+PDF textbook
+  → page images
+  → direct text extraction
+  → page metadata
+
+PowerPoint
+  → slide images
+  → speaker notes
+  → slide text
+
+Excel
+  → sheets
+  → tables
+  → named ranges
+
+Image
+  → image metadata
+  → dimensions
+  → OCR-needed flag
+</code></pre>
+<pre><code class="language-JSON">{
+  &quot;document_id&quot;: &quot;doc_123&quot;,
+  &quot;file_type&quot;: &quot;pdf&quot;,
+  &quot;pages&quot;: [
+    {
+      &quot;page_id&quot;: &quot;doc_123_page_1&quot;,
+      &quot;page_number&quot;: 1,
+      &quot;raw_text&quot;: &quot;Photosynthesis is the process...&quot;,
+      &quot;image_uri&quot;: &quot;s3://bucket/doc_123/page_1.png&quot;,
+      &quot;needs_ocr&quot;: true,
+      &quot;needs_vision&quot;: true
+    }
+  ]
+}
+</code></pre>
+<h2>Multi-Tenant Row Level Isolation in Postgres</h2>
+<h3>Add tenant_id to every tenant-owned table</h3>
+<h3>Enable Row Level Security</h3>
+<h3>Set the current tenant in the DB session/transaction</h3>
+<h3>Write policies that only allow rows where tenant_id = current_setting(...)</h3>
+<h3>Make Sure app roles cannot bypass RLS</h3>
+<pre><code class="language-sql">CREATE TABLE orders (
+  id uuid PRIMARY KEY,
+  tenant_id uuid NOT NULL,
+  customer_name text NOT NULL,
+  total_cents integer NOT NULL
+);
+
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orders FORCE ROW LEVEL SECURITY;
+</code></pre>
+<p>Create a policy:</p>
+<pre><code class="language-sql">CREATE POLICY tenant_isolation_orders
+ON orders
+USING (
+  tenant_id = current_setting('app.current_tenant_id')::uuid
+)
+WITH CHECK (
+  tenant_id = current_setting('app.current_tenant_id')::uuid
+);
+</code></pre>
+<p>In the application, set the tenant per transaction.</p>
+<pre><code class="language-sql">BEGIN;
+
+SET LOCAL app.current_tenant_id = '6b3f7b7e-4c1a-4db2-9349-6e8b3df2c001';
+
+SELECT * FROM orders;
+
+COMMIT;
+</code></pre>
+<h2>OIDC - OpenID Connect</h2>
+<p>OIDC - an authentication protocol built on top of the OAuth 2.0 framework</p>
+<p>This allows third-party applications (Relying Parties) to verify a user's identity via an external Identity Provider</p>
+<h3></h3>
+<p>MCP vs. API</p>
+<p>API built for deterministic software<br />
+MCP built for non-deterministic software</p>
+<p>6 Phase</p>
+<p>Phase 1 Come up with all the Data Definitions</p>
+<p>Phase 2 Define all the interfaces that we need</p>
+<p>Phase 3 Design all the todos for what code needs to change</p>
+<p>Phase 4 Given all the todos and data structures we've created. Implement it, play the game in JSON mode and making sure everything works. Tell me where you had to go outside of all the todos, or leave the path</p>
+<ul>
+<li>Implementation Tests</li>
+</ul>
+<p>game -&gt; JSON mode vs render, write to output which can be replayed and reviewed</p>
+<hr />
+<p><em>Still chewing on:</em> Reflecting on today's exploration, it becomes clear how much effort goes into balancing the cost-efficiency of local models with the quality needed for complex tasks. The tiered model routing approach is a promising strategy, but there are still nuances to iron out in terms of determining when and where to escalate tasks from cheaper to more expensive services.</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'multi-modal-rag-ingestion-pipeline-a-journey-through-text-and-vision';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script>
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    </script>
+</body>
+</html>
