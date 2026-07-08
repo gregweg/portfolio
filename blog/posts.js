@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Exploring AI in Reasoning and Structuring a Member Search API",
+        slug: "exploring-ai-in-reasoning-and-structuring-a-member-search-api",
+        date: "2026-07-08",
+        tags: ["AI", "Human Reasoning", "API Development", "Python"],
+        description: "Greg contemplates the role of AI in human reasoning while building out an API for searching member records."
+    },
+    {
         title: "Full-Stack Coding Round Prep Notes",
         slug: "full-stack-coding-round-prep-notes",
         date: "2026-07-08",
