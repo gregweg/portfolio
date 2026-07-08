@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Full-Stack Coding Round Prep Notes",
+        slug: "full-stack-coding-round-prep-notes",
+        date: "2026-07-08",
+        tags: ["frontend", "backend", "typescript", "react", "api"],
+        description: "Preparing for a full-stack coding round with frontend and backend components."
+    },
+    {
         title: "My Modern Programming Approach",
         slug: "my-modern-programming-approach",
         date: "2026-07-08",
