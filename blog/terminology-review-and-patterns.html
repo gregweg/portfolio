@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Today's notes explore various client-side and backend terminologies, patterns, and trade-offs to optimize system performance and reliability.">
+    <title>Day in the Life of Client-Side & Backend Terminology</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-08-12</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">client-side</span>
+                                    <span class="tag">backend</span>
+                                    <span class="tag">optimistic updates</span>
+                                    <span class="tag">API Gateway</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Day in the Life of Client-Side & Backend Terminology</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>In today’s notes, Greg delves into the intricacies of client-side terminology like optimistic updates, background sync, and IndexedDB, alongside backend concepts such as idempotency and rate-limiting. The discussion is grounded in practical examples and trade-offs relevant to real-world system design.</p>
+<h2>Terminology Review</h2>
+<hr />
+<h3>Client Side Terminology</h3>
+<h4>Optimistic Updates</h4>
+<p>Definition: Updating the client UI immediately after a user action before receiving confirmation from the server, assuming the network request will succeed.</p>
+<p>Key Use Case: Low-latency UI responsiveness (toggling a "Like" button, sending a chat message).</p>
+<p>Trade-off / Gotcha: Requires robust rollback logic and error handling if the server request fails or returns a validation error.</p>
+<h4>Background Sync</h4>
+<p>Definition: A browser/application strategy that defers network requests until stable connectivty is restored, executing them in the background (often via Service Workers)</p>
+<p>Key Use Case: Offline-first mobile/web applications (ex. queuing draft emails or field data logs).</p>
+<p>Trade-Off / Gotcha: Requests can be delayed unpredictably; requires handling out-of-order state updates when reconnecting.</p>
+<h4>IndexedDB/SQLite</h4>
+<p>Definition: Persistent, client-side transactional databases (IndexedDB natively in browsers, SQLite via WASM or mobile wrappers) for storing structured data locally.</p>
+<p>Key Use Case: Caching complex application state, enabling offline functionality, and reducing API reads for large datasets.</p>
+<p>Trade-Off / Gotcha: Schema migrations on client devices are complex, and storage limits vary across platforms.</p>
+<h4>Payload Compression</h4>
+<p>Definition: Reducing the byte size of requests/response payloads using algorithms like Gzip, Brotli, or binary serialization formats (e.g., Protocol Buffers)</p>
+<p>Key Use Case: Minimizing network bandwidth usage and latency over slow or constrained mobile networks.</p>
+<p>Trade-Off / Gotcha: Adds CPU overhead for encoding/decoding on both client and server; negligible gain on very small JSON payloads.</p>
+<hr />
+<h3>API/Backend Terminology</h3>
+<h4>Idempotency</h4>
+<p>Definition: A property of an API endpoint where making the exact same request multiple times yields the same system state as making it once.</p>
+<p>Key Use Case: Preventing duplicate charges or creations during network timeouts/retries via Idempotency-Key headers.</p>
+<p>Trade-Off / Gotcha: Requires caching request keys and response in a fast distributed store (e.g., Redis) with explicit expiration TTLs.</p>
+<h4>Rate-Limiting (Tocken Bucket)</h4>
+<p>Definition: An algorithm that tracks available requests as "tokens" in a bucket filled at a constant rate; requests consume tokens and are rejected (HTTP 429) when the bucket is empty.</p>
+<p>Key Use Case: Protecting endpoints from denial-of-service, scraping or resource exhaustion while permitting controlled traffic bursts.</p>
+<p>Trade-Off / Gotcha: Need distributed state (e.g., Redis scripts) to enforce limits accurately across multiple API instances.</p>
+<h4>API Gateway</h4>
+<p>Definition: A single entry-point reverse proxy that handles cross-cutting concerns like routing, authentication, SSL termination, and rate-limiting before forwarding requests to microservices.</p>
+<p>Key Use Case: Centralizing edge security and routing logic away from individual downstream services.</p>
+<p>Trade-Off / Gotcha: Can become a single point of failure and a performance bottleneck if over-packed with heavy business logic.</p>
+<h4>Stateless Auth (JWT/OAuth2)</h4>
+<p>Definition: An authentication model where user identity and permissions are embedded inside a cryptographically signed token (JWT), eliminating server-side session lookups.</p>
+<p>Key Use Case: Scaling authentication horizontally across stateless microservices.</p>
+<p>Trade-Off / Gotcha: Revoking tokens before they expire is difficult without maintaining an explicit invalidation list (blocklist).</p>
+<hr />
+<h3>Data/Queue</h3>
+<h4>Read-heavy caching</h4>
+<p>Definition: Placing an in-memory datastore (e.g., Redis, Memcached) in front of the primary database using patterns like Cache-Aside or Read-Through to serve frequent reads.</p>
+<p>Key Use Case: Systems with high read-to-write ratios (e.g., user profiles, product catalogs).</p>
+<p>Trade-Off / Gotcha: Invalidation is notoriously difficult; risks serving stale data or causing "cache stampedes" on cold cache misses.</p>
+<h4>Message Brokers</h4>
+<p>Definition: Middleware (e.g., RabbitMQ, Apache Kafka, AWS SQS) that decouples producers and consumers by asynchronously routing, queuing, and delivering messages.</p>
+<p>Key Use Case: Aynchronous task processing, event-driven architectures, and smoothing out traffic spikes.</p>
+<p>Trade-Off / Gotcha: Introduces eventual consistency, message ordering challenges, and poison-pill handling requirements.</p>
+<h4>Worker Pools</h4>
+<p>Definition: A concurrency pattern where a fixed number of reusable threads or processes consume tasks from a shared queue.</p>
+<p>Key Use Case: Preventing CPU/memory exhausion by bounding resourc eonsumption when handling heavy background workloads</p>
+<p>Trade-Off / Gotcha: If the pool size is too small, tasks back up in the queue; if too large, context switching degrades throughput</p>
+<h4>Database Sharding/Partitioning</h4>
+<p>Definition:<br />
+    - Partitioning: Splitting a larger table into smaller sub-tables within a single database instance (e.g., by date range)<br />
+    - Sharding: Distributing data across multiple separate databases instances using a shard key (e.g., user_id % num_shards consistent hashing) </p>
+<p>Key Use Case: Overcoming storage and CPU/IOPS limits of a single databse machine when scaling horizontally.</p>
+<p>Trade-Off / Gotcha: Cross-shard joins, distributed transactions, and re-sharding existing data add significant operational complexity.</p>
+<hr />
+<h2>Problem Triggers -&gt; Pattern/Tool + Tradeoffs</h2>
+<h3>Handling High Traffic &amp; Scaling</h3>
+<h4>High Read-to-Write Ratio (e.g., 99% reads, 1% writes like Twitter feeds)</h4>
+<p>Pattern / Tool: Cache-Aside / Read Replicas</p>
+<p>Why Use It?: Offloads reads from primary DB; drastically reduces query latency.</p>
+<p>Tradeoffs &amp; Gotchas:<br />
+    - Cache Invalidation: Complex logic to prevent stale reads.<br />
+    - Replication Lag: Replicas may serve slightly outdated data.</p>
+<h4>Monolithic DB hitting disk/CPU limits on Writes</h4>
+<p>Pattern / Tool: Database Sharding (Horizontal Paritioning)</p>
+<p>Why Use It?: Distributes write load across multiple hardware nodes.</p>
+<p>Tradeoffs &amp; Gotchas:<br />
+    - Cross-Shard Joins: Extremely slow or unsupported.<br />
+    - Hotspot Shards: Poor choice of shard key leads to uneven load</p>
+<h4>Sudden Traffic Spikes / Burstiness (e.g. flash sales, ticket booking)</h4>
+<p>Pattern / Tool: Message Queue / Asynchronous Buffer</p>
+<p>Why Use It?: Smooths out traffic spikes ("load leveling") so downstream workers aren't overwhelmed.</p>
+<p>Tradeoffs &amp; Gotchas:<br />
+    - Eventual Consistency: User doesn't get an immediate confirmation.<br />
+    - Queue Management: Must handle dead-letter queues (DLQs) for failed processing.</p>
+<h4>Global User Base / High Network Latency</h4>
+<p>Pattern / Tool: CDN (Content Delivery Network) &amp; Anycast Routing</p>
+<p>Why Use It?: Serves static assets and dynamic content closer to the edge via PoPs (Points of Presence).</p>
+<p>Tradeoffs &amp; Gotchas:<br />
+    - Cost: High egress charges.<br />
+    - Purging Cache: Invalidation across globally distributed edge nodes takes time.</p>
+<h3>Real-Time Communication &amp; APIs</h3>
+<h4>Bidirectional, Low-Latency Updates (e.g., chat apps, collaborative editors, gaming)</h4>
+<p>Pattern / Tool: WebSockets</p>
+<p>Why Use It?: Full-duplex persistent connection over a single TCP connection.</p>
+<p>Tradeoffs &amp; Gotchas:<br />
+    - Stateful Servers: Makes horizontal scaling and load balancing complex (requires stick sessions or a pub/sub backbone)</p>
+<h4>Server-to-Client Updates Only</h4>
+<p>Pattern / Tool: Server-Sent Events (SSE)</p>
+<p>Why Use It?: Lighter than WebSockets; built on HTTP, automatic reconnection out of the box.</p>
+<p>Tradeoffs &amp; Gotchas:<br />
+    - Unidirectional: Connection is read-only for the client; sending data requires sepearate HTTP POST requests.</p>
+<h4>Protecting Downstream Services from Overload</h4>
+<p>Pattern / Tool: API Gateway + Rate Limiter</p>
+<p>Why Use It?: Centralizes Auth, SSL termination, routing and prevents abuse/DDoS.</p>
+<p>Tradeoffs &amp; Gotchas:<br />
+    - Single Point of Failure (SPOF): If the gateway goes down, all API traffic fails.<br />
+    - Added Latency: Every request incurs extra hop latency</p>
+<h3>Consistency &amp; Distributed Data</h3>
+<h4>Financial / Ledger Transactions across Microservices</h4>
+<p>Pattern / Tool: Saga Pattern (Orchestration vs Choreography)</p>
+<p>Why Use It?: Manages long-running distributed transactions without locking tables across DBs via compensating actions.</p>
+<p>Tradeoffs &amp; Gotchas:<br />
+    - Complex Rollbacks: Writing reversing/compensating logic for every step is error-prone<br />
+    - Eventual Consistency: Intermediate states are visible to users.</p>
+<h4>High Read Throughput + COmplex Analytical Queries</h4>
+<p>Pattern / Tool: CQRS (Command Query Responsibility Segregation)</p>
+<p>Why Use It?: Decouples reads and write data models, optimizing each independently</p>
+<p>Tradeoffs &amp; Gotchas:<br />
+    - Code Duplication: Requires maintaining distinct schema and models.<br />
+    - Data Lag: Read side is eventually consisten with the write side.</p>
+<h4>Complete Audit Trails / Un-deleteable History (e.g., bank accounts, inventory logs)</h4>
+<p>Pattern / Tool: Event Sourcing</p>
+<p>Why Use It?: Appends state changes as imutable events rather than mutating current state.</p>
+<p>Tradeoffs &amp; Gotchas:<br />
+    - Schema Evolution: Changing event formats over time is difficult.<br />
+    - Replay Latency: Rebuilding current state from scratch requires creating periodic snapshots.</p>
+<h3>Reliability &amp; Fault Tolerance</h3>
+<h4>Preventing Cascading Failures (e.g., slow third-party payment vendor)</h4>
+<p>Pattern / Tool: Circuit Breaker Pattern</p>
+<p>Why Use It?: Fast-fails requests to a failing service to give it time to recover, keeping the rest of the app functional.</p>
+<p>Tradeoffs &amp; Gotchas:<br />
+    - Degraded User Experience: Must design fallback UI states.<br />
+    - Tuning Thresholds: Setting error rates and sleep windows accurately requires precise telemetry.</p>
+<h4>Idempotent Operations over Unreliable Network</h4>
+<p>Pattern / Tool: Idempotency Keys</p>
+<p>Why Use It?: Allows clients to safely retry failed HTTP requests (like payments) without double-processing.</p>
+<p>Tradeoffs &amp; Gotchas:<br />
+    - Storage Overhead: Must store idempotency tokens and past responses in distributed memory. (e.g., Redis TTLs).</p>
+<h4>Zero Downtime Deployments</h4>
+<p>Pattern / Tool: Blue/Green or Canary Deployments</p>
+<p>Why Use It?: Routes traffic progressible to test new releases safely with instantaneous rollback capability.</p>
+<p>Tradeoffs &amp; Gotchas:<br />
+    - Cost: Blue/Green requires running duplicate hardware environments during releases.<br />
+    - DB Migrations: DB schemas must remain backward-compatible with both old and new app versions simultaneously.</p>
+<h2>System Design Practice</h2>
+<p>Optimizing for high availability or strict consistency here?</p>
+<h2>1. Clarify &amp; Scope</h2>
+<p>Functional Requirements: 2-3 must have features<br />
+- Users should be able to scan a badge and tap Popl cards<br />
+- Enterprise Admin should have a dashboard with <br />
+    - live metrics<br />
+    - recent lead captures<br />
+    - team activity</p>
+<p>Non-Functional Requirements: What are scale and constraints? (Latency Targets, Offline Capability, Expected Throughput, Read/Write Ratio)</p>
+<ul>
+<li>Admin dashboard should refresh with near-zero latency.</li>
+<li>50 sales reps, 5,000 to 10,000 total leads over an 8-hour day, <ul>
+<li>~ 1000 leads an hour / 60 </li>
+<li>~ 10-20 scans / min</li>
+<li>~ bursts of 100+ scans / min at peak booth times</li>
+<li>admin view live feed with under 1-second delay</li>
+</ul>
+</li>
+</ul>
+<p>Entities:<br />
+LeadSource (Popl NFC Device, QR Code, Badge)<br />
+Lead</p>
+<p>Leads<br />
+id              uuid PK<br />
+name:           string<br />
+email:          string<br />
+company:        string<br />
+notes:          string<br />
+qualifiers:     string<br />
+timestamp:      timestamp</p>
+<h2>2. High-Level Architecture</h2>
+<pre><code class="language-text">[Mobile App / Web UI] ──(HTTPS / REST / GQL)──&gt; [API Gateway / Load Balancer]
+                                                        │
+                                                 [Core Service]
+                                                  │          │
+                                       (Write) ───┘          └─── (Read / Hot Data)
+                                          │                         │
+                                   [Relational DB]             [In-Memory Cache]
+                                          │
+                                (Events / Async)
+                                          │
+                                    [Message Queue]
+                                          │
+                                  [Background Worker] ───&gt; [3rd Party CRM / Webhook]
+</code></pre>
+<p>The Transactional Outbox Pattern: To guarantee that an event is 100% produced whenever the DB write succeeds, write an event into the database within the same database transaction.</p>
+<ol>
+<li>Transaction Begin:<ul>
+<li>Insert into leads table.</li>
+<li>Insert an event record into an outbox table ( outbox: { id, event_type: "lead.created", payload, status: "pending" })</li>
+</ul>
+</li>
+<li>
+<p>Transaction Commit.</p>
+</li>
+<li>
+<p>A separate lightweight worker process continuously polls or tail-reads outbox table and pushes those pending rows straight into RabbitMQ/SQS/Kafka, updating their status to published. </p>
+</li>
+<li>
+<p>Pros: Guarantees at-least-once delivery and zero event loss without needing complex infrastructure changes.</p>
+</li>
+<li>Cons: Requires a polling worker or log scanner on the outbox table.</li>
+</ol>
+<p>How do we bridge the message queue events over to WebSockets or SSE so the Enterprie Admin's dashboard updates instantly?</p>
+<p>Main API nodes and workers are stateless, admin's browser holds an open WebSocket connection with Server Node A, while sale's rep's phone might hit Server Node B.</p>
+<p>Need a pub/sub backbone to bridge that gap.</p>
+<p>3-Step Connection Pipeline</p>
+<h3>1. The Pub/Sub Router (Redis)</h3>
+<ul>
+<li>When background worker consumes a lead.created event from SQS/Kafka, it immediately puiblishes that payload to an in-memory Pub/Sub channel (Redis Pub/Sub) keyed by thte Enterprise Team ID:</li>
+<li>Channel Name: team:tenant_123:events</li>
+<li>Payload: { event: "LEAD_CREATED", rep: "Alex", time: "10:03AM", stats: { totalToday: 142 } }</li>
+</ul>
+<p>Message queues like SQS are meant for worker task distribution (one worker processes one message).<br />
+Predis Pub/Suc is meant foor broadcasting - it instantly fans out a single message to dozens of listening API/WebSocket server instances in sub-millisecond time.</p>
+<h3>2. Connection Management &amp; Gateway Nodes</h3>
+<ul>
+<li>When the Enterprise Admin logs in, their browser opens a persistent Server-Sent Events (SSE) connection to a Gateway node (or a dedicated real-time service like Socket.io / AWS API Gateway WebSockets)<ol>
+<li>Authentication: Authenticate the connection via a short-lived token (JWT) passed in query params or headers during the handshake.</li>
+<li>Subscription: The node registers interest in the team's Redis channel (SUBSCRIBE team:tenant_123:events)</li>
+<li>Push to Client: Whenever Redis broadcasts an event on that channel, the Node server receives it in-memory and pushes it down the matching client's socket</li>
+</ol>
+</li>
+</ul>
+<pre><code class="language-text">[Rep Phone] ──&gt; [API Server] ──&gt; [DB + Outbox] ──&gt; [Worker]
+                                                        │
+                                          (Publishes event to Channel)
+                                                        │
+                                                        ▼
+                                           [Redis Pub/Sub Broker]
+                                                        │
+                                                        ▼
+                                           [Edge API Server Node]
+                                                        │
+                                           ┌────────────┴──────┐
+                                           /                    \
+                       (Delivers to all active connection nodes)
+                                         /                        \
+                       [WebSocket Node A]            [WebSocket Node B]
+                               │                                │
+                       (Pushes via SSE)                  (Pushes via SSE)
+                       `https://api.popl.co/events`      `https://api.popl.co/events`
+                               │                                │
+                       [Admin Dashboard]                [Admin Dashboard]
+</code></pre>
+<p>SSE Persistent Connection Pipeline</p>
+<p>SSE uses a standard HTTP/1.1 or HTTP/2 GET requests with continuous streaming response headers:</p>
+<pre><code class="language-HTTP">GET /api/v1/teams/tenant_123/live-stream HTTP/1.1
+Host: api.popl.co
+Authorization: Bearer &lt;jwt_token&gt;
+Accept: text/event-stream
+
+HTTP/1.1 200 OK
+Content-Type: text/event-stream
+Cache-Control: no-cache
+Connection: keep-alive
+Access-Control-Allow-Origin: *
+</code></pre>
+<p>The Wired Data Format</p>
+<p>When Redis Pub/Sub receives an event, the Edge API server formats the JSON into plain text liens starting with data: and separated by double new lines (\n\n):</p>
+<pre><code class="language-text">id: evt_987654321
+event: lead_captured
+data: {&quot;rep&quot;: &quot;Alex&quot;, &quot;lead&quot;: &quot;Acme Corp&quot;, &quot;total_today&quot;: 142}
+
+id: evt_987654322
+event: leaderboard_update
+data: {&quot;top_rep&quot;: &quot;Sarah&quot;, &quot;scans&quot;: 38}
+</code></pre>
+<p>Client-Side Implementation (Standard Browser API)<br />
+While WebSockets require managing manaual reconnect loops and heartbeat intervals, SSE uses the browser's native EventSource API, which manages network drop-outs automatically:</p>
+<pre><code class="language-javascript">// Native browser API — no external libraries needed
+const eventSource = new EventSource('/api/v1/teams/tenant_123/live-stream');
+
+// Listen for custom events pushed from the server
+eventSource.addEventListener('lead_captured', (event) =&gt; {
+  const data = JSON.parse(event.data);
+  updateDashboardFeed(data);
+});
+
+// Auto-reconnect with historical catch-up built-in
+eventSource.onerror = (err) =&gt; {
+  console.log('Connection lost, browser is auto-reconnecting...');
+};
+</code></pre>
+<p>Why SSE over WebSockets<br />
+- Lower Operational Overhead: Works out-of-the box with standard HTTP/2 multiplexing, ALB/Ngninx load balancers, and Cloudflare/Fastly proxies without requiring specialized WebSocket connection upgrading logic.<br />
+- Resilience at Conferences: Corporate event Wi-Fi frequently drops. SSE automatically sends a Last-Event-ID header upon reconnecting, allowing your Edge server to replay missed Redis events without custom client-side retry engines.<br />
+- Simplicity: Unidirectional (Server -&gt; Client) fits a dashboard feed perfectly. You avoid the overhead of managing full-duplex framing when the client never needs to push raw data back down the socket.</p>
+<p>How SSE Keeps the Connection Open<br />
+Under the hood, SSE leverages standard HTTP streaming:<br />
+1. Initial Request: The client sends an HTTP GET reques tot an endpoint (/api/v1/live-leads)<br />
+2. Infinite Headers: The server responds with 200 OK, Content-Type: text/event-stream, and Connection: keep-alive.<br />
+3. Chunked Streaming: Instead of sending a Content-Length header and closing response (like a normal REST API), the server leaves the HTTP response stream open indefinitely.<br />
+4. Pushing Data: Whenever an event happens ont he backend (a Redis Pub/Sub message fires), the server writes a chunk of text directly down that open HTTP socket.</p>
+<h2>3. Deep-Dive into Full-Stack Integration</h2>
+<p>Frontend/Client: How does client handle state? Optimistic UI Updates for speed, local indexed DB / SQLite storage for offline queues, and exponential backoff retry algorithms for syncing.</p>
+<ol>
+<li>Local Offline Storage: IndexedDB (Web) vs. SQLite / WatermelonDB (Mobile)<br />
+When a sales rep taps a Popl card or scans a badge, the network is never on the critical path.</li>
+</ol>
+<pre><code class="language-sql">[User Scans Badge]
+        │
+        ▼
+[Synchronous Local Write] ───&gt; (Write to SQLite / IndexedDB)
+        │
+        ├───&gt; Update React / Mobile UI Instantly (Optimistic)
+        │
+        └───&gt; Enqueue Sync Job (Queue Manager)
+                                  │
+                          [Sync Background Process]
+                                  │
+                      (Online?) ──┴── (Offline?)
+                          │              │
+                          ▼              ▼
+                     [POST API]    [Wait for Connectivity]
+</code></pre>
+<p>Backend/Data: How are entities modeled? Primary Keys, Indexing Strategies (ex. indexing team_id or user_id), and caching invalidation triggers.</p>
+<h2>4. Edge Cases &amp; System Failure Scenarios</h2>
+<p>Network drop mid-sync: Use idempotency keys (UUID generated on the client) so retried requests don't create duplicate leads.</p>
+<p>External API Failure (ex. Salesforce rate limit / down): Implement exponential backoff retries with Dead Letter Queues (DLQ) for manual reply or alerted retries</p>
+<p>Thundering Herd / Cache Stampede: If a viral profile gets thousands of hits at once, use stale-while-revalidate or edge caching.</p>
+<hr />
+<p><em>Still chewing on:</em> Greg’s exploration leaves me pondering the complexity of managing state across client and server, especially with asynchronous patterns like message queues and background sync. How do we ensure consistency while maintaining responsiveness?</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'terminology-review-and-patterns';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script>
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    </script>
+</body>
+</html>

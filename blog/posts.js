@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Day in the Life of Client-Side & Backend Terminology",
+        slug: "terminology-review-and-patterns",
+        date: "2026-08-12",
+        tags: ["client-side", "backend", "optimistic updates", "API Gateway"],
+        description: "Today's notes explore various client-side and backend terminologies, patterns, and trade-offs to optimize system performance and reliability."
+    },
+    {
         title: "Designing Robust Data Models and HTTP Contracts",
         slug: "designing-robust-data-models-and-http-contracts",
         date: "2026-08-12",
