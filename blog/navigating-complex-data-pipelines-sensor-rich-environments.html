@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Greg explores the challenges of aligning and processing data from multiple sensors for machine learning applications, focusing on storage optimization and lineaging techniques.">
+    <title>Navigating Complex Data Pipelines in Sensor-rich Environments</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-08-12</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">data engineering</span>
+                                    <span class="tag">machine learning</span>
+                                    <span class="tag">sensor data</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Navigating Complex Data Pipelines in Sensor-rich Environments</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Today's notes delve into the intricacies of managing and optimizing multi-modal sensor data for machine learning projects. Greg outlines key strategies to handle asynchronous ingestion, calibration, and efficient storage formats, emphasizing the importance of maintaining data lineage and reprocessing workflows.</p>
+<h1>0-to-1 Data Platform / ML Infrastructure Multi-Modal Sensor Synchronization, Storage Optimization, Data Lineage and Developer Ergonomics for ML Engineers.</h1>
+<h2>Mult-Sensor Data Alignment &amp; Calibration</h2>
+<h3>Key Concepts</h3>
+<h4>Asynchronous Ingestion &amp; Alignment: Maritime sensors (hydrophones, GPS, AIS, IMU) log data at different frequencies and clock drift. You need to align streams using temporal join algorithms (e.g. ASOF joins) or time-window resampling.</h4>
+<h4>Resampling &amp; Signal Processing: Downsampling high-frequency acoustic data or interpolating sparse telemetry (e.g. linear interpolation, cubic splines, zero-order hold).</h4>
+<h4>Calibration &amp; Windowing: Applying sensor transformation matrices, rolling temporal windows (ex. 5-second chunked spectographic frames) and normalizing values across historical runs.</h4>
+<pre><code>[Raw Hydrophone (100kHz)] ──┐
+[Raw GPS / AIS (1Hz)]    ──┼─► [Batch/Micro-batch Window (30m/1h)] ──► [ASOF Join &amp; Resample] ──► [Aligned Parquet/Zarr]
+[IMU / Telemetry (50Hz)] ──┘
+</code></pre>
+<h2>Storage Layot, Formats &amp; Chunking</h2>
+<h3>Key Concepts</h3>
+<ul>
+<li>Format Selection:<ul>
+<li>Columnar tabular / metadata: Apache Parquet, Apache Iceberge.</li>
+<li>N-dimensional array / Acoustic signals: Zarr or HDF5 (crucial for time-series / spectogram / audio arrays)</li>
+</ul>
+</li>
+<li>Storage Optimization:<ul>
+<li>Chunking &amp; Sharding: Aligning chunk size on S3/GCS with query access patterns (e.g., chunking by time window + sensor ID so ML loaders don't download unneeded slices).</li>
+<li>Partitioning Strategieis: Partitioning by data / region_geohash / modality rather than fine-grained timestamps to avoid the small-file problem.</li>
+</ul>
+</li>
+</ul>
+<p>Format  Best Use Case   Query Pattern   Key Consideration<br />
+Apache Parquet  Telemetry, metadata, labels Columnar SQL, fast filtering    Poor for arbitrary n-dimensional slicing<br />
+Zarr / HDF5 Raw acoustic waveforms, spectrograms    Slicing arrays along axes (time/freq)   Cloud-native friendly (Zarr) vs local file system (HDF5)<br />
+Apache Iceberg  Lakehouse table management  Time-travel queries, schema evolution   Provides ACID transactions over Parquet</p>
+<h2>Reprocessing, Backfill &amp; Lineage</h2>
+<h3>Key Concepts</h3>
+<ul>
+<li>Immutable Storage &amp; Versioning: Never mutate historical processed data. Store datasets immutably and version the transformation pipeline logic.</li>
+<li>Data Lineage: Tracking: Dataset ID = f(Raw Signals v1.2, Filter Code v2.0, Label Set v4)</li>
+<li>Idempotent Backfills: Designing DAGs/pipelines such that rerunning a pipeline for a specific time partition (Ti -&gt; Tj) produces the exact same output without side effects.</li>
+</ul>
+<h3>Frameworks of Use</h3>
+<ul>
+<li>Orchestration: Prefect, Dagster, or Apache Airflow</li>
+<li>Table/Dataset Versioning: LakeFS, DVC (Data Version Control), or Apache Iceberge time-travel.</li>
+</ul>
+<h2>Dataset Discovery &amp; Access SDK</h2>
+<h3>Key COncepts</h3>
+<ul>
+<li>Data Catalog &amp; Discovery API: An internal REST/gRPC service or Python SDK taht allows ML engineers to run queries like:</li>
+</ul>
+<pre><code>dataset = client.get_dataset(
+    start_time=&quot;2026-07-01&quot;,
+    end_time=&quot;2026-07-15&quot;,
+    region=&quot;san_francisco_bay&quot;,
+    modalities=[&quot;acoustic_spectrogram&quot;, &quot;telemetry&quot;],
+    min_quality_score=0.95,
+    labels=[&quot;vessel_engine&quot;, &quot;marine_mammal&quot;]
+)
+</code></pre>
+<ul>
+<li>ML Data Loading: Streaming data directly from S3/GCS into PyTorch/TensorFLow Datasets using multi-threaded prefetching without saturating local RAM.</li>
+</ul>
+<h2>Pre-labeling Workflows &amp; Custom Tooling</h2>
+<h3>Key Concepts</h3>
+<ul>
+<li>Pre-labeling Pipeline: Running baseline ML models on fresh ingest batches to gneerate candidate labels/bounding boxes/time-intervals before human review.</li>
+<li>Tooling Architecture: Lightweight frontend + fast backend API for serving accoustic spectrogramsn and receiving analyst annotations</li>
+<li>Label Lineage: Tracking albel confidence, annotator ID, and model version if pre-labeled.</li>
+</ul>
+<h2>System Architecture</h2>
+<pre><code>┌────────────────────────────────────────────────────────────────────────┐
+│                        INGESTION &amp; RAW STORAGE                         │
+│   Ingest (Acoustic / Telemetry / GPS)  ──►  S3 Raw Bucket (Immutable)  │
+└──────────────────────────────────┬─────────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼─────────────────────────────────────┐
+│                    PROCESSING &amp; REPROCESSING ENGINE                    │
+│   • Orchestrator: Dagster / Prefect                                    │
+│   • Workers: DuckDB / Polars / PySpark / Ray                           │
+│   • Operations: Time sync (ASOF), resampling, calibration, chunking    │
+└──────────────────────────────────┬─────────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼─────────────────────────────────────┐
+│                      STORAGE &amp; DATA LAKEHOUSE                          │
+│   • Metadata &amp; Telemetry: Apache Iceberg (Parquet)                     │
+│   • Acoustic Signals: Zarr (Cloud-Native N-Dim Arrays)                 │
+└──────────────────────────────────┬─────────────────────────────────────┘
+                                   │
+┌──────────────────────────────────▼─────────────────────────────────────┐
+│                       CONSUMPTION &amp; TOOLING                            │
+│   • Python SDK / Discovery API (PyTorch DataLoader integration)        │
+│   • Data Quality Instrumentation &amp; Canary Datasets                     │
+│   • Labeling Tool API (Serving spectrograms &amp; receiving bounds)        │
+└────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<hr />
+<p><em>Still chewing on:</em> Greg raises an interesting question about how to effectively balance the trade-offs between using cloud-native Zarr format versus traditional HDF5 for storing large-scale acoustic signals. This decision hinges on specific use cases and query patterns, which remain open-ended in today's notes.</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'navigating-complex-data-pipelines-sensor-rich-environments';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script>
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    </script>
+</body>
+</html>
