@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Greg explores the technical details of building a Retrieval-Augmented Generation (RAG) architecture for an AI tutor, focusing on data ingestion and retrieval processes.">
+    <title>Building an AI Tutor with RAG Architecture</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-08-12</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">AI Tutor</span>
+                                    <span class="tag">RAG Architecture</span>
+                                    <span class="tag">Data Ingestion</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Building an AI Tutor with RAG Architecture</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Today, Greg delves into the intricate process of crafting a Retrieval-Augmented Generation (RAG) system for an AI tutor. The notes focus on how raw educational content is ingested and transformed through various steps to create a searchable knowledge base that can dynamically generate responses based on student needs.</p>
+<h1>AI Tutor RAG architecture</h1>
+<h2></h2>
+<pre><code class="language-plaintext">Raw Content
+PDFs, docs, slides, textbook chapters, question banks
+        ↓
+Parsing / Extraction
+text, images, tables, diagrams, metadata
+        ↓
+Cleaning / Normalization
+remove noise, fix formatting, standardize equations, deduplicate
+        ↓
+Segmentation / Chunking
+split into lesson-sized or concept-sized passages,
+        ↓
+Enrichment
+label subject, topic, difficulty, standards, prerequisites, learning objectives
+        ↓
+Question/Concept Mapping
+link chunks to quizzes, exercises, worked examples, answer keys
+        ↓
+Embedding
+convert chunks into vectors
+        ↓
+Indexing
+store vectors + metadata in vector DB / search index
+        ↓
+Retrieval-Ready Knowledge Base
+</code></pre>
+<h2>Ingestion Pipeline</h2>
+<pre><code>PDF / Image
+      │
+      ▼
+Parser
+      │
+      ▼
+Vision Enrichment Service
+      │
+      ▼
+Enriched Text Blocks
+      │
+      ▼
+Chunking
+      │
+      ▼
+Embedding
+</code></pre>
+<p>Attach metadata into chunks</p>
+<pre><code class="language-json">{
+  &quot;subject&quot;: &quot;Algebra&quot;,
+  &quot;unit&quot;: &quot;Linear Equations&quot;,
+  &quot;lesson_id&quot;: &quot;lesson_12&quot;,
+  &quot;concepts&quot;: [&quot;slope&quot;, &quot;y-intercept&quot;, &quot;linear function&quot;],
+  &quot;difficulty&quot;: &quot;middle_school&quot;,
+  &quot;source_id&quot;: &quot;algebra_textbook_ch_3&quot;,
+  &quot;chunk_type&quot;: &quot;explanation&quot;,
+  &quot;question_ids&quot;: [&quot;q_102&quot;, &quot;q_103&quot;, &quot;q_104&quot;],
+  &quot;learning_objective_ids&quot;: [&quot;lo_linear_equations_01&quot;],
+  &quot;prerequisites&quot;: [&quot;coordinate_plane&quot;, &quot;proportional_relationships&quot;]
+}
+</code></pre>
+<pre><code>TextChunk
+  id
+  document_id
+  page
+  text
+  bbox
+  section_id
+
+VisualBlock
+  id
+  document_id
+  page
+  image_uri
+  bbox
+  ocr_text
+  caption
+  structured_description
+
+ChunkVisualLink
+  text_chunk_id
+  visual_block_id
+  relation_type
+  distance / confidence
+</code></pre>
+<p>Concepts → Learning Objectives → Lessons → Questions → Hints → Rubrics → Assessments</p>
+<p>“What concept does this question test?”<br />
+“What hint should I give without revealing the answer?”<br />
+“What prerequisite is the student missing?”<br />
+“What worked example is closest to this problem?”<br />
+“What rubric explains why this answer is wrong?”</p>
+<p>Creates Several Indexes, not just one:</p>
+<ol>
+<li>
+<p>Content Index<br />
+   Explanations, textbook passages, lessons</p>
+</li>
+<li>
+<p>Question Index<br />
+   Problems, prompts, answer choices, solutions</p>
+</li>
+<li>
+<p>Worked Example Index<br />
+   Step-by-step examples</p>
+</li>
+<li>
+<p>Hint/Rubric Index<br />
+   Misconceptions, grading criteria, feedback patterns</p>
+</li>
+<li>
+<p>Concept Graph / Metadata Store</p>
+</li>
+</ol>
+<p>The vector database helps find semantically similar material.<br />
+The metadata/graph tells the tutor what that material means pedagogically.<br />
+   Prerequisites, standards, topic hierarchy</p>
+<p>ANN indexes</p>
+<p>Most vector databases therefore build</p>
+<p>Approximate Nearest Neighbor indexes.</p>
+<p>Common algorithms include</p>
+<ul>
+<li>HNSW</li>
+<li>IVF</li>
+<li>PQ</li>
+<li>ScaNN</li>
+<li>DiskANN</li>
+</ul>
+<p>HNSW</p>
+<h2>Metadata store</h2>
+<p>Where traditional databases shine</p>
+<p>Concept Graph</p>
+<p>This is one of the most powerful pieces of an AI tutor.<br />
+Instead of storing only text…<br />
+you store relationships.</p>
+<p>Vector retrieval (HNSW) </p>
+<p>Question becomes an embedding<br />
+HNSW searches your content index returns something like:</p>
+<pre><code class="language-yaml">Chunk 348
+Similarity: 0.92
+
+&quot;Multiplying two negative numbers...&quot;
+</code></pre>
+<pre><code class="language-yaml">Worked Example 77
+Similarity: 0.89
+
+(-3)(-5)
+</code></pre>
+<pre><code class="language-yaml">Question 921
+Similarity: 0.84
+</code></pre>
+<p>Vector DB Returns Chunk 348<br />
+Metadata says</p>
+<pre><code>{
+  &quot;subject&quot;: &quot;Algebra&quot;,
+  &quot;grade&quot;: 7,
+  &quot;lesson&quot;: &quot;Integers&quot;,
+  &quot;difficulty&quot;: 2,
+  &quot;concept&quot;: &quot;negative multiplication&quot;,
+  &quot;curriculum&quot;: &quot;Common Core&quot;
+}
+</code></pre>
+<p>if Student Profile says: grade: 5. Tutor can immediately reject that chunk because it's structured filtering.</p>
+<p>Concept graph expansion</p>
+<p>Retrieved Chunk References:<br />
+Concept: Negative Multiplication</p>
+<p>A Concept Graph might contain:</p>
+<pre><code>Negative Multiplication
+        │
+ requires
+        │
+ Integers
+        │
+ requires
+        │
+ Number Line
+ ...
+ Negative Multiplication
+        │
+tested_by
+        │
+Question 921
+...
+Negative Multiplication
+        │
+example
+        │
+Worked Example 77
+...
+Negative Multiplication
+        │
+misconception
+        │
+Students think
+negative × negative = negative
+</code></pre>
+<p>Now the tutor has expanded the retrieval beyond what the vector search returned.</p>
+<p>Vector Search found Chunk 348:<br />
+Explanation of slope</p>
+<p>Graph Established Known Relationships:</p>
+<pre><code>Slope
+
+requires
+
+Coordinate Plane
+
+requires
+
+Ordered Pairs
+
+requires
+
+Positive/Negative Numbers
+</code></pre>
+<p>At Retrieval Time combine Image and Text Context</p>
+<pre><code class="language-yaml">Retrieve relevant TextChunk
+  ↓
+Fetch linked VisualBlocks nearby
+  ↓
+Assemble final context:
+  - text passage
+  - image caption / OCR / diagram description
+  - image URI if using vision model
+  - page/bbox for citation
+</code></pre>
+<p>How I’d architect a production AI Tutor</p>
+<p>Given your background in distributed systems and the RAG pipeline you’ve been designing, I’d separate responsibilities like this:</p>
+<ul>
+<li>Object storage (documents, PDFs, images, videos): raw source material.</li>
+<li>Relational database (e.g., PostgreSQL): metadata, document hierarchy, users, lessons, learning objectives, permissions, and ingestion status.</li>
+<li>Vector database (e.g., pgvector, Milvus, Qdrant, or Pinecone): semantic embeddings and approximate nearest-neighbor indexes.</li>
+<li>Graph database (e.g., Neo4j, or graph tables in PostgreSQL if the graph is modest): concepts, prerequisites, curriculum structure, misconceptions, and links between concepts, chunks, questions, and examples.</li>
+</ul>
+<pre><code class="language-code">Student Question
+                        │
+                        ▼
+              Embed Question Vector
+                        │
+                        ▼
+          HNSW Vector Search (semantic)
+                        │
+           Top 20 candidate chunks
+                        │
+                        ▼
+         Metadata Filter &amp; Re-ranker
+      (grade, lesson, curriculum, difficulty,
+       permissions, student progress)
+                        │
+                        ▼
+              Concept Graph Expansion
+   (prerequisites, examples, questions,
+    hints, misconceptions, learning objectives)
+                        │
+                        ▼
+          Final Context for the LLM Tutor
+</code></pre>
+<h4>Random Topics:</h4>
+<p>MicroVM - lightweight virtual machines that boot in milliseconds and use minimal device modes, hardware-level isolation of a traditional VM with the speed and density of a cotnainer. Designed specifically to safely run multi-tenant and untrusted workloads without overhead of full-scale virtualization</p>
+<p>Firecracker: an open-source VMM (Virtual Machine Monitor) developed by AWS that powers severless computing.</p>
+<p>AWS Lambda MicroVMs: serverless computing primitive purpose-built for executing user- or AI-generated code, enabling persistent, multi-tenant sandboxes that resume instantly.</p>
+<hr />
+<p><em>Still chewing on:</em> How does the combination of vector databases and concept graphs enhance the tutor's ability to provide personalized learning experiences, especially when it comes to addressing misconceptions and prerequisite knowledge gaps?</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'building-an-ai-tutor-with-rag-architecture';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script>
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    </script>
+</body>
+</html>

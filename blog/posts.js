@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Building an AI Tutor with RAG Architecture",
+        slug: "building-an-ai-tutor-with-rag-architecture",
+        date: "2026-08-12",
+        tags: ["AI Tutor", "RAG Architecture", "Data Ingestion"],
+        description: "Greg explores the technical details of building a Retrieval-Augmented Generation (RAG) architecture for an AI tutor, focusing on data ingestion and retrieval processes."
+    },
+    {
         title: "Concurrency, Parallelism, Multithreading & High-Throughput Webhook Processing",
         slug: "concurrency-webhooks",
         date: "2026-07-08",
