@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Navigating Complex Data Pipelines in Sensor-rich Environments",
+        slug: "navigating-complex-data-pipelines-sensor-rich-environments",
+        date: "2026-08-12",
+        tags: ["data engineering", "machine learning", "sensor data"],
+        description: "Greg explores the challenges of aligning and processing data from multiple sensors for machine learning applications, focusing on storage optimization and lineaging techniques."
+    },
+    {
         title: "Day in the Life of Client-Side & Backend Terminology",
         slug: "terminology-review-and-patterns",
         date: "2026-08-12",
