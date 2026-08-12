@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Greg explores the complexities of data modeling, focusing on order management and payment processing.">
+    <title>Designing Robust Data Models and HTTP Contracts</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-08-12</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">data modeling</span>
+                                    <span class="tag">API design</span>
+                                    <span class="tag">order management</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Designing Robust Data Models and HTTP Contracts</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Today's notes delve into the intricacies of designing effective data models and HTTP contracts for managing orders and payments. Greg delves into schema design, versioning strategies, and handling idempotency to ensure reliable and consistent operations.</p>
+<h1>Data Modeling</h1>
+<p>Modeling Time, Money, Status Transitions, Audit History</p>
+<h2>API Contracts</h2>
+<p>Request/Response Schemas and Validation<br />
+Error formats, pagination, filtering and sorting<br />
+Optional, nullable, absent and defaulted fields<br />
+OpenAPI or JSON Schema as executable contracts<br />
+Consumer-driven contract and integration testing</p>
+<p>Versioning and evolutionBreaking versus non-breaking changes<br />
+Additive evolution and tolerant readers<br />
+URL, header, media-type, and date-based versioning<br />
+Expand–migrate–contract database migrations<br />
+Deprecation policies and compatibility windows<br />
+When a new version is genuinely necessary</p>
+<p>Idempotency and reliability Safe versus idempotent HTTP methods<br />
+Idempotency keys for commands such as payments<br />
+Request fingerprints and response replay<br />
+Concurrency, atomicity, and uniqueness constraints<br />
+Retry policies and duplicate delivery<br />
+Outbox/inbox patterns and effectively-once processing</p>
+<p>POST /orders<br />
+Idempotency-Key: 71f6...</p>
+<p>{<br />
+    "customer_id": "cust_123",<br />
+    "items": [<br />
+        { "product_id": "prod_7", "quantity": 2 }<br />
+    ]<br />
+}</p>
+<p>Is an order's price copied at purchase time or read from the current product?<br />
+Can an order change after submission?<br />
+What happens if the client sends the same request twice?<br />
+What if it reuses the key with different content?<br />
+Can a new response field break existing containers?<br />
+How do we rename or remove a field safely?</p>
+<pre><code class="language-text">Receive request
+    ↓
+Atomically reserve (client_id, idempotency_key)
+    ↓
+Same key + same request → replay recorded result
+Same key + different request → return conflict
+New key → execute operation and record result
+</code></pre>
+<p>Design the Data Model and HTTP Contract for Creating, Paying for and Canceling an Order<br />
+Assuming Requests and payment events can be duplicated.</p>
+<h3>Schema</h3>
+<h2>Customers</h2>
+<p>id:                 string PK<br />
+first_name:         string<br />
+last_name:          string<br />
+email:              string<br />
+email_normalized    string UNIQUE<br />
+created_at          timestamp</p>
+<h2>CustomerAddresses</h2>
+<p>id                  string PK<br />
+customer_id         string FK -&gt; Customers(id)<br />
+line_1              string<br />
+line_2              string nullable<br />
+city                string<br />
+region              string<br />
+postal_code         string<br />
+country_code        string</p>
+<h2>Brands</h2>
+<p>id                  string PK<br />
+name                string</p>
+<h2>Products</h2>
+<p>id:                 string PK<br />
+brand_id:           string FK -&gt; Brands(id)<br />
+name                string<br />
+current_price_minor integer<br />
+currency            string<br />
+active              boolean</p>
+<h2>Orders</h2>
+<p>id:                     string PK<br />
+customer_id:            string FK -&gt; Customers(id)<br />
+status:                 enum(pending_payment, paid, cancelled)<br />
+currency:               string<br />
+total_minor:            integer<br />
+shipping_address_json:  JSON/object snapshot<br />
+created_at:             timestamp<br />
+updated_at:             timestamp<br />
+version:                integer</p>
+<h2>OrderItems</h2>
+<p>order_id:           string FK -&gt; Orders(id)<br />
+line_number:        integer<br />
+product_id:         string FK -&gt; Products(id)<br />
+product_name:       string snapshot<br />
+unit_price_minor:   integer snapshot<br />
+quantity:           integer CHECK quantity &gt; 0<br />
+line_total_minor:   integer<br />
+PRIMARY KEY(order_id, line_number)</p>
+<h2>Payments</h2>
+<p>id:                 string PK<br />
+order_id            string FK -&gt; Orders(id)<br />
+provider            string<br />
+provider_reference  string nullable<br />
+status              enum(pending, succeeded, failed)<br />
+amount_minor        integer<br />
+currency            string<br />
+failure_code        string nullable<br />
+created_at          timestamp</p>
+<h2>Cancellations</h2>
+<p>id                  string PK<br />
+order_id            string FK -&gt; Orders(id)<br />
+reason_code         string<br />
+reason_text         string nullable<br />
+created_at          timestamp</p>
+<p>Database Invariants enforced where possible:</p>
+<pre><code class="language-text">quantity &gt; 0
+amount_minor &gt;= 0
+one successful payment per order
+one cancellation per order
+order and payment currencies must agree
+</code></pre>
+<h3>Create Order</h3>
+<pre><code class="language-text">POST /orders
+Idempotency-Key: 71f6...
+Content-Type: application/json
+{
+    &quot;customer_id&quot;: &quot;cust_123&quot;,
+    &quot;items&quot;: [
+        { &quot;product_id&quot;: &quot;prod_7&quot;, &quot;quantity&quot;: 2 }
+    ]
+}
+
+Response
+
+
+201 Created
+
+{
+  &quot;id&quot;: &quot;order_123&quot;,
+  &quot;customer_id&quot;: &quot;cust_123&quot;,
+  &quot;status&quot;: &quot;pending_payment&quot;,
+  &quot;currency&quot;: &quot;USD&quot;,
+  &quot;total_minor&quot;: 23400,
+  &quot;items&quot;: [
+    {
+      &quot;line_number&quot;: 1,
+      &quot;product_id&quot;: &quot;prod_7&quot;,
+      &quot;product_name&quot;: &quot;Example product&quot;,
+      &quot;unit_price_minor&quot;: 11700,
+      &quot;quantity&quot;: 2,
+      &quot;line_total_minor&quot;: 23400
+    }
+  ]
+}
+</code></pre>
+<h3>Pay for Order</h3>
+<pre><code class="language-text">POST /orders/{order_id}/payments
+Idempotency-Key: 82e9...
+Content-Type: application/json
+
+{
+  &quot;payment_method_token&quot;: &quot;pm_provider_token&quot;
+}
+
+Response:
+</code></pre>
+<h3>Cancel Order</h3>
+<pre><code class="language-text">POST /orders/{order_id}/cancellations
+Idempotency-Key: 92c5...
+
+{
+  &quot;reason_code&quot;: &quot;ordered_by_mistake&quot;,
+  &quot;reason_text&quot;: &quot;Mistaken order&quot;
+}
+
+Response: 201 Created
+
+{
+  &quot;id&quot;: &quot;cancel_789&quot;,
+  &quot;order_id&quot;: &quot;order_123&quot;,
+  &quot;status&quot;: &quot;cancelled&quot;,
+  &quot;reason_code&quot;: &quot;ordered_by_mistake&quot;
+}
+</code></pre>
+<p>Cancel Needs a definted State-Transition Policy:</p>
+<pre><code class="language-text">pending_payment → cancelled     allowed
+paid            → cancelled     perhaps requires a refund
+cancelled       → cancelled     replay/no-op
+cancelled       → paid          forbidden
+</code></pre>
+<h3>Idempotency contract</h3>
+<p>Persist something equivalent to:</p>
+<h2>IdempotencyRecords</h2>
+<p>scope                 string<br />
+key                   string<br />
+request_fingerprint   string<br />
+status                enum(in_progress, completed)<br />
+response_status       integer nullable<br />
+response_body         object nullable<br />
+created_at            timestamp<br />
+expires_at            timestamp<br />
+UNIQUE(scope, key)</p>
+<p>Behavior:<br />
+- Same key and same normalized request: replay the original status and response.<br />
+- Same key with a different request: return 409 Conflict.<br />
+- Same key while the first request is running: return the eventual response, or a documented 409/425.<br />
+- No key for an endpoint requiring one: return 400 Bad Request.<br />
+- Scope keys by caller and operation, not globally.<br />
+- Create the idempotency record and business mutation atomically when they share a database.</p>
+<hr />
+<p><em>Still chewing on:</em> How can we best implement state-transition policies to maintain consistency in order states during cancellation processes?</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'designing-robust-data-models-and-http-contracts';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script>
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    </script>
+</body>
+</html>
