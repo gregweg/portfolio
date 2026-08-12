@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Designing Robust Data Models and HTTP Contracts",
+        slug: "designing-robust-data-models-and-http-contracts",
+        date: "2026-08-12",
+        tags: ["data modeling", "API design", "order management"],
+        description: "Greg explores the complexities of data modeling, focusing on order management and payment processing."
+    },
+    {
         title: "Building an AI Tutor with RAG Architecture",
         slug: "building-an-ai-tutor-with-rag-architecture",
         date: "2026-08-12",
