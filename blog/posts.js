@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Exploring AI Agent Design and Backend Development",
+        slug: "exploring-ai-agent-design-backend-development",
+        date: "2026-08-25",
+        tags: ["AI", "Backend Development", "Machine Learning", "Engineering Challenges"],
+        description: "Today's notes dive into Greg's daily challenges in building AI agents and backend systems, reflecting on his technical hurdles and learnings."
+    },
+    {
         title: "Navigating Complex Data Pipelines in Sensor-rich Environments",
         slug: "navigating-complex-data-pipelines-sensor-rich-environments",
         date: "2026-08-12",
