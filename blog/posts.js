@@ -1,12 +1,12 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
-        title: "Orchestration and Eval Learnings: Security, GPU Management, and Observability",
+        title: "Exploring Algorithms and Data Structures",
         slug: "exploring-efficiency",
         date: "2026-09-09",
-        tags: ["ML Infrastructure", "Security", "GPU Allocation", "Observability"],
-        description: "Greg explores security measures in ML infrastructure, efficient GPU allocation, and modern observability tools for AI applications."
-    },
+        tags: ["algorithms", "data structures", "graph theory", "task scheduling", "interval merging"],
+        description: "Today's notes cover a variety of algorithms including graph traversal, task scheduling, interval merging, palindrome checks, and duplicate removal."
+    },,
     {
         title: "Exploring AI Agent Design and Backend Development",
         slug: "exploring-ai-agent-design-backend-development",
