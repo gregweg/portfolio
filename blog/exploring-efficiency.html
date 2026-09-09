@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Greg explores security measures in ML infrastructure, efficient GPU allocation, and modern observability tools for AI applications.">
-    <title>Orchestration and Eval Learnings: Security, GPU Management, and Observability</title>
+    <meta name="description" content="Today's notes cover a variety of algorithms including graph traversal, task scheduling, interval merging, palindrome checks, and duplicate removal.">
+    <title>Exploring Algorithms and Data Structures</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,121 +38,199 @@
                             <div class="blog-card-meta">
                                 <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-09-09</span>
                                 <div class="blog-card-tags">
-                                    <span class="tag">ML Infrastructure</span>
-                                    <span class="tag">Security</span>
-                                    <span class="tag">GPU Allocation</span>
-                                    <span class="tag">Observability</span>
+                                    <span class="tag">algorithms</span>
+                                    <span class="tag">data structures</span>
+                                    <span class="tag">graph theory</span>
+                                    <span class="tag">task scheduling</span>
+                                    <span class="tag">interval merging</span>
                                 </div>
                             </div>
-                            <h1 class="blog-post-title">Orchestration and Eval Learnings: Security, GPU Management, and Observability</h1>
+                            <h1 class="blog-post-title">Exploring Algorithms and Data Structures</h1>
                         </header>
 
                         <div class="blog-post-body">
-                            <p>Today's notes delve into the intricate world of orchestrating machine learning (ML) workloads securely and efficiently. Greg discusses runtime and tenant isolation techniques, data access controls, API security, and GPU management strategies. The final section focuses on modern observability tools that help in tracking user behavior and AI model performance.</p>
-<h1>Orchestration and Eval Learnings</h1>
-<h2>Security in ML Infrastructure</h2>
-<h3>Runtime &amp; Tenante Isolation</h3>
-<pre><code>- Multi-Tenant Clusters: Isolate namespaces in Kubernetes to keep team workloads separated.
-    - mTLS (Mutual Transport Layer Security): A process where both client and server verify each other's cryptographic keys before establishing a connection. Used for securing inter-node worker communication (Ray nodes) against eavesdropping or unauthorized traffic.
-- Code Sandboxing: Isolate execution environments when running unverified or user-submitted code.
-    - eBPF (Extended Berkeley Packer Filter): A kernel-level technology that allows programs to run directly inside the Linux kernel without modifying source code. Used for deep, low-overhead security monitoring and tracing at the system level.
-    - gVisor: An open-source, user-space kernel that acts as a secure sandbox layer between an application and the host OS kernel, preventing malicious code execution from compromising the host.
+                            <p>Today’s notes delve into fundamental concepts in algorithm design, specifically focusing on Directed Graphs for course scheduling, Task Scheduling to manage cooldown periods, Interval Merging for organizing intervals efficiently, and checking Palindromes with different approaches. These topics are crucial for understanding how to solve real-world problems using various data structures and algorithms.</p>
+<h2>Data Structures &amp; Algorithms</h2>
+<h3>Course Schedule</h3>
+<p>Directed Graphs can be used to represent courses with edges representing the prerequisite relationships. Below we employ a queue in a BFS manner to keep track of nodes with zero in-degrees and thus no remanining prerequisites. Using a list to track the number of prerequisites for each course.</p>
+<p>Each course with no in-degrees or prerequisites remaining is dequeued and it's neighbors are processed for their reduced in-degrees. When 0 in-degrees added to the queue. </p>
+<p>Keeping track of processed courses we are able to see if all courses can be finished. If the count of processed courses matches total number of courses there are no cyclic dependencies and the courses can be completed.</p>
+<pre><code class="language-python">from collections import deque, defaultdict
+from typing import List
+
+def can_finish(num_courses: int, prerequisites: List[List[int]]) -&gt; bool:
+    # Adjacency List and In-Degree count
+    adjacency_list = defaultdict(list)
+    in_degree = [0] * num_courses
+
+    # Build the graph
+    for dest, src in prerequisites:
+        adjacency_list[src].append(dest)
+        in_degree[dest] += 1
+
+    # Initialize a queue with all courses having zero in-degree
+    queue = deque([i for i in range(num_courses) if in_degree[i] == 0])
+
+    visited_courses = 0
+
+    # Process nodes with zero in-degree, potential starting course.
+    while queue:
+        node = queue.popleft()
+        visited_courses += 1
+        for neighbor in adjacency_list[node]:
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                queue.append(neighbor)
+    # Check if we visited all courses
+    return visited_courses == num_courses
+
+print(can_finish(4, [[1, 0], [2, 1], [3, 2]]))
 </code></pre>
-<h3>Data &amp; Artifact Access Control</h3>
-<h4>Identity Management: Use pod/worker-level IAM roles (AWS IRSA, GCP Workload Identity) over static credentials.</h4>
-<pre><code>- IRSA (IAM Roles for Service Accounts): An AWS mechanism that maps IAM permissions directly to specfic Kubernetes service accounts instead of sharing broad, hardcoded node credentials.
+<h3>Task Scheduler</h3>
+<p>Start with counting frequencies of each task.</p>
+<p>Determine Maximum Frequency and Task count, along with how many similar have this maximum frequency. </p>
+<p>Calculate required idle slots needed between the most frequent tasks to ensure they are spaced out according to the cooldown period.</p>
+<p>partCount = maxCount - 1<br />
+ partLength = n - (maxCountTasks - 1)<br />
+ emptySlots = partCount * partLength</p>
+<p>Compute Available Tasks: Compute the total number of tasks that can be filled into these empty slots:<br />
+availableTasks = totalTasks - maxCount * maxCountTasks</p>
+<p>Calculate Idle Time: Determine number of idle intervals required:<br />
+idles = max(0, emptySlots - availableTasks)</p>
+<p>COmpute Total Intervals:<br />
+totalIntervals = totalTasks + idles</p>
+<pre><code class="language-python">def least_interval_naive(tasks: List[str], n: int) -&gt; int:
+    # count number of each tasks
+    task_counts = Counter(tasks)
+    interval = 0
+    task_availability = dict.fromkeys(task_counts.keys(), 0)
+
+    while task_counts and any(task_counts.values()):
+        next_tasks = task_counts.most_common(n+1) if n &gt; 0 else task_counts.most_common()
+        # set an idle time for next use  on the selected task
+        for t, _ in next_tasks:
+            if task_availability[t] &lt;= interval:
+                task_counts[t] -= 1
+                if task_counts[t] == 0:
+                    del task_counts[t]
+                task_availability[t] = interval + n + 1
+                break
+        interval += 1
+    return interval
+
+def least_interval(tasks: List[str], n: int) -&gt; int:
+    # count number of each tasks
+    task_counts = Counter(tasks)
+    max_count = max(task_counts.values())
+    max_count_tasks = sum(1 for count in task_counts.values() if count == max_count)
+
+    part_count = max_count - 1
+    part_length = n - (max_count_tasks - 1)
+    empty_slots = part_count * part_length
+    available_tasks = len(tasks) - max_count * max_count_tasks
+    idles = max(0, empty_slots - available_tasks)
+
+    return len(tasks) + idles
+# debug your code below
+print(least_interval(['A', 'A', 'B'], 2))
 </code></pre>
-<h4>Storage Protection: Enforce strict bucket policies (S3/GCS) and KMS encryption at rest and in transit for model weights, artifacts, and sensitive training datasets.</h4>
-<h3>API &amp; Gateway Security</h3>
-<ul>
-<li>Authentication: Implement OAuth2 / JWT (JSON Web Tokens) for external inference APIs.</li>
-<li>Network Policies: Restrict outbound (egress) traffic from compute nodes to prevent data exfiltration. Guard endpoints against prompt injection and malicious payloads at the API gateway layer.</li>
-</ul>
-<h2>GPU Allocation &amp; Compute Orchestration</h2>
-<h3>Scheduling &amp; Sharing Strategies</h3>
-<ul>
-<li>Spatial Sharing (Physical Splitting):<ul>
-<li>NVIDA MIG (Multi-Instance GPU): A technology on NVIDIA A100/H100 GPUs that physocally partitions a single GPU into up to seven fully isolated instances, each with its own dedicated high-bandwidth memory and compute cores.</li>
-</ul>
-</li>
-<li>Temporal Sharing (Time Splitting):<ul>
-<li>CUDE Time-Slicing: A software-based approach where multiple processes share a single GPU by taking turns using the processing cores over time, similar to CPU time-sharing.</li>
-</ul>
-</li>
-<li>Allocation Strategy: Use temporal/spatial sharing for light microservices or development environments, and switch to dedicated node affinity (100% GPU reserved) for large distributed training tasks.</li>
-</ul>
-<h3>Topology &amp; Interconnects</h3>
-<h3>Autoscaling &amp; Reliability</h3>
-<h2>Data &amp; ML Ops</h2>
-<p>Domain: Data Pipelines<br />
-Key Concepts &amp; Definitions:<br />
-Architecture Trade-offs:</p>
-<p>Domain: Inference Engine<br />
-Key Concepts &amp; Definitions:<br />
-Architecture Trade-offs:</p>
-<p>Domain: Orchestration<br />
-Key Concepts &amp; Definitions:<br />
-Architecture Trade-offs:</p>
-<p>Domain: Observability<br />
-Key Concepts &amp; Definitions:<br />
-Architecture Trade-offs:</p>
-<h2>Architectural Patterns &amp; Rules of Thumb</h2>
-<h2>Modern AI &amp; Behavioral Observability Stack:</h2>
-<pre><code>┌────────────────────────────────────────────────────────┐
-                     │                   Application Gateway                  │
-                     └───────────────────────────┬────────────────────────────┘
-                                                 │
-                   ┌─────────────────────────────┴─────────────────────────────┐
-                   │                                                           │
-                   ▼                                                           ▼
-    ┌──────────────────────────────┐                            ┌──────────────────────────────┐
-    │     UX &amp; Behavioral Signal   │                            │  LLM Tracing &amp; Evaluation    │
-    ├──────────────────────────────┤                            ├──────────────────────────────┤
-    │  PostHog / Mixpanel          │                            │  Langfuse / Braintrust / Opik│
-    │  • Session Replay &amp; Flags    │                            │  • Step-by-step Tracing      │
-    │  • UI Interaction Analytics  │                            │  • Dynamic Evals (LLM Judge) │
-    │  • Cohorts &amp; Churn Points    │                            │  • Cost &amp; Latency Metrics    │
-    └──────────────┬───────────────┘                            └──────────────┬───────────────┘
-                   │                                                           │
-                   └─────────────────────────────┬─────────────────────────────┘
-                                                 │
-                                                 ▼
-                                ┌─────────────────────────────────┐
-                                │   Standard Infrastructure APM   │
-                                ├─────────────────────────────────┤
-                                │   OpenTelemetry + Datadog       │
-                                │   • System &amp; GPU Telemetry      │
-                                └─────────────────────────────────┘
+<h3>Merge Intervals</h3>
+<pre><code class="language-python">from typing import List
+
+def mergeIntervals(intervals: List[List[int]]) -&gt; List[List[int]]:
+    if not intervals:
+        return []
+
+    intervals.sort(key=lambda x: x[0])
+
+    result = [intervals[0]]
+
+    for i in range(1, len(intervals)):
+        current_interval = result[-1]
+        next_interval = intervals[i]
+
+        # If the curtrent interval overlaps with the next interval, merge
+        if current_interval[1] &gt;= next_interval[0]:
+            current_interval[1] = max(current_interval[1], next_interval[1])
+        else:
+            # Otherwise, add the next interval to the result.
+            result.append(next_interval)
+    return result
+
+# debug your code below
+print(mergeIntervals([[1,3], [2,6], [8,10], [15,18]]))
 </code></pre>
-<h3>Core Observability Pillars for Unique AI Interfaces</h3>
-<h4>Native AI Tracing &amp; Model Evals</h4>
-<p>Langfuse (Open-Source / Managed): Excellent for tracking complex generation chains, dynamic batching costs and model latency. Integrates easily with OpenTelemetry.</p>
-<p>Braintrust: FOcuses heavily on automated evaluation pipelines (LLM-as-a-Judge). ALlows you to continuously score model predictions against human overrides to catch quality regreressins during rapid deploys.</p>
-<p>Comet Opik: Open-source framework designed for evaluation and tracing across model version iterations.</p>
-<h4>AI-Aware Product Analytics &amp; Session Replay</h4>
-<p>Since your interface introduces a new design pattern, seeing what users do when an AI forecast appears is critical.</p>
-<ul>
-<li>
-<p>PostHog: COmbines session recordings, event- based product analytics, and native LLM trace inestion via OpenLLMetry. Watching session replays when users manually override or edit an AI-generated forecast provides immediate UX feedback.</p>
-</li>
-<li>
-<p>Mixpanel + Custom Event Metadata: Tracks aggregate cohort behavior and conversion funnels specifically to AI feature exposure.</p>
-</li>
-</ul>
-<h4>Standard Infrastructure Telemetry</h4>
-<ul>
-<li>
-<p>OpenTelelmetry(Otel): The industry standard for instrumentation. Using OTel libraries prevents vendor lock-in, allowing you to stream traces to any backend (Datadog, Grafana, PostHog, or Langufe) via standard SDK hooks.</p>
-</li>
-<li>
-<p>Instrument with OpenTelemetry First: Avoid proprietary SDKs where possible. Standardize backend logging around OTel gen_ai.* trace conventions so you can swap or multi-home your observability backends without rewriting application logic.  </p>
-</li>
-<li>
-<p>Log User Overrides as Ground Truth: Whenever a user edits an AI forecast on your interface, capture the initial forecast vs. the user's corrected value as a telemetry event. This forms your baseline evaluation dataset for fine-tuning.</p>
-</li>
-</ul>
+<h3>Palindrome check</h3>
+<pre><code class="language-python"># Time Complexity: O(n)
+# Space Complexity: O(n) for filtered characters and reversed characters
+def is_palindrome(s: str) -&gt; bool:
+    # Filter out non-alphanumeric characters and convert to lowercase
+    filtered_chars = [char.lower() for char in s if char.isalnum()]
+
+    # Check if the filtered string reads the same forward and backward
+    return filtered_chars == filtered_chars[::-1]
+
+# Time Complexity: O(n)
+# Space Complexity: O(1) for two pointers
+def is_palindrome(s: str) -&gt; bool:
+    left, right = 0, len(s) - 1
+
+    while left &lt; right:
+        while left &lt; right and not s[left].isalnum():
+            left += 1
+
+        while left &lt; right and not s[right].isalnum():
+            right -= 1
+
+        if s[left].lower() != s[right].lower():
+            return False
+
+        left += 1
+        right -= 1
+
+    return True
+
+# debug your code below
+print(is_palindrome('abcba'))
+</code></pre>
+<h3>Remove Duplicates</h3>
+<pre><code class="language-python">def identify_adjacent(s: str, k: int) -&gt; str:
+    stack = [] # Store as [char, count]
+
+    for char in s:
+        if stack and stack[-1][0] == char:
+            stack[-1][1] += 1 # increment consecutive
+        else:
+            stack.append([char, 1])
+
+        if stack[-1][1] == k: # Check if the count has reached k
+            stack.pop()
+    return &quot;&quot;.join(char * count for char, count in stack)
+
+print(identify_adjacent(&quot;abcd&quot;, 2))
+</code></pre>
+<pre><code class="language-python">def has_good_subarray(nums, k):
+    if nums is None:
+        return False
+
+    MIN_GOOD_SUBARRAY_LIMIT = 2
+
+    sum_so_far = 0
+    remainder_index_map = {0: -1}
+
+    for current_index, num in enumerate(nums):
+        sum_so_far += num
+        remainder = sum_so_far % k
+
+        if remainder not in remainder_index_map:
+            remainder_index_map[remainder] = current_index
+        elif current_index - remainder_index_map[remainder] &gt;= MIN_GOOD_SUBARRAY_LIMIT:
+            return True
+    return False
+print(has_good_subarray([23, 2, 4, 7], 6))
+</code></pre>
 <hr />
-<p><em>Still chewing on:</em> While the notes provide valuable insights into ML infrastructure best practices, they leave me questioning how to effectively implement these solutions at scale without compromising flexibility or performance.</p>
+<p><em>Still chewing on:</em> It's intriguing how these algorithms can be applied in diverse scenarios from course planning to optimizing task schedules. How might we further optimize the palindrome check function, especially for very large strings? This remains an open question as we explore these concepts.</p>
                         </div>
                     </article>
 
