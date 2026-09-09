@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Greg explores security measures in ML infrastructure, efficient GPU allocation, and modern observability tools for AI applications.">
+    <title>Orchestration and Eval Learnings: Security, GPU Management, and Observability</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-09-09</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">ML Infrastructure</span>
+                                    <span class="tag">Security</span>
+                                    <span class="tag">GPU Allocation</span>
+                                    <span class="tag">Observability</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Orchestration and Eval Learnings: Security, GPU Management, and Observability</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Today's notes delve into the intricate world of orchestrating machine learning (ML) workloads securely and efficiently. Greg discusses runtime and tenant isolation techniques, data access controls, API security, and GPU management strategies. The final section focuses on modern observability tools that help in tracking user behavior and AI model performance.</p>
+<h1>Orchestration and Eval Learnings</h1>
+<h2>Security in ML Infrastructure</h2>
+<h3>Runtime &amp; Tenante Isolation</h3>
+<pre><code>- Multi-Tenant Clusters: Isolate namespaces in Kubernetes to keep team workloads separated.
+    - mTLS (Mutual Transport Layer Security): A process where both client and server verify each other's cryptographic keys before establishing a connection. Used for securing inter-node worker communication (Ray nodes) against eavesdropping or unauthorized traffic.
+- Code Sandboxing: Isolate execution environments when running unverified or user-submitted code.
+    - eBPF (Extended Berkeley Packer Filter): A kernel-level technology that allows programs to run directly inside the Linux kernel without modifying source code. Used for deep, low-overhead security monitoring and tracing at the system level.
+    - gVisor: An open-source, user-space kernel that acts as a secure sandbox layer between an application and the host OS kernel, preventing malicious code execution from compromising the host.
+</code></pre>
+<h3>Data &amp; Artifact Access Control</h3>
+<h4>Identity Management: Use pod/worker-level IAM roles (AWS IRSA, GCP Workload Identity) over static credentials.</h4>
+<pre><code>- IRSA (IAM Roles for Service Accounts): An AWS mechanism that maps IAM permissions directly to specfic Kubernetes service accounts instead of sharing broad, hardcoded node credentials.
+</code></pre>
+<h4>Storage Protection: Enforce strict bucket policies (S3/GCS) and KMS encryption at rest and in transit for model weights, artifacts, and sensitive training datasets.</h4>
+<h3>API &amp; Gateway Security</h3>
+<ul>
+<li>Authentication: Implement OAuth2 / JWT (JSON Web Tokens) for external inference APIs.</li>
+<li>Network Policies: Restrict outbound (egress) traffic from compute nodes to prevent data exfiltration. Guard endpoints against prompt injection and malicious payloads at the API gateway layer.</li>
+</ul>
+<h2>GPU Allocation &amp; Compute Orchestration</h2>
+<h3>Scheduling &amp; Sharing Strategies</h3>
+<ul>
+<li>Spatial Sharing (Physical Splitting):<ul>
+<li>NVIDA MIG (Multi-Instance GPU): A technology on NVIDIA A100/H100 GPUs that physocally partitions a single GPU into up to seven fully isolated instances, each with its own dedicated high-bandwidth memory and compute cores.</li>
+</ul>
+</li>
+<li>Temporal Sharing (Time Splitting):<ul>
+<li>CUDE Time-Slicing: A software-based approach where multiple processes share a single GPU by taking turns using the processing cores over time, similar to CPU time-sharing.</li>
+</ul>
+</li>
+<li>Allocation Strategy: Use temporal/spatial sharing for light microservices or development environments, and switch to dedicated node affinity (100% GPU reserved) for large distributed training tasks.</li>
+</ul>
+<h3>Topology &amp; Interconnects</h3>
+<h3>Autoscaling &amp; Reliability</h3>
+<h2>Data &amp; ML Ops</h2>
+<p>Domain: Data Pipelines<br />
+Key Concepts &amp; Definitions:<br />
+Architecture Trade-offs:</p>
+<p>Domain: Inference Engine<br />
+Key Concepts &amp; Definitions:<br />
+Architecture Trade-offs:</p>
+<p>Domain: Orchestration<br />
+Key Concepts &amp; Definitions:<br />
+Architecture Trade-offs:</p>
+<p>Domain: Observability<br />
+Key Concepts &amp; Definitions:<br />
+Architecture Trade-offs:</p>
+<h2>Architectural Patterns &amp; Rules of Thumb</h2>
+<h2>Modern AI &amp; Behavioral Observability Stack:</h2>
+<pre><code>┌────────────────────────────────────────────────────────┐
+                     │                   Application Gateway                  │
+                     └───────────────────────────┬────────────────────────────┘
+                                                 │
+                   ┌─────────────────────────────┴─────────────────────────────┐
+                   │                                                           │
+                   ▼                                                           ▼
+    ┌──────────────────────────────┐                            ┌──────────────────────────────┐
+    │     UX &amp; Behavioral Signal   │                            │  LLM Tracing &amp; Evaluation    │
+    ├──────────────────────────────┤                            ├──────────────────────────────┤
+    │  PostHog / Mixpanel          │                            │  Langfuse / Braintrust / Opik│
+    │  • Session Replay &amp; Flags    │                            │  • Step-by-step Tracing      │
+    │  • UI Interaction Analytics  │                            │  • Dynamic Evals (LLM Judge) │
+    │  • Cohorts &amp; Churn Points    │                            │  • Cost &amp; Latency Metrics    │
+    └──────────────┬───────────────┘                            └──────────────┬───────────────┘
+                   │                                                           │
+                   └─────────────────────────────┬─────────────────────────────┘
+                                                 │
+                                                 ▼
+                                ┌─────────────────────────────────┐
+                                │   Standard Infrastructure APM   │
+                                ├─────────────────────────────────┤
+                                │   OpenTelemetry + Datadog       │
+                                │   • System &amp; GPU Telemetry      │
+                                └─────────────────────────────────┘
+</code></pre>
+<h3>Core Observability Pillars for Unique AI Interfaces</h3>
+<h4>Native AI Tracing &amp; Model Evals</h4>
+<p>Langfuse (Open-Source / Managed): Excellent for tracking complex generation chains, dynamic batching costs and model latency. Integrates easily with OpenTelemetry.</p>
+<p>Braintrust: FOcuses heavily on automated evaluation pipelines (LLM-as-a-Judge). ALlows you to continuously score model predictions against human overrides to catch quality regreressins during rapid deploys.</p>
+<p>Comet Opik: Open-source framework designed for evaluation and tracing across model version iterations.</p>
+<h4>AI-Aware Product Analytics &amp; Session Replay</h4>
+<p>Since your interface introduces a new design pattern, seeing what users do when an AI forecast appears is critical.</p>
+<ul>
+<li>
+<p>PostHog: COmbines session recordings, event- based product analytics, and native LLM trace inestion via OpenLLMetry. Watching session replays when users manually override or edit an AI-generated forecast provides immediate UX feedback.</p>
+</li>
+<li>
+<p>Mixpanel + Custom Event Metadata: Tracks aggregate cohort behavior and conversion funnels specifically to AI feature exposure.</p>
+</li>
+</ul>
+<h4>Standard Infrastructure Telemetry</h4>
+<ul>
+<li>
+<p>OpenTelelmetry(Otel): The industry standard for instrumentation. Using OTel libraries prevents vendor lock-in, allowing you to stream traces to any backend (Datadog, Grafana, PostHog, or Langufe) via standard SDK hooks.</p>
+</li>
+<li>
+<p>Instrument with OpenTelemetry First: Avoid proprietary SDKs where possible. Standardize backend logging around OTel gen_ai.* trace conventions so you can swap or multi-home your observability backends without rewriting application logic.  </p>
+</li>
+<li>
+<p>Log User Overrides as Ground Truth: Whenever a user edits an AI forecast on your interface, capture the initial forecast vs. the user's corrected value as a telemetry event. This forms your baseline evaluation dataset for fine-tuning.</p>
+</li>
+</ul>
+<hr />
+<p><em>Still chewing on:</em> While the notes provide valuable insights into ML infrastructure best practices, they leave me questioning how to effectively implement these solutions at scale without compromising flexibility or performance.</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'exploring-efficiency';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script>
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    </script>
+</body>
+</html>
