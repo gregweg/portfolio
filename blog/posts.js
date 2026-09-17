@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Exploring Patterns for Reliable Systems and Agent Workflows",
+        slug: "exploring-patterns-reliable-systems-agent-workflows",
+        date: "2026-09-17",
+        tags: ["software development", "reliability engineering", "Kubernetes", "agent workflows", "large language models"],
+        description: "Today's notes dive into the intricacies of software development lifecycle patterns, reliability strategies, and running large language models (LLMs) on Kubernetes. These topics are crucial for maintaining high-quality codebases and robust systems in a dynamic technological landscape."
+    },
+    {
         title: "Exploring Algorithms and Data Structures",
         slug: "exploring-efficiency",
         date: "2026-09-09",

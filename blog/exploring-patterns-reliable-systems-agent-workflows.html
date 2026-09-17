@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Today's notes dive into the intricacies of software development lifecycle patterns, reliability strategies, and running large language models (LLMs) on Kubernetes. These topics are crucial for maintaining high-quality codebases and robust systems in a dynamic technological landscape.">
+    <title>Exploring Patterns for Reliable Systems and Agent Workflows</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-09-17</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">software development</span>
+                                    <span class="tag">reliability engineering</span>
+                                    <span class="tag">Kubernetes</span>
+                                    <span class="tag">agent workflows</span>
+                                    <span class="tag">large language models</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Exploring Patterns for Reliable Systems and Agent Workflows</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Today’s notes explore the agent software development lifecycle (SDLC) pattern, reliability strategies, and the unique challenges of running large language model (LLM) workloads on Kubernetes. These topics are essential for ensuring that code changes are well-considered, systems remain reliable under various conditions, and LLMs operate efficiently within a containerized environment.</p>
+<h1>Notes — 2026-09-15</h1>
+<p>Three unrelated note-sets in one file: the agent SDLC pattern, reliability<br />
+patterns, and what changes when LLM workloads run on Kubernetes.</p>
+<ul>
+<li><a href="#part-1--the-agent-sdlc-pattern">Part 1 — The agent SDLC pattern</a></li>
+<li><a href="#part-2--reliability">Part 2 — Reliability</a></li>
+<li><a href="#part-3--llm-and-agent-workloads-on-kubernetes">Part 3 — LLM and agent workloads on Kubernetes</a></li>
+</ul>
+<hr />
+<h1>Part 1 — The agent SDLC pattern</h1>
+<h2>The idea in one line</h2>
+<p>Move the expensive decisions out of the model's context and into files a human<br />
+reviews, so that being wrong is caught at the cheapest point in the cycle.</p>
+<p>An agent that is handed a ticket and told "go" makes a hundred small decisions<br />
+silently: what the feature actually means, which files to touch, what "done"<br />
+looks like, what counts as a regression. Each one is a place to be wrong, and<br />
+you find out at the end, in a diff. The pattern splits those decisions into<br />
+named artifacts, each one a checkpoint where correction costs minutes instead of<br />
+a rewrite.</p>
+<h2>The loop</h2>
+<pre><code>intent.md  →  spec.md  →  plan.md  →  implement  →  verify  →  review
+   why          what         how        the work    does it    is it
+                                                    run?       right?
+                                            ↑                     │
+                                            └── findings feed back ┘
+                                              into CLAUDE.md / skills
+</code></pre>
+<p>Two clocks run at once:</p>
+<p><strong>Per-task artifacts</strong> — <code>intent.md</code>, <code>spec.md</code>, <code>plan.md</code>. Disposable. Written<br />
+for one change, kept alive for that change, then archived with the PR or<br />
+deleted. They exist because a context window is lossy: long sessions get<br />
+compacted, detail evaporates, and the thing the agent agreed to two hours ago<br />
+is no longer in front of it. A file survives compaction. Chat history does not.</p>
+<p><strong>Standing artifacts</strong> — <code>CLAUDE.md</code>, <code>.claude/skills/</code>, <code>.claude/agents/</code>,<br />
+<code>REVIEW.md</code>, the eval suite. Permanent and cumulative. Every correction you<br />
+make twice belongs in one of these, or you will make it a third time.</p>
+<p>The single most common failure in adopting this pattern is writing the per-task<br />
+artifacts and never writing the standing ones. You get good individual changes<br />
+and no compounding — the agent is exactly as ignorant on change fifty as it was<br />
+on change one.</p>
+<h2>The per-task artifacts</h2>
+<h3>1. Intent — why</h3>
+<p>Written by a human, usually not an engineer. Deliberately contains no solution.<br />
+Its job is to survive contact with the answer "we should not build this."</p>
+<pre><code class="language-markdown"># Intent: claims status self-service
+Author: J. Ortiz (claims operations). Status: draft.
+## Problem
+Customers phone the contact center to ask where their claim is.
+Handlers spend roughly a third of call time on status-only queries.
+## Proposed outcome
+Customers see claim status, next step and expected date in the portal.
+## Affected users and systems
+Claims handlers, portal team, claims-core API.
+## Constraints
+No new PII in the portal session. Existing authentication only.
+## Open questions
+Do third-party loss adjusters need access too?
+</code></pre>
+<p>What makes it work: the constraints and open questions. Constraints are the<br />
+boundary the agent is not allowed to cross while looking for a clever solution.<br />
+Open questions are explicit permission to stop and ask rather than guess — the<br />
+agent will otherwise resolve ambiguity silently and confidently.</p>
+<h3>2. Spec — what</h3>
+<p>The contract. Observable behavior only: what a user or a caller can see. No<br />
+file names, no function names, no implementation. Drafted with the agent from<br />
+the intent, then <strong>approved by a human</strong> — this is the highest-leverage review<br />
+in the whole loop, because everything downstream is generated from it.</p>
+<p>A spec is good when a test can be written from it without asking a follow-up<br />
+question, and when it says what is <em>not</em> being built.</p>
+<pre><code class="language-markdown"># Spec: claims status self-service (from intent.md 2026-06-02)
+Status: approved by J. Ortiz and portal team, 2026-06-05.
+
+## Behavior
+A signed-in customer opens a claim in the portal and sees:
+- current status, one of: received, in assessment, awaiting documents,
+  settled, closed
+- the next step, phrased for a customer, not the internal state name
+- an expected date for that next step, or &quot;no date yet&quot;
+
+## Acceptance criteria
+- A claim in each of the five states renders the correct label and next step.
+- A claim with no expected date renders &quot;no date yet&quot; — not an empty cell,
+  not today's date.
+- A customer requesting a claim they do not own gets 404, not 403.
+  (403 confirms the claim exists.)
+- When claims-core is unavailable the panel renders from cache with the
+  cache age shown; it does not spin indefinitely.
+- No field tagged pii in the claims-core schema appears in the portal
+  response payload.
+
+## Out of scope
+Document upload. Loss adjuster access. Notification of status change.
+
+## Non-functional
+- Panel adds no more than 200ms to claim page load at p95.
+- Status reads cached 60s per claim; claims-core is rate-limited at
+  50 rps shared across the whole portal.
+
+## Open questions resolved
+Loss adjusters: no, not in this change. Separate intent if needed.
+</code></pre>
+<p>Note the negative cases (404 not 403, "no date yet" not an empty cell). Those<br />
+are the lines that stop an agent from producing something that satisfies the<br />
+happy path and quietly leaks or misleads everywhere else.</p>
+<h3>3. Plan — how</h3>
+<p>Drafted by the agent from the spec, approved by a human before any code is<br />
+written. Short-lived, and short: if the plan is long, the change is too big and<br />
+should be split into separate specs.</p>
+<pre><code class="language-markdown"># Plan: claims status self-service (from spec.md 2026-06-05)
+
+## Files that change
+portal/src/claims/StatusPanel.tsx (new), claims-api/routes/status.py,
+claims-api/tests/test_status.py
+
+## Order of work
+1. Add the status endpoint behind existing auth.
+2. Panel against the endpoint.
+3. Wire into the portal nav.
+
+## Risks
+The claims-core API rate-limits at 50 rps; the panel must cache.
+
+## Proof
+test_status.py covers the four claim states; screenshot matches the
+approved mock.
+</code></pre>
+<p>The two sections that earn their keep:</p>
+<ul>
+<li><strong>Files that change.</strong> Reviewing this list takes thirty seconds and catches<br />
+  the "it decided to refactor the auth middleware" class of surprise before it<br />
+  happens, not in a 4,000-line diff.</li>
+<li><strong>Proof.</strong> Stated before the work, so "done" is defined by something other<br />
+  than the agent's own judgment at the end of a long session. Without it you<br />
+  get "I've implemented the feature and it should work now."</li>
+</ul>
+<p>During implementation the plan is the agent's working memory. Have it tick off<br />
+steps in the file as it goes — after a compaction the file is what tells it<br />
+where it was.</p>
+<h3>4. Implement</h3>
+<p>The plan is worked one step at a time, not all at once. Each step should end<br />
+somewhere the tests pass, so a bad step is one revert rather than an<br />
+archaeology session.</p>
+<h3>5. Verify — does it actually run?</h3>
+<p>The step people skip, and the one that separates a pattern that works from a<br />
+pattern that produces confident, broken changes. Tests passing is not the same<br />
+as the feature working; an agent that wrote both the code and the test has<br />
+correlated errors in them.</p>
+<p>Verification goes to a <strong>subagent with its own context window</strong> — something that<br />
+did not write the code and is not invested in it.</p>
+<p><code>.claude/agents/verifier.md</code>:</p>
+<pre><code class="language-markdown">---
+name: verifier
+description: Runs the app and checks the change works before the session
+  reports done
+tools: Bash, Read
+---
+
+Start the app with make run. Exercise the changed behavior and the two
+nearest neighboring flows. Report what you ran, what you saw, and any
+behavior that does not match spec.md. Do not fix anything; report only.
+</code></pre>
+<p>Three details do the work here:</p>
+<ul>
+<li><strong><code>tools: Bash, Read</code></strong> — no Edit. It structurally cannot paper over what it<br />
+  finds.</li>
+<li><strong>"Do not fix anything; report only."</strong> A verifier that fixes destroys the<br />
+  signal. You want the list of what was wrong, not a silently repaired diff.</li>
+<li><strong>"the two nearest neighboring flows."</strong> Regressions live next door to the<br />
+  change, not in it.</li>
+</ul>
+<h3>6. Review</h3>
+<p>Review with written instructions, not vibes. The point of <code>REVIEW.md</code> is<br />
+severity calibration: a review where everything is Important is a review nobody<br />
+reads.</p>
+<p><code>REVIEW.md</code>:</p>
+<pre><code class="language-markdown"># Review instructions
+## Passes
+Run three passes and tag each finding with its pass:
+- Bugs: logic errors, broken edge cases, subtle regressions
+- Security: injection risks, authentication gaps, PII in logs
+- Compliance: the change matches spec.md, plan.md and our design principles
+## What Important means here
+Reserve Important for findings that would break behavior, leak data
+or breach a policy. Style and naming are nits.
+## Cap the nits
+Report at most five nits per review; summarize the rest as a count.
+## Do not report
+Generated files under src/gen/ and anything CI already enforces.
+</code></pre>
+<p>Separate passes matter because a single pass optimizes for whatever it noticed<br />
+first — usually style, which is the cheapest thing to see and the least<br />
+valuable thing to report.</p>
+<h3>The feedback edge</h3>
+<p>The loop closes when review findings go into the standing artifacts rather than<br />
+into a PR comment. "It keeps using <code>double</code> for money" is a <code>CLAUDE.md</code> line,<br />
+written once. A PR comment fixes one PR.</p>
+<h2>The standing artifacts</h2>
+<h3>CLAUDE.md — the always-loaded context</h3>
+<pre><code class="language-markdown"># Payments service
+## Commands
+- Build: make build
+- Test: make test (unit), make itest (integration, needs docker)
+- Lint: make lint (runs in CI; fix before pushing)
+## Conventions
+- Java 21, Spring Boot 3. No new Lombok.
+- Money is always BigDecimal, never double.
+- Every endpoint needs an integration test in src/itest.
+## Architecture
+- api/ holds REST controllers, core/ holds domain logic,
+  adapters/ talks to external systems.
+- Kafka events are defined in schemas/; never edit generated classes.
+## Things Claude gets wrong
+- Do not bump dependency versions; the platform team owns them.
+- The legacy v1/ package is frozen; changes go in v2/.
+</code></pre>
+<p>This is loaded on every session, so every line costs tokens on every turn.<br />
+Keep it under roughly a page. Rules of thumb:</p>
+<ul>
+<li><strong>Commands first.</strong> Knowing the test command is worth more than any amount of<br />
+  architectural prose, because it's what lets the agent close its own loop.</li>
+<li><strong>State conventions as rules, not preferences.</strong> "Money is always BigDecimal,<br />
+  never double" is followable. "We prefer good numeric hygiene" is not.</li>
+<li><strong>"Things Claude gets wrong" is the highest-value section.</strong> It is the<br />
+  accumulated diff between what the model assumes and what is true here, and<br />
+  it's the section that should grow. Everything else is mostly static.</li>
+<li>Anything long, conditional, or needed only sometimes belongs in a skill, not<br />
+  here.</li>
+</ul>
+<h3>Skills — loaded on demand</h3>
+<p><code>.claude/skills/secure-api-review/SKILL.md</code>:</p>
+<pre><code class="language-markdown">---
+name: secure-api-review
+description: Apply the API security standard. Use whenever creating or
+  modifying an external-facing endpoint, reviewing API code, or
+  generating an OpenAPI spec.
+---
+# Secure API review
+When you create or change an API endpoint:
+1. Authentication: every endpoint requires the gateway JWT;
+   no anonymous routes outside /health.
+2. Input validation: validate request bodies against the OpenAPI
+   schema and reject unknown fields.
+3. Audit: every state-changing endpoint emits an audit event with
+   actor, action, entity and timestamp.
+4. Data classification: fields tagged pii in the schema must never
+   appear in logs or error messages.
+Run scripts/check-endpoints.sh and include its output in your summary.
+</code></pre>
+<p>Only the name and description sit in context until the skill fires — the body<br />
+loads when the description matches. So:</p>
+<ul>
+<li><strong>The description is the trigger, and it is the whole ballgame.</strong> Write it in<br />
+  terms of <em>when to use this</em>, not what it is. "Apply the API security<br />
+  standard" alone would rarely fire; the "Use whenever…" clause is what makes<br />
+  it match. A skill that never triggers is worth exactly nothing.</li>
+<li><strong>Terminate in a command.</strong> <code>scripts/check-endpoints.sh</code> turns a checklist<br />
+  the agent can claim to have followed into a result it has to show. Anything<br />
+  mechanically checkable should be a script the skill runs, not a numbered<br />
+  instruction.</li>
+<li>A skill is also the natural home for the standards that don't fit in a<br />
+  review — the ones that need to be applied while writing, not after.</li>
+</ul>
+<h3>Evals — regression tests for the setup itself</h3>
+<p><code>CLAUDE.md</code> and <code>.claude/</code> are code, and they regress: someone adds a rule that<br />
+contradicts another, a skill description drifts until it stops firing, a<br />
+convention is removed and nobody notices for two months. The eval suite is the<br />
+test for that, pinned to the paths it covers.</p>
+<p><code>.github/workflows/agent-evals.yml</code>:</p>
+<pre><code class="language-yaml">name: Agent evals
+on:
+  pull_request:
+    paths: ['CLAUDE.md', '.claude/**']
+  schedule:
+    - cron: '0 2 * * *'
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm install -g @anthropic-ai/claude-code
+      - name: Run eval suite
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          for eval in evals/*.json; do
+            claude -p &quot;$(jq -r '.prompt' $eval)&quot; \
+              --allowedTools &quot;Read,Edit,Bash(make test)&quot; \
+              --output-format json &gt; result.json
+            ./evals/check.sh &quot;$eval&quot; result.json
+          done
+</code></pre>
+<ul>
+<li><code>paths:</code> triggers the suite exactly when the agent's configuration changes —<br />
+  the one moment a regression can be introduced.</li>
+<li>The nightly <code>schedule:</code> catches drift that isn't caused by your commits:<br />
+  model updates, dependency changes, external services moving.</li>
+<li><code>--allowedTools</code> is doing real work. It bounds what a run can do in CI, and<br />
+  it makes the eval a test of judgment under constraint rather than a test of<br />
+  whether the agent can find some way through.</li>
+<li>Good evals are behavioral, not textual. "Does it use BigDecimal when adding a<br />
+  money field" beats "does the output mention BigDecimal."</li>
+</ul>
+<h2>What each artifact prevents</h2>
+<table>
+<thead>
+<tr>
+<th>Artifact</th>
+<th>Answers</th>
+<th>Written by</th>
+<th>Lifetime</th>
+<th>Failure it prevents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>intent.md</code></td>
+<td>Why</td>
+<td>Requester (human)</td>
+<td>One change</td>
+<td>Building the wrong thing well</td>
+</tr>
+<tr>
+<td><code>spec.md</code></td>
+<td>What</td>
+<td>Agent, approved by human</td>
+<td>One change</td>
+<td>Ambiguity resolved silently and wrongly</td>
+</tr>
+<tr>
+<td><code>plan.md</code></td>
+<td>How</td>
+<td>Agent, approved by human</td>
+<td>One change</td>
+<td>Surprise blast radius; "done" self-declared</td>
+</tr>
+<tr>
+<td><code>CLAUDE.md</code></td>
+<td>Always-true context</td>
+<td>Team, accumulates</td>
+<td>Permanent</td>
+<td>Re-explaining the same conventions forever</td>
+</tr>
+<tr>
+<td>Skills</td>
+<td>Conditional standards</td>
+<td>Team, accumulates</td>
+<td>Permanent</td>
+<td>Standards applied inconsistently or not at all</td>
+</tr>
+<tr>
+<td>Subagents</td>
+<td>Independent checks</td>
+<td>Team</td>
+<td>Permanent</td>
+<td>Author grading its own work; context flooding</td>
+</tr>
+<tr>
+<td><code>REVIEW.md</code></td>
+<td>Severity calibration</td>
+<td>Team</td>
+<td>Permanent</td>
+<td>Reviews of uniform, ignorable urgency</td>
+</tr>
+<tr>
+<td>Evals</td>
+<td>Does the setup still work</td>
+<td>Team</td>
+<td>Permanent</td>
+<td>Silent config drift</td>
+</tr>
+</tbody>
+</table>
+<h2>Adoption notes</h2>
+<ul>
+<li><strong>The gate is human approval, not the file.</strong> An artifact nobody reads is<br />
+  ceremony. If you're approving specs without reading them, delete the step and<br />
+  admit what you're doing.</li>
+<li><strong>Start with <code>CLAUDE.md</code> and the verifier.</strong> Commands plus "run it and report"<br />
+  is most of the value for two files of effort. Everything else is refinement.</li>
+<li><strong>Scale the ceremony to the change.</strong> A one-line fix does not need an intent<br />
+  doc. The pattern earns its cost when the change is large enough that being<br />
+  wrong is expensive, or when several people have to agree on what "right"<br />
+  means.</li>
+<li><strong>Watch for spec inflation.</strong> Specs that grow implementation detail have<br />
+  become plans, and the human approval on them starts costing more than it<br />
+  returns.</li>
+<li><strong>The artifacts are for humans too.</strong> A spec that makes an agent's output<br />
+  predictable makes a new team member's output predictable for the same reason.</li>
+</ul>
+<hr />
+<h1>Part 2 — Reliability</h1>
+<p>A <strong>reliable</strong> system can perform its function, tolerate errors, and prevent<br />
+unauthorized access or abuse. Reliability implies availability but is more than<br />
+that: building for reliability means added security, error-handling, disaster<br />
+recovery and countless other contingencies.</p>
+<h2>Two classes of error</h2>
+<ul>
+<li><strong>Hardware errors</strong> — network outages, server failure. These won't be fixed<br />
+  quickly and are often called <strong>non-transient</strong> errors.</li>
+<li><strong>Application errors</strong> — bugs, failures to accommodate spikes in traffic.<br />
+  These should resolve quickly and are known as <strong>transient</strong> errors.</li>
+</ul>
+<h2>Retries</h2>
+<p>An application detecting a failure will immediately retry. This may work fine if<br />
+the failure is unusual and unlikely to repeat, but for common transient failures<br />
+(e.g. network failures) repeat retries may overload the downstream system once<br />
+the underlying issue is resolved.</p>
+<p><strong>Delayed retry</strong> holds the retry back for a set amount of time, allowing the<br />
+system to recover. An <strong>exponential backoff</strong> strategy systematically decreases<br />
+the rate of re-transmission in search of an acceptable retry rate.</p>
+<p>To avoid retries building up in high-traffic systems and causing a high system<br />
+load once the error clears — the <strong>thundering herd</strong> problem, which can cause<br />
+more damage than the original transient error as your resources struggle with<br />
+the request volume — introduce <strong>jitter</strong>, randomness in the delay interval, so<br />
+clients don't synchronize.</p>
+<h2>Circuit breakers</h2>
+<p>A robust retry alleviates short-lived transient errors. But what about<br />
+non-transient errors, or transient errors with uncertain recovery times?</p>
+<p>The circuit breaker pattern accepts failure and stops the application from<br />
+repeatedly trying to execute. This prevents cascading failures and saves<br />
+computing power.</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Behavior</th>
+<th>Transition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Closed</strong></td>
+<td>Requests pass through; failures counted</td>
+<td>Failures exceed threshold within an interval → Open</td>
+</tr>
+<tr>
+<td><strong>Open</strong></td>
+<td>No requests let through; timer running</td>
+<td>Timer expires → Half-open</td>
+</tr>
+<tr>
+<td><strong>Half-open</strong></td>
+<td>A few test requests allowed through</td>
+<td>All succeed → Closed, counter reset. Any fail → Open, timer restarts</td>
+</tr>
+</tbody>
+</table>
+<h2>Saga pattern</h2>
+<p>Saga is a strategy used most often in microservice architecture, where<br />
+completing an action (a <strong>distributed transaction</strong>) entails successfully<br />
+completing a set of local transactions across multiple independent services.</p>
+<p>Instead of a single distributed transaction, the component local transactions<br />
+are decoupled, grouped and executed sequentially. Each string of related local<br />
+transactions is a saga.</p>
+<p>If the saga coordinator detects a failure it invokes a predefined set of<br />
+<strong>countermeasures</strong>, effectively reversing the actions already taken. On an<br />
+e-commerce site, the inventory number would revert to its previous state, and<br />
+payment and cart updates would be reversed.</p>
+<p>Two ways to implement it:</p>
+<ul>
+<li><strong>Choreography</strong> — decentralized; each local transaction triggers the next.</li>
+<li><strong>Orchestration</strong> — a centralized controller directs saga participants.</li>
+</ul>
+<hr />
+<h1>Part 3 — LLM and agent workloads on Kubernetes</h1>
+<p>What's different about running LLM and agent workloads versus a normal service?<br />
+Four assumptions break:</p>
+<ul>
+<li>capacity isn't CPU</li>
+<li>requests aren't cheap or idempotent</li>
+<li>connections are long-lived</li>
+<li>health checks can't see the failure that matters</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Assumption</th>
+<th>Why it breaks</th>
+<th>What you do instead</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scale on CPU</td>
+<td>Capacity is tokens/min and concurrent requests; a waiting pod is idle</td>
+<td>KEDA on queue depth or in-flight requests, not HPA on CPU</td>
+</tr>
+<tr>
+<td>Retries are free</td>
+<td>Every retry spends money and provider quota; many calls aren't idempotent</td>
+<td>Retry budgets, circuit breakers, idempotency keys, per-request spend caps</td>
+</tr>
+<tr>
+<td>Rolling updates are safe</td>
+<td>Streaming connections get cut mid-response; agent runs can last minutes</td>
+<td>Long termination grace, connection draining, or checkpointed/durable runs</td>
+</tr>
+<tr>
+<td>Probes detect failure</td>
+<td>A model returning fast nonsense is HTTP 200</td>
+<td>Golden-set canaries in prod as a quality signal alongside liveness</td>
+</tr>
+<tr>
+<td>Cost is finance's problem</td>
+<td>A runaway agent loop burns budget in minutes</td>
+<td>Per-tenant and per-agent budgets with kill switches; treat spend as a paged alert</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><em>Still chewing on:</em> I'm still chewing on how the per-task artifacts and standing ones can coexist in an SDLC pattern. How do we ensure that temporary decisions are captured effectively while maintaining a cumulative repository of best practices?</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'exploring-patterns-reliable-systems-agent-workflows';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script>
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    </script>
+</body>
+</html>
