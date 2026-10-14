@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Exploring Algorithms: From Three-Sum to Doubly-Linked List Merge Sort",
+        slug: "exploring-algorithms-three-sum-doubly-linked-list",
+        date: "2026-10-14",
+        tags: ["Python", "Algorithms", "Coding"],
+        description: "Greg delves into two algorithmic challenges, first tackling the three-sum problem with a Python function and then moving on to merge sort for doubly-linked lists."
+    },
+    {
         title: "Exploring Patterns for Reliable Systems and Agent Workflows",
         slug: "exploring-patterns-reliable-systems-agent-workflows",
         date: "2026-09-17",
