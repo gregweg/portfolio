@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Exploring Data Structures and Algorithms",
+        slug: "exploring-data-structures-and-algorithms",
+        date: "2026-10-14",
+        tags: ["data structures", "algorithms", "coding"],
+        description: "Today's notes cover a variety of topics including sliding windows, priority queues, binary search, and more."
+    },
+    {
         title: "Exploring Algorithms: From Three-Sum to Doubly-Linked List Merge Sort",
         slug: "exploring-algorithms-three-sum-doubly-linked-list",
         date: "2026-10-14",
