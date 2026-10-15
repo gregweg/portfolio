@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Today's notes dive into Google Cloud Platform services, Kubernetes orchestration, and CI/CD practices, all with a focus on security and automation.">
+    <title>Exploring GCP & Kubernetes Infrastructure</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Greg Wegman</a>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../projects.html">Projects</a></li>
+                <li><a href="../hobbies.html">Hobbies</a></li>
+                <li><a href="index.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-layout">
+                    <article class="blog-post">
+                        <a href="index.html" class="back-link">
+                            <i class="fas fa-arrow-left"></i> Back to Blog
+                        </a>
+
+                        <header class="blog-post-header">
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date"><i class="fas fa-calendar-alt"></i> 2026-10-14</span>
+                                <div class="blog-card-tags">
+                                    <span class="tag">GCP</span>
+                                    <span class="tag">Kubernetes</span>
+                                    <span class="tag">CI/CD</span>
+                                    <span class="tag">Terraform</span>
+                                </div>
+                            </div>
+                            <h1 class="blog-post-title">Exploring GCP & Kubernetes Infrastructure</h1>
+                        </header>
+
+                        <div class="blog-post-body">
+                            <p>Greg's detailed notes today cover the foundational aspects of managing infrastructure at scale using Google Cloud Platform (GCP) services and Kubernetes. With a strong emphasis on security, automation, and CI/CD practices, these notes provide insight into how to effectively deploy and manage applications in a modern cloud environment.</p>
+<h1>GCP / Cloud SQL / GCS / GKE</h1>
+<pre><code class="language-plaintext">GitHub
+                         │
+                    Pull Request
+                         │
+              ┌──────────▼──────────┐
+              │       CI/CD         │
+              │ tests / evals / IaC │
+              └──────────┬──────────┘
+                         │
+              ┌──────────▼──────────┐
+              │      Terraform      │
+              │ infrastructure IaC  │
+              └──────────┬──────────┘
+                         │
+                         ▼
+                       GCP
+        ┌────────────────┼────────────────┐
+        │                │                │
+       GKE           Cloud SQL           GCS
+        │
+        ▼
+   Kubernetes
+        │
+    Deployment
+        │
+    ReplicaSet
+        │
+       Pods
+        │
+     Service
+        │
+     Ingress
+        │
+ Load Balancer
+        │
+     Internet
+</code></pre>
+<h2>CI/CD PR vs Merge</h2>
+<pre><code class="language-plaintext">Developer pushes branch
+        │
+        ▼
+PR opened / updated
+        │
+        ├── lint / formatting
+        ├── type checking
+        ├── unit tests
+        ├── targeted integration tests
+        ├── security/static analysis
+        └── small/fast AI eval suite
+        │
+        ▼
+   Required checks pass
+        │
+        ▼
+    Merge candidate
+        │
+        ├── optional heavier pre-merge validation
+        │
+        ▼
+      MERGE
+        │
+        ▼
+       main
+        │
+        ├── full integration suite
+        ├── larger AI/RAG eval suite
+        ├── E2E tests
+        └── build production artifact
+        │
+        ▼
+    staging / canary
+        │
+        ├── smoke tests
+        ├── production-like E2E
+        └── additional evals
+        │
+        ▼
+     production
+</code></pre>
+<h2>AI-Native Software Development</h2>
+<pre><code class="language-plaintext">Developer
+                        │
+              ┌─────────▼─────────┐
+              │ Coding Agent      │
+              │ Claude/Codex/etc. │
+              └─────────┬─────────┘
+                        │
+       ┌────────────────┼─────────────────┐
+       ▼                ▼                 ▼
+ Repository Context    Tools          Guardrails
+ AGENTS.md             MCP            Permissions
+ Architecture docs     GitHub         Sandboxing
+ Conventions           CI             Secret controls
+ Skills                Datadog        Branch policies
+ Examples              Internal APIs
+       │                │                 │
+       └────────────────┼─────────────────┘
+                        ▼
+                Validation Layer
+          lint / types / tests / evals
+                        │
+                        ▼
+                     PR
+                        │
+                 CI + Review
+                        │
+                        ▼
+                  Deployment
+</code></pre>
+<h2>Agent Guardrails</h2>
+<p>Capability Levels</p>
+<pre><code class="language-plaintext">Level 0   Read/search repository
+
+Level 1   Modify code locally
+          ↓
+Level 2   Run tests / lint / builds
+          ↓
+Level 3   Open PR
+          ↓
+Level 4   Respond to CI/review feedback
+          ↓
+Level 5   Merge low-risk changes
+          ↓
+Level 6   Deploy non-production
+          ↓
+Level 7   Production actions
+</code></pre>
+<h2>Kubernetes</h2>
+<h3>Deployment / ReplicaSet / Pod</h3>
+<h4>Pod</h4>
+<p>Pod - Smallest deployable unit in Kubernetes. A Pod contains one or more containers that run together and share networking and storage.</p>
+<pre><code class="language-plaintext">Pod
+├── Application container
+└── Sidecar container (optional)
+</code></pre>
+<p>Containers inside a Pod share:<br />
+- IP address / network namespace<br />
+- localhost<br />
+- mounted volumes<br />
+- lifecycle</p>
+<h4>ReplicaSet</h4>
+<p>ReplicaSet - A kubernetes controller that ensures a specified number of identical Pod replicaes are running.</p>
+<p>ReplicaSets provide replication and self-healing.</p>
+<h4>Deployment</h4>
+<p>Deployment - A higher-level Kubernetes controller that manages ReplicaSets and provides declarative application deployment and rollout behavior.</p>
+<pre><code class="language-plaintext">spec:
+  replicas: 3
+</code></pre>
+<p>Deployments also support:<br />
+- rolling updates<br />
+- rollbacks<br />
+- scaling<br />
+- rollout history<br />
+- declarative application versions</p>
+<pre><code class="language-plaintext">Deployment = release management
+ReplicaSet = replica management
+Pod        = running workload
+</code></pre>
+<h3>Service / Ingress</h3>
+<h4>Service</h4>
+<p>Service - provides a stable network endpoint for accessing a group of Pods</p>
+<pre><code class="language-plaintext">Client
+   ↓
+Service
+   ↓
+┌─────┬─────┬─────┐
+Pod   Pod   Pod
+</code></pre>
+<p>The Service discovers Pods using labels/selectors.</p>
+<p>Common types:</p>
+<p>ClusterIP - internal cluster access.<br />
+NodePort - exposes a port on each Kubernetes node.<br />
+LoadBalancer - asks the cloud provider to provision an external load balancer.</p>
+<h4>Ingress</h4>
+<p>Ingress - Defines HTTP/HTTPS routing from outside the cluster to Services inside the cluster.</p>
+<pre><code class="language-plaintext">Internet
+   ↓
+Load Balancer / Ingress Controller
+   ↓
+Ingress rules
+   │
+   ├── /api → API Service
+   │             ↓
+   │           Pods
+   │
+   └── /web → Web Service
+                 ↓
+               Pods
+
+
+Ingress → routes HTTP traffic to Services
+Service → routes traffic to Pods
+</code></pre>
+<p>Ingress commonly handles:<br />
+- hostname routing<br />
+- path routing<br />
+- TLS termination<br />
+- external HTTP/HTTPS traffic</p>
+<h3>Requests vs Limits</h3>
+<h4>Request</h4>
+<p>Request - The amount of CPU/memory Kubernetes uses when deciding where a Pod can be scheduled.</p>
+<pre><code class="language-yaml">resources:
+  requests:
+    cpu: &quot;500m&quot;
+    memory: &quot;512Mi&quot;
+</code></pre>
+<p>Schedule me onto a node that can accomodate this workload.</p>
+<h4>Limit</h4>
+<p>Limit - The maximum resource usage Kubernetes allows for a container.</p>
+<pre><code class="language-yaml">limits:
+  cpu: &quot;1&quot;
+  memory: &quot;1Gi&quot;
+</code></pre>
+<pre><code class="language-plaintext">If CPU exceeds the limit:
+CPU → throttled
+
+If memory exceeds its effective memory limit:
+Memory → container may be OOMKilled
+
+Requests → scheduling / guaranteed allocation assumptions
+Limits   → runtime resource ceiling
+</code></pre>
+<p>Poorly chosen values can cause underutilized nodes, throttling, OOMKIlls, or difficult scheduling.</p>
+<h3>Readiness vs Liveness vs Startup Probes</h3>
+<h4>Readiness Probe</h4>
+<p>Answers: Can this Pod receive traffic right now?</p>
+<p>If readiness fails:</p>
+<pre><code class="language-plaintext">Pod remains running
+      ↓
+removed from Service endpoints
+      ↓
+no new traffic
+</code></pre>
+<p>Example: The process is alive, but its dependencies haven't initialized.</p>
+<h4>Liveness Probe</h4>
+<p>Answers: Is this application still functioning, or should Kubernetes restart it?</p>
+<p>If it repeatedly fails:</p>
+<pre><code class="language-plaintext">liveness failure
+      ↓
+container restart
+</code></pre>
+<p>Usefull for situations like a process that is alive but deadlocked.<br />
+A dangerous liveness probe can create restart loops, so it should test something the applicaiton can reasonably recover from through restart.</p>
+<h4>Startup Probe</h4>
+<p>Answers: Has this application finished starting?<br />
+Useful for slow-starting applications.</p>
+<p>While the startup probe hasn't succeeded, Kubernetes doesn't use the normal liveness behavior to kill the application for simply taking too long to initialize.</p>
+<pre><code class="language-plaintext">Mental Model:
+
+Startup   → Have you started yet?
+Readiness → Should I send traffic to you?
+Liveness  → Should I restart you?
+</code></pre>
+<h3>ConfigMaps / Secrets</h3>
+<h4>ConfigMap</h4>
+<p>ConfigMap - Stores non-sensitive configuration.</p>
+<pre><code class="language-plaintext">LOG_LEVEL=INFO
+ENVIRONMENT=production
+FEATURE_X_ENABLED=true
+</code></pre>
+<h4>Secret</h4>
+<p>Stores sensitive configuration such as:</p>
+<pre><code class="language-plaintext">API keys
+passwords
+tokens
+certificates
+</code></pre>
+<p>Kubernetes Secrets are not magically secure merely because they're called Secrets. They require proper encryption-at-rest configuration, RBAC&lt; secret-access policies, rotation, etc.</p>
+<h3>HPA - Horizontal Pod Autoscaler</h3>
+<p>HPA - Automatically adjusts the number of Pod replicas based on observed metrics.</p>
+<pre><code class="language-plaintext">Traffic increases
+       ↓
+CPU = 85%
+       ↓
+HPA
+       ↓
+replicas: 3 → 8
+
+
+
+
+Deployment
+    ↑
+HPA modifies replica count
+    ↓
+ReplicaSet
+    ↓
+Pods
+</code></pre>
+<pre><code class="language-plaintext">HPA → more/fewer Pods
+VPA → more/fewer resources per Pod
+Cluster Autoscaler → more/fewer Nodes
+</code></pre>
+<p>Can Scale Using:<br />
+- CPU<br />
+- Memory<br />
+- Custom Metrics<br />
+- External Metrics</p>
+<h3>Rolling Deployments</h3>
+<p>Rolling Deployments - Gradually replace old Pods with new Pods instead of stopping everything simultaneously.</p>
+<pre><code class="language-plaintext">v1 v1 v1
+
+v2 v1 v1
+
+v2 v2 v1
+
+v2 v2 v2
+</code></pre>
+<p>This enables deployments with little or no downtime.</p>
+<h3>Jobs/CronJobs</h3>
+<h4>Job</h4>
+<p>Job - Runs work to completion rather than indefinitely.<br />
+ex)</p>
+<pre><code class="language-plaintext">database migration
+data processing
+one-time cleanup
+batch processing
+</code></pre>
+<p>A Deployment says: Keep this running.<br />
+A Job says: Make sure this task successfully finishes.</p>
+<h4>CronJob</h4>
+<p>CronJob - RUns Jobs on a schedule</p>
+<pre><code class="language-plaintext">CronJob
+   ↓ every night
+Job
+   ↓
+Pod
+
+nightly cleanup
+daily report
+scheduled synchronization
+periodic maintenance
+</code></pre>
+<h3>PDBs - PodDisruptionBudget</h3>
+<p>PodDisruptionBudget - Specifies how much voluntary disruption an application can tolerate.</p>
+<pre><code class="language-plaintext">Suppose you have:
+5 API Pods
+
+
+A PDB might require:
+minAvailable: 4
+</code></pre>
+<p>If Kubernetes maintenance attempts to evict several Pods simultaneously, the PDB helps prevent too many from becoming unavailable.</p>
+<p>DPBs primarily protect against voluntary disruptions, such as node drains. They don't magically prevent hardware failures or application crashes.</p>
+<h3>Namespaces</h3>
+<p>Namespaces - Logical partitions inside a Kubernetes cluster.</p>
+<pre><code class="language-plaintext">Cluster
+
+├── namespace: production
+│   ├── API
+│   └── workers
+│
+├── namespace: staging
+│
+└── namespace: monitoring
+</code></pre>
+<p>Namespaces help organize and scope:<br />
+- resources<br />
+- RBAC<br />
+- quotas<br />
+- policies<br />
+- service names</p>
+<h3>RBAC - Role-Based Access Control</h3>
+<p>Controls: Who can perform what action on which Kubernetes resources?</p>
+<pre><code class="language-plaintext">Role
+RoleBinding
+
+ClusterRole
+ClusterRoleBinding
+</code></pre>
+<p>Role - is namespace-scoped.<br />
+ClusterRole can describe cluster-wide permissions or reusable permissions.<br />
+The core principle is: Least privilege -- give huands and workloads only the permissions they actually need.</p>
+<p>This is especially important for coding/opertations agents.</p>
+<p>An incident agent might get:</p>
+<pre><code class="language-plaintext">✓ read logs
+✓ inspect Pods
+✓ inspect deployments
+
+✗ delete deployments
+✗ read unrelated secrets
+✗ modify RBAC
+</code></pre>
+<h3>node scheduling basics</h3>
+<p>Kubernetes needs to determeune: Which node should run this Pod?</p>
+<pre><code class="language-plaintext">Pod
+ ↓
+Scheduler
+ ↓
+┌────────┬────────┬────────┐
+Node A   Node B   Node C
+</code></pre>
+<p>The scheduler considers resource requests plus placement rules and constraints.</p>
+<p>nodeSelector =</p>
+<pre><code class="language-plaintext">Run this Pod only on nodes labeled:
+
+gpu=true
+</code></pre>
+<p>Nod Affinity - More expressive placement preferences/requirements. (Node in X availability zone)</p>
+<p>Pod Affinity - Place me near Pods matching Z. Useful when workloads benefit from locality.</p>
+<p>Pod anti-affinity - Avoid putting me near another instance of myself. <br />
+ex)</p>
+<pre><code class="language-plaintext">API Pod → Node A
+API Pod → Node B
+API Pod → Node C
+</code></pre>
+<p>rather than all replicas on Node A.</p>
+<p>Taints and Tolerations<br />
+Nodes can effectively say: Don't schedule normal workloads here. A Pod with appropriate toleration is allowed onto that node. Useful for dedicated nodes such as:</p>
+<pre><code class="language-plaintext">GPU nodes
+high-memory nodes
+specialized workloads
+</code></pre>
+<p>Topology spread constraints<br />
+Help distribute replicas across:</p>
+<pre><code class="language-plaintext">nodes
+availability zones
+other topology domains
+</code></pre>
+<h2>GCP</h2>
+<p>For GCP, I'd especially review </p>
+<h3>GKE - Google Kubernetes Engine</h3>
+<p>GKE - Google Cloud's managed Kubernetes service.</p>
+<p>Instead of building and operating the entire Kubernaetes control plane yourself:</p>
+<pre><code class="language-plaintext">GCP
+ ↓
+GKE
+ ↓
+Kubernetes Cluster
+ ↓
+Nodes
+ ↓
+Pods
+</code></pre>
+<p>Google manages much of the Kubernetes control-plane infrastructure.<br />
+GKE integrates with:<br />
+- IAM<br />
+- VPC networking<br />
+- CLoud Load Balancing<br />
+- Cloud Logging/Monitoring<br />
+- Artifact Registry<br />
+- Secret Manager</p>
+<pre><code class="language-plaintext">GitHub
+   ↓
+CI
+   ↓
+Artifact Registry
+   ↓
+GKE
+   ↓
+Deployment
+   ↓
+Pods
+</code></pre>
+<h3>IAM/service account</h3>
+<h4>IAM - Identity and Access Management</h4>
+<p>Who can do what to which GCP resource?</p>
+<pre><code class="language-plaintext">Principal
+   +
+Role
+   +
+Resource
+</code></pre>
+<p>Follow leat privilege principles.</p>
+<h4>Service Account</h4>
+<p>A machine/workload identity.</p>
+<h3>Cloud SQL</h3>
+<p>Managed relational databases. ~ RDS, supports engines including PostgreSQL, MySQL, SQL Server.</p>
+<p>Google manages much of the infrastructure around:<br />
+- backups<br />
+- replication<br />
+- patching<br />
+- availability<br />
+- storage<br />
+- failover options</p>
+<p>You still own things such as schema design, queries/indexes, connection ,management and application-level database behavior.</p>
+<h3>GCS - Google Cloud Storage</h3>
+<p>Object storage, analogous to AWS S3.<br />
+Stores objects such as:</p>
+<pre><code class="language-plaintext">documents
+PDFs
+images
+ML datasets
+backups
+logs
+artifacts
+
+Conceptually:
+
+Bucket
+├── papers/paper1.pdf
+├── papers/paper2.pdf
+└── datasets/eval.json
+</code></pre>
+<p>Source documents or generated artifects stored in GCS while metadata/indexing lives elsewhere.</p>
+<h3>Secrets Manager</h3>
+<p>Managed storage for secrets.</p>
+<pre><code class="language-plaintext">OpenAI API key
+database credentials
+third-party API tokens
+
+Instead of Git repo -&gt; .env -&gt; API_KEY
+
+Secret Manager
+      ↓
+IAM-controlled access
+      ↓
+Workload
+</code></pre>
+<h3>Artifact Registry</h3>
+<pre><code class="language-plaintext">Developer
+    ↓
+GitHub
+    ↓
+CI
+    ↓
+docker build
+    ↓
+Artifact Registry
+    ↓
+GKE pulls image
+    ↓
+Pod
+</code></pre>
+<h3>GCP Load balancing/Networking</h3>
+<pre><code class="language-plaintext">Internet
+   ↓
+Cloud Load Balancer
+   ↓
+GKE Ingress / Gateway
+   ↓
+Service
+   ↓
+Pods
+</code></pre>
+<p>VPC - Private network boundary for cloud resources.<br />
+Subnets - IP ranges inside a VPC.<br />
+Firewall Rule - COtnrol allowed network traffic.<br />
+Load Balanccer - Distributes incoming traffic across healthy backends.<br />
+Private IPs - Allow internal services to communicate without exposing resources publicly.</p>
+<pre><code class="language-plaintext">Internet
+   ↓
+HTTPS Load Balancer
+   ↓
+GKE
+   ↓
+API Pods
+   ↓
+Private network
+   ↓
+Cloud SQL
+</code></pre>
+<h3>GCP basic logging/monitoring architecture</h3>
+<pre><code class="language-plaintext">Applications
+GKE
+Cloud SQL
+Infrastructure
+      │
+      ▼
+Cloud Logging
+      │
+      ├── logs
+      │
+      ▼
+Cloud Monitoring
+      │
+      ├── metrics
+      ├── dashboards
+      └── alerts
+</code></pre>
+<h2>Terraform</h2>
+<h3>module boundaries</h3>
+<p>A Terraform module is a reusable collection of infrastructure definitions. ~ Pulumi component</p>
+<pre><code class="language-plaintext">terraform/
+
+modules/
+├── network/
+├── gke/
+├── cloudsql/
+└── monitoring/
+
+environments/
+├── dev/
+├── staging/
+└── prod/
+</code></pre>
+<p>Goal:</p>
+<pre><code class="language-plaintext">Reusable
++
+understandable
++
+loosely coupled
+</code></pre>
+<h3>Remote State</h3>
+<p>Terraform needs to remember what infrastructure it manages.</p>
+<p>That information lives in: terraform.tfstate</p>
+<p>Remote stat eprovides a shared authoritative state representation and supports safer team workflows.</p>
+<h3>State Locking</h3>
+<p>Problem:</p>
+<pre><code class="language-plaintext">Engineer A → terraform apply
+                    +
+Engineer B → terraform apply
+</code></pre>
+<p>Simultaneous changes could corrupt or conflict with infrastructure state. State locking conceptually provides:</p>
+<pre><code class="language-plaintext">Apply A
+ ↓
+LOCK
+ ↓
+change infrastructure
+ ↓
+update state
+ ↓
+UNLOCK
+</code></pre>
+<p>Then another operation can proceed. Locking behavior depends on the Terraform version/backend and configuration, don't assume every remote-state backend automatically provides identical locking semantics.</p>
+<h3>Plan/Apply Separation</h3>
+<p>Terraform has two major phases.</p>
+<p><strong>Plan</strong></p>
+<pre><code class="language-plaintext">terraform plan
+
+Answers: What would Terraform change?
+
+Example:
+
++ create GKE node pool
+~ modify load balancer
+- destroy old resource
+</code></pre>
+<p><strong>Apply</strong></p>
+<pre><code class="language-plaintext">terraform apply
+
+Actually performs those changes
+
+Pull Request
+    ↓
+terraform plan
+    ↓
+PR displays proposed changes
+    ↓
+Review
+    ↓
+Merge
+    ↓
+approved CI/CD
+    ↓
+terraform apply
+</code></pre>
+<p>This is significantly safer than engineers routinely running production applies from laptops.</p>
+<h3>Environment Isolation</h3>
+<p>Isolation of dev/staging/prod</p>
+<p>To avoid sharing dangerous infrastructure state or permissions. You want isolation through some combination of:</p>
+<pre><code class="language-plaintext">different state
+different projects/accounts
+different IAM
+different variables/configuration
+
+dev state  → dev infrastructure
+
+prod state → prod infrastructure
+</code></pre>
+<h3>CI-Driven Applies</h3>
+<p>Rather than:</p>
+<pre><code class="language-plaintext">Developer laptop
+      ↓
+terraform apply prod
+</code></pre>
+<p>prefer:</p>
+<pre><code class="language-plaintext">GitHub PR
+   ↓
+Terraform Plan
+   ↓
+Review
+   ↓
+Merge
+   ↓
+CI identity
+   ↓
+Terraform Apply
+</code></pre>
+<p>Benefits:<br />
+- audit trail<br />
+- consistent Terraform version<br />
+- controlled credentials<br />
+- reproducibility<br />
+- policy enforcement<br />
+- review</p>
+<pre><code class="language-plaintext">Agent
+ ↓
+Terraform modification
+ ↓
+fmt
+ ↓
+validate
+ ↓
+plan
+ ↓
+PR
+ ↓
+Human/Policy Review
+ ↓
+CI Apply
+</code></pre>
+<h3>Terraform IAM</h3>
+<p>Terraform itself needs permissions to manage infrastructure.</p>
+<pre><code class="language-plaintext">Terraform CI Service Account
+
+✓ manage GKE
+✓ manage load balancers
+✓ manage specific networking resources
+
+✗ billing admin
+✗ organization admin
+</code></pre>
+<h3>Terraform Secret Management</h3>
+<p>Approaches:</p>
+<pre><code class="language-plaintext">Secret Manager
+CI secret store
+Workload Identity
+short-lived credentials
+</code></pre>
+<p>Secrets can end up in Terraform state. Therefore protecting state is extremely improtant even if the original secret wsn't commited to GIt. </p>
+<h3>Drift Detection</h3>
+<p>Drift occurs whena ctual ifnrastructure differs from Terraform's expected state/configuration</p>
+<pre><code class="language-plaintext">Desired Infrastructure
+        ≠
+Actual Infrastructure
+</code></pre>
+<p>Infrastructure changes should normally flow through IaC rather than manual console modifications.</p>
+<h3>Version Pinning</h3>
+<p>Infrastructure behavior shouldn't unexpectedly change because a provider or mudle updated. <br />
+Instead of implicyly taking arbitrary fututre version, constrain versions deliberately.<br />
+For example:</p>
+<pre><code class="language-hcl">terraform {
+  required_version = &quot;~&gt; 1.x&quot;
+
+  required_providers {
+    google = {
+      source  = &quot;hashicorp/google&quot;
+      version = &quot;~&gt; 7.0&quot;
+    }
+  }
+}
+</code></pre>
+<p>Also pi or deliberately manage versions for:</p>
+<pre><code class="language-plaintext">Terraform
+providers
+modules
+CI actions/tools
+</code></pre>
+<h3>Terraform Reviewability.</h3>
+<p>Infrastructure code should be understandable during PR review.<br />
+A reviewer should be able to determine:</p>
+<pre><code class="language-plaintext">What changed?
+
+Why?
+
+What resources are affected?
+
+Is anything being destroyed?
+
+What's the blast radius?
+</code></pre>
+<p>That's why the Terraform plan is so useful:</p>
+<pre><code class="language-plaintext">Code Diff
+   +
+Terraform Plan
+   ↓
+Infrastructure Review
+</code></pre>
+<p>A production change like:</p>
+<pre><code class="language-plaintext">Plan:
+
++ 1 create
+~ 2 update
+- 14 destroy    &lt;==== this should immediately draw attention
+</code></pre>
+<hr />
+<p><em>Still chewing on:</em> As I continue to explore these tools and practices, I find myself thinking about the balance between flexibility and security. How can we ensure that our infrastructure is both adaptable and resilient, while maintaining tight controls over who has access to what? These questions remain central as I dig into more of Greg's notes.</p>
+                        </div>
+                    </article>
+
+                    <aside class="blog-sidebar">
+                        <div class="sidebar-widget">
+                            <h3 class="sidebar-title">All Posts</h3>
+                            <ul class="sidebar-post-list" id="sidebar-post-list">
+                                <!-- Links injected by JS -->
+                            </ul>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Greg Wegman. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="posts.js"></script>
+    <script>
+        const currentSlug = 'exploring-gcp-kubernetes-infrastructure';
+        const sidebarList = document.getElementById('sidebar-post-list');
+
+        BLOG_POSTS.forEach(post => {
+            const li = document.createElement('li');
+            const isCurrent = post.slug === currentSlug;
+            li.innerHTML = `<a href="${post.slug}.html" class="sidebar-post-link${isCurrent ? ' sidebar-post-active' : ''}">${post.title}</a>`;
+            sidebarList.appendChild(li);
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script>
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    </script>
+</body>
+</html>
