@@ -1,6 +1,13 @@
 // Blog post manifest — add an entry here whenever a new post is added to blog/
 const BLOG_POSTS = [
     {
+        title: "Exploring GCP & Kubernetes Infrastructure",
+        slug: "exploring-gcp-kubernetes-infrastructure",
+        date: "2026-10-14",
+        tags: ["GCP", "Kubernetes", "CI/CD", "Terraform"],
+        description: "Today's notes dive into Google Cloud Platform services, Kubernetes orchestration, and CI/CD practices, all with a focus on security and automation."
+    },
+    {
         title: "Exploring Data Structures and Algorithms",
         slug: "exploring-data-structures-and-algorithms",
         date: "2026-10-14",
